@@ -1,0 +1,61 @@
+不使用域名
+```
+server {
+    listen      80;
+    server_name localhost;
+    charset utf-8;
+    root /data;
+    location / {
+        autoindex on;
+        autoindex_exact_size on;
+        autoindex_localtime on;
+    }
+}
+``` 
+使用域名
+```
+server {
+    listen      80;
+    server_name file.sjhz.tk;
+    charset utf-8;
+    root /data;
+    location / {
+        autoindex on;
+        autoindex_exact_size on;
+        autoindex_localtime on;
+    }
+}
+```
+
+使用certbot生成ssl证书之后
+```
+server {
+    server_name file.sjhz.tk;
+    charset utf-8;
+    root /data;
+    location / {
+        autoindex on;
+        autoindex_exact_size on;
+        autoindex_localtime on;
+    }
+
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/file.sjhz.tk/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/file.sjhz.tk/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+
+}
+server {
+    if ($host = file.sjhz.tk) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+
+    listen      80;
+    server_name file.sjhz.tk;
+    return 404; # managed by Certbot
+
+
+}
+```
