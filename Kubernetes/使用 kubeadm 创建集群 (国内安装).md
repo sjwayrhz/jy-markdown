@@ -56,7 +56,10 @@ Set SELinux in permissive mode (effectively disabling it)
 ```
 Install kubelet kubeadm kubectl
 ```bash
+latest
 ~]# sudo yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes
+指定版本
+~]# sudo yum install -y kubeadm-1.21.2 kubectl-1.21.2 kubelet-1.21.2 --disableexcludes=kubernetes
 ~]# sudo systemctl enable --now kubelet
 ```
 
