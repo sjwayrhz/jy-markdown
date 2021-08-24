@@ -39,10 +39,19 @@ DNS2=8.8.8.8
 ~]# bash
 ```
 
+### 换源
+
+```bash
+~]# sed -e 's|^mirrorlist=|#mirrorlist=|g' \
+    -e 's|^#baseurl=http://dl.rockylinux.org/$contentdir|baseurl=https://mirrors.sjtug.sjtu.edu.cn/rocky|g' \
+    -i.bak \
+    /etc/yum.repos.d/Rocky-*.repo
+```
+
 ### 安装基础组件
 
 ```bash
-~]# dnf install vim net-tools wget -y
+~]# dnf install vim net-tools wget telnet epel-release -y
 ```
 
 ### 关闭selinux
@@ -66,34 +75,6 @@ DNS2=8.8.8.8
 ```
 
 
-
-### 修改dnf源
-
-进入dnf源目录
-
-```bash
-~]# cd /etc/yum.repos.d
-```
-
-将dnf源里的centos地址换成阿里云
-
-```bash
-yum.repos.d]# sed -i 's/http:\/\/mirror.centos.org/https:\/\/mirrors.aliyun.com/g' *
-```
-
-修改配置文件，不使用镜像列表，而是固定使用阿里云
-
-```bash
-yum.repos.d]# sed -i 's/mirrorlist=/#mirrorlist=/g' *
-
-yum.repos.d]# sed -i 's/# baseurl=/baseurl=/g' *
-```
-
-查看结果
-
-```bash
-~]# dnf repolist
-```
 
 ### 提升ssh访问速度
 
