@@ -256,6 +256,7 @@ kubeadm join 10.86.48.227:6443 --token 8rku3h.mxyph2vxb0lvjqn0 \
 ### Installing a Pod network add-on
 
 如果安装calico网络
+release will be found on this site . `https://docs.projectcalico.org/releases`
 
 ```bash
 ~]# kubectl apply -f https://docs.projectcalico.org/v3.19/manifests/calico.yaml
