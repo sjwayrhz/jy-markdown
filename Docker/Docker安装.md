@@ -40,7 +40,7 @@ Docker version 18.09.4, build d14af54266
 
 ```
 ~]# mkdir -p /etc/docker
-tee /etc/docker/daemon.json <<-'EOF'
+~]# tee /etc/docker/daemon.json <<-'EOF'
 {
   "registry-mirrors": ["http://hub-mirror.c.163.com"],
   "graph": "/opt/docker",

@@ -112,6 +112,13 @@ To see the stack trace of this error execute with --v=5 or higher
 ~]# docker tag 296 registry.aliyuncs.com/google_containers/coredns:v1.8.0
 ```
 
+或者pull自己的taoistmonk中images收集的coredns
+
+```bash
+~]# docker pull registry.cn-shanghai.aliyuncs.com/taoistmonk/images:coredns-v1.8.4 
+~]# docker tag 8d1 registry.aliyuncs.com/google_containers/coredns:v1.8.4
+```
+
 接下来继续执行kubeadm命令即可
 
 如果失败可以回退
@@ -120,7 +127,92 @@ To see the stack trace of this error execute with --v=5 or higher
 kubeadm reset
 ```
 
+## kubeadm安装k8s_1.22.1失败解决方法
 
+首先根据之前的经验，安装方法为
+
+```
+kubeadm init \
+  --apiserver-advertise-address=192.168.177.20 \
+  --image-repository registry.aliyuncs.com/google_containers \
+  --kubernetes-version v1.22.1 \
+  --service-cidr=10.8.0.0/16 \
+  --pod-network-cidr=10.2.0.0/16
+```
+
+但是出现如下的错误
+
+```
+[wait-control-plane] Waiting for the kubelet to boot up the control plane as static Pods from directory "/etc/kubernetes/manifests". This can take up to 4m0s
+[kubelet-check] Initial timeout of 40s passed.
+
+        Unfortunately, an error has occurred:
+                timed out waiting for the condition
+
+        This error is likely caused by:
+                - The kubelet is not running
+                - The kubelet is unhealthy due to a misconfiguration of the node in some way (required cgroups disabled)
+
+        If you are on a systemd-powered system, you can try to troubleshoot the error with the following commands:
+                - 'systemctl status kubelet'
+                - 'journalctl -xeu kubelet'
+
+        Additionally, a control plane component may have crashed or exited when started by the container runtime.
+        To troubleshoot, list all containers using your preferred container runtimes CLI.
+
+        Here is one example how you may list all Kubernetes containers running in docker:
+                - 'docker ps -a | grep kube | grep -v pause'
+                Once you have found the failing container, you can inspect its logs with:
+                - 'docker logs CONTAINERID'
+
+error execution phase wait-control-plane: couldn't initialize a Kubernetes cluster
+To see the stack trace of this error execute with --v=5 or higher
+```
+
+于是，希望不通过阿里云的镜像安装，而是通过将阿里云的镜像转为官方镜像，官方需要的镜像为：
+
+```bash
+~]# kubeadm config images list
+k8s.gcr.io/kube-apiserver:v1.22.1
+k8s.gcr.io/kube-controller-manager:v1.22.1
+k8s.gcr.io/kube-scheduler:v1.22.1
+k8s.gcr.io/kube-proxy:v1.22.1
+k8s.gcr.io/pause:3.5
+k8s.gcr.io/etcd:3.5.0-0
+k8s.gcr.io/coredns/coredns:v1.8.4
+```
+
+根据阿里云仓库下载的镜像为：
+
+```bash
+~]# docker images
+REPOSITORY                                                        TAG       IMAGE ID       CREATED        SIZE
+registry.aliyuncs.com/google_containers/kube-apiserver            v1.22.1   f30469a2491a   4 days ago     128MB
+registry.aliyuncs.com/google_containers/kube-controller-manager   v1.22.1   6e002eb89a88   4 days ago     122MB
+registry.aliyuncs.com/google_containers/kube-scheduler            v1.22.1   aca5ededae9c   4 days ago     52.7MB
+registry.aliyuncs.com/google_containers/kube-proxy                v1.22.1   36c4ebbc9d97   4 days ago     104MB
+registry.aliyuncs.com/google_containers/etcd                      3.5.0-0   004811815584   2 months ago   295MB
+registry.aliyuncs.com/google_containers/coredns                   v1.8.4    8d147537fb7d   2 months ago   47.6MB
+registry.aliyuncs.com/google_containers/pause                     3.5       ed210e3e4a5b   5 months ago   683kB
+```
+
+修改的命令为
+
+```
+docker tag f30 k8s.gcr.io/kube-apiserver:v1.22.1
+docker tag 6e0 k8s.gcr.io/kube-controller-manager:v1.22.1
+docker tag aca k8s.gcr.io/kube-scheduler:v1.22.1
+docker tag 36c k8s.gcr.io/kube-proxy:v1.22.1
+docker tag 004 k8s.gcr.io/etcd:3.5.0-0
+docker tag 8d1 k8s.gcr.io/coredns/coredns:v1.8.4
+docker tag ed2 k8s.gcr.io/pause:3.5
+```
+
+修改之后，安装k8s的命令为
+
+```bash
+~]# kubeadm init --kubernetes-version=v1.22.1 --pod-network-cidr=10.8.0.0/16 --service-cidr=10.2.0.0/16
+```
 
 ### Creating a single control-plane cluster with kubeadm
 
