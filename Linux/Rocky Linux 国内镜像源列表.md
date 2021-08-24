@@ -2,7 +2,7 @@
 
 上海交通大学示例：
 
-```
+```bash
 sed -e 's|^mirrorlist=|#mirrorlist=|g' \
     -e 's|^#baseurl=http://dl.rockylinux.org/$contentdir|baseurl=https://mirrors.sjtug.sjtu.edu.cn/rocky|g' \
     -i.bak \
@@ -22,4 +22,12 @@ CN 开头的站点
 | CN      | SDU-Mirrors                         | mirrors.sdu.edu.cn        | Rocky Linux: https                  | 1000      | No        |
 | CN      | SJTUG                               | mirrors.sjtug.sjtu.edu.cn | Rocky Linux: https \| rsync         | 1000      | No        |
 | CN      | SKYSHE                              | mirrors.skyshe.cn         | Rocky Linux: https \| http          | 1000      | Yes       |
+
+Almalinux
+
+```bash
+sed -e 's|^baseurl=https://repo.almalinux.org|baseurl=https://mirrors.sjtug.sjtu.edu.cn|g' \
+    -i.bak \
+    /etc/yum.repos.d/almalinux*.repo
+```
 
