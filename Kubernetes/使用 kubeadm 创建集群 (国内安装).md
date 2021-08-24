@@ -72,6 +72,12 @@ latest
 10.230.8.60 k8s-master
 ```
 
+注意：必须确认kubelet处于启动状态，否则执行kubeadm init会出错。
+
+```bash
+~]# sudo systemctl status kubelet
+```
+
 如果不需要自己搬运，可以尝试使用如下参数
 
 ```bash
