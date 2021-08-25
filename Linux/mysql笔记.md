@@ -1,7 +1,7 @@
 mysql  使root可以远程登录
 
 ```mysql
- mysql> GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY 'root' WITH GRANT OPTION;
+ mysql> GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY '123456' WITH GRANT OPTION;
  mysql> FLUSH PRIVILEGES;
 ```
 
