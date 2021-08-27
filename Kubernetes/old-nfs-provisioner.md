@@ -108,7 +108,7 @@ Export list for 10.230.7.21:
 ~]# mkdir /data
 ~]# yum install -y showmount
 ~]# vi /etc/fstab
-10.230.7.21:/data        /data                    nfs     defaults              0 0
+10.230.7.21:/data /data nfs defaults 0 0
 
 ~]# reboot
 ```
