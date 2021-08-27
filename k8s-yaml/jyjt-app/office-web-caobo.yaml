@@ -1,0 +1,61 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: caobo-web-config-prod
+data:
+  web-env: caobo
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: caobo-web
+  labels:
+    app: caobo-web
+spec:
+  selector:
+    matchLabels:
+      app: caobo-web
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: caobo-web
+    spec:
+      containers:
+        - name: caobo-web
+          image: 'registry.cn-shanghai.aliyuncs.com/jyjt/caobo-web:202108252059'
+          imagePullPolicy: IfNotPresent
+          args: ["--spring.profiles.active=$(web-env-key)"]
+          ports:
+          - containerPort: 8080 
+          env:
+          - name: web-env-key
+            valueFrom:
+              configMapKeyRef:
+                name: caobo-web-config-prod
+                key: web-env 
+          resources:
+            limits:
+              cpu: "800m"
+              memory: "2Gi"
+            requests:
+              cpu: "500m"
+              memory: "1Gi" 
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: caobo-web-service
+  labels:
+    name: caobo-web-service
+spec:
+  type: NodePort
+  ports:
+  - name: caobo-web
+    port: 8080
+    targetPort: 8080
+    nodePort: 30085
+  selector:
+    app: caobo-web

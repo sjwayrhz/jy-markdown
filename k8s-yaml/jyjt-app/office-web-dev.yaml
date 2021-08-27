@@ -1,0 +1,61 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dev-web-config
+data:
+  web-env: dev
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dev-web
+  labels:
+    app: dev-web
+spec:
+  selector:
+    matchLabels:
+      app: dev-web
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: dev-web
+    spec:
+      containers:
+        - name: dev-web
+          image: 'registry.cn-shanghai.aliyuncs.com/jyjt/caobo-web:202108252059'
+          imagePullPolicy: IfNotPresent
+          args: ["--spring.profiles.active=$(web-env-key)"]
+          ports:
+          - containerPort: 8080 
+          env:
+          - name: web-env-key
+            valueFrom:
+              configMapKeyRef:
+                name: dev-web-config
+                key: web-env 
+          resources:
+            limits:
+              cpu: "800m"
+              memory: "2Gi"
+            requests:
+              cpu: "500m"
+              memory: "1Gi" 
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dev-web-service
+  labels:
+    name: dev-web-service
+spec:
+  type: NodePort
+  ports:
+  - name: dev-web
+    port: 8080
+    targetPort: 8080
+    nodePort: 30084
+  selector:
+    app: dev-web

@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: nginx-ingress
+  namespace: junyao
+spec:
+  rules:
+  - host: test-v1.com
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: service-v1
+          servicePort: 8081
+  - host: test-v2.com
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: service-v2
+          servicePort: 8081
