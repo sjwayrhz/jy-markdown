@@ -45,6 +45,7 @@ spec:
   serviceMonitorNamespaceSelector: {}
   serviceMonitorSelector: {}
   version: 2.29.1
+  # fixed
   storage:
     volumeClaimTemplate:
       spec:
@@ -52,4 +53,4 @@ spec:
         resources:
           requests:
             storage: 40Gi
-
+  # fixed
