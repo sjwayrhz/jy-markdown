@@ -1,0 +1,51 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jyjt-web
+  namespace: app-dev
+  labels:
+    app: jyjt-web
+spec:
+  selector:
+    matchLabels:
+      app: jyjt-web
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: jyjt-web
+    spec:
+      containers:
+        - name: jyjt-web
+          image: 'registry.cn-shanghai.aliyuncs.com/jyjt/sit-web:202107211802.16'
+          ports:
+            - name: web
+              containerPort: 8080
+              protocol: TCP   
+          resources:
+            limits:
+              cpu: "500m"
+              memory: "1Gi"
+            requests:
+              cpu: "500m"
+              memory: "512Mi" 
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: jyjt-web-service
+  namespace: app-dev
+  labels:
+    name: jyjt-web-service
+spec:
+  type: NodePort
+  ports:
+  - name: jyjt-web
+    port: 8080
+    targetPort: 8080
+    nodePort: 30082
+  selector:
+    app: jyjt-web

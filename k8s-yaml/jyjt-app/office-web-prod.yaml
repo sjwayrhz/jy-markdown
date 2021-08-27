@@ -1,0 +1,61 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prod-web-config-prod
+data:
+  web-env: prod
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prod-web
+  labels:
+    app: prod-web
+spec:
+  selector:
+    matchLabels:
+      app: prod-web
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: prod-web
+    spec:
+      containers:
+        - name: prod-web
+          image: 'registry.cn-shanghai.aliyuncs.com/jyjt/caobo-web:202108252059'
+          imagePullPolicy: IfNotPresent
+          args: ["--spring.profiles.active=$(web-env-key)"]
+          ports:
+          - containerPort: 8080 
+          env:
+          - name: web-env-key
+            valueFrom:
+              configMapKeyRef:
+                name: prod-web-config-prod
+                key: web-env 
+          resources:
+            limits:
+              cpu: "800m"
+              memory: "2Gi"
+            requests:
+              cpu: "500m"
+              memory: "1Gi" 
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: prod-web-service
+  labels:
+    name: prod-web-service
+spec:
+  type: NodePort
+  ports:
+  - name: prod-web
+    port: 8080
+    targetPort: 8080
+    nodePort: 30083
+  selector:
+    app: prod-web

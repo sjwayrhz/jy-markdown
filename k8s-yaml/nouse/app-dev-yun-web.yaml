@@ -1,0 +1,51 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: yun-web
+  namespace: app-dev
+  labels:
+    app: yun-web
+spec:
+  selector:
+    matchLabels:
+      app: yun-web
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: yun-web
+    spec:
+      containers:
+        - name: yun-web
+          image: 'registry.cn-shanghai.aliyuncs.com/jyjt/develop-web:202108240832'
+          ports:
+            - name: web
+              containerPort: 8080
+              protocol: TCP   
+          resources:
+            limits:
+              cpu: "3000m"
+              memory: "8Gi"
+            requests:
+              cpu: "1500m"
+              memory: "4Gi" 
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: yun-web-service
+  namespace: app-dev
+  labels:
+    name: yun-web-service
+spec:
+  type: NodePort
+  ports:
+  - name: yun-web
+    port: 8080
+    targetPort: 8080
+    nodePort: 30084
+  selector:
+    app: yun-web
