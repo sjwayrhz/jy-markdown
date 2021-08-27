@@ -46,6 +46,7 @@ JENKINS_ARGS=""
 
 ```bash
 JENKINS_HOME="/var/lib/jenkins"		--> 	JENKINS_HOME="/opt/jenkins"
+JENKINS_USER="jenkins"			    -->  	JENKINS_USER="root"
 ```
 
 新建jenkins家目录
