@@ -28,7 +28,7 @@ spec:
       containers:
       - args:
         - --kubelet-service=kube-system/kubelet
-        - --prometheus-config-reloader=quay.io/prometheus-operator/prometheus-config-reloader:v0.50.0
+        - --prometheus-config-reloader=registry.cn-shanghai.aliyuncs.com/taoistmonk/images:prometheus-config-reloader-v0.50.0
         # fixed
         - storage.tsdb.retention.time=30d # set 30d for a month
         # fixed
