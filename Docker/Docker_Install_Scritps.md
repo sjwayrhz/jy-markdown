@@ -1,12 +1,12 @@
 可以通过github的链接脚本安装
-```
-wget -O- https://gitee.com/sjwayrhz/one_key_install/raw/master/install_docker.sh | sh
+```bash
+~]# wget -O- https://gitee.com/sjwayrhz/one_key_install/raw/master/install_docker.sh | sh
 ```
 
 
 一键安装脚本如下
 
-```
+```shell
 #!/bin/bash
 
 echo -e "\033[32m  指定安装的docker版本,例如"-20.10.6-3.el7",可在加入yum源后通过yum list docker-ce --showduplicates|sort -r查看 \033[0m"

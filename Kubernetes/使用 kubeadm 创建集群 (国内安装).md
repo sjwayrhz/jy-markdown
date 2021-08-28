@@ -26,9 +26,8 @@ EOF
 
 一般情况下，k8s采用docker的运行环境，可以通过daocloud急速安装docker环境哦，安装docker的方法如下：
 
-```
-~]# curl -sSL https://get.daocloud.io/docker | sh
-~]# systemctl enable --now docker 
+```bash
+~]#  wget -O- https://gitee.com/sjwayrhz/one_key_install/raw/master/install_docker.sh | sh
 ```
 
 ### Installing kubeadm, kubelet and kubectl
@@ -393,7 +392,106 @@ systemctl restart kubelet
 给node命名roles为worker
 
 ```
-kubectl label node k8s-node-01 node-role.kubernetes.io/worker=worker
+~]# kubectl label node k8s-node-01 node-role.kubernetes.io/worker=worker
+```
+
+### 添加master
+
+假设原先有k8s-master作为主节点，现在需要添加两个master分别为 k8s-master-left 和k8s-master-right
+
+在k8s-master的kubeadm-config中添加 `controlPlaneEndpoint: ${ip}:${port}`
+
+```
+controlPlaneEndpoint: 10.230.7.20:6443
+```
+
+具体操作如下：
+
+```yaml
+~]# kubectl edit -n kube-system cm kubeadm-config
+apiVersion: v1
+data:
+  ClusterConfiguration: |
+    apiServer:
+      extraArgs:
+        authorization-mode: Node,RBAC
+      timeoutForControlPlane: 4m0s
+    apiVersion: kubeadm.k8s.io/v1beta2
+    certificatesDir: /etc/kubernetes/pki
+    clusterName: kubernetes
+    controlPlaneEndpoint: 10.230.7.20:6443
+    controllerManager: {}
+    dns:
+      type: CoreDNS
+    etcd:
+      local:
+        dataDir: /var/lib/etcd
+    imageRepository: registry.aliyuncs.com/google_containers
+    kind: ClusterConfiguration
+    kubernetesVersion: v1.21.4
+    networking:
+      dnsDomain: cluster.local
+      podSubnet: 10.2.0.0/16
+      serviceSubnet: 10.8.0.0/16
+    scheduler: {}
+  ClusterStatus: |
+    apiEndpoints:
+      k8s-master:
+        advertiseAddress: 10.230.7.20
+        bindPort: 6443
+    apiVersion: kubeadm.k8s.io/v1beta2
+    kind: ClusterStatus
+kind: ConfigMap
+metadata:
+  creationTimestamp: "2021-08-24T23:24:35Z"
+  name: kubeadm-config
+  namespace: kube-system
+  resourceVersion: "207"
+  uid: 333d1199-2bad-4bef-bac1-80b512f6e1fc
+```
+
+登录k8s-master, 获得加入master的命令
+
+```bash
+~]# kubeadm token create --print-join-command
+kubeadm join 10.230.7.20:6443 --token jksr2p.33e1qdh1uca8rlag --discovery-token-ca-cert-hash sha256:ad7a32886d6f58339ebb7b5e3b4cc1c12bc6e319e2b2b10dcaec78b9bf27c10e 
+
+~]# kubeadm init phase upload-certs --upload-certs
+I0829 07:16:29.077778 1023310 version.go:254] remote version is much newer: v1.22.1; falling back to: stable-1.21
+[upload-certs] Storing the certificates in Secret "kubeadm-certs" in the "kube-system" Namespace
+[upload-certs] Using certificate key:
+54ab65724ca5fae6173a40d2d90df456f8356fd2da8c22252ac47933856bf2bb
+```
+
+如果是在国内网络，可能需要pull阿里云coredns镜像
+
+```bash
+~]# docker pull coredns/coredns:1.8.0
+~]# docker tag 296 registry.aliyuncs.com/google_containers/coredns:v1.8.0
+```
+
+于是，加入master到集群的命令为
+
+```bash
+~]# kubeadm join 10.230.7.20:6443 \
+--token nwl9bh.tueegchv2du3t3dv --discovery-token-ca-cert-hash sha256:ad7a32886d6f58339ebb7b5e3b4cc1c12bc6e319e2b2b10dcaec78b9bf27c10e \
+--control-plane --certificate-key 54ab65724ca5fae6173a40d2d90df456f8356fd2da8c22252ac47933856bf2bb
+```
+
+如果需要导入rancher，还需要做以下操作
+
+```bash
+~]# sed -i 's|- --port=0|#- --port=0|' /etc/kubernetes/manifests/kube-scheduler.yaml
+~]# sed -i 's|- --port=0|#- --port=0|' /etc/kubernetes/manifests/kube-controller-manager.yaml
+
+~]# systemctl restart kubelet
+```
+
+参考文档
+
+```
+https://www.reddit.com/r/kubernetes/comments/kwj1jx/adding_additional_master_nodes_to_an_existing/
+https://blog.csdn.net/u012586326/article/details/117742500
 ```
 
 ### 删除node
