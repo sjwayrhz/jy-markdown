@@ -58,7 +58,7 @@ Install kubelet kubeadm kubectl
 latest
 ~]# sudo yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes
 指定版本
-~]# sudo yum install -y kubeadm-1.21.2 kubectl-1.21.2 kubelet-1.21.2 --disableexcludes=kubernetes
+~]# sudo yum install -y kubeadm-1.21.4 kubectl-1.21.4 kubelet-1.21.4 --disableexcludes=kubernetes
 ~]# sudo systemctl enable --now kubelet
 ```
 
