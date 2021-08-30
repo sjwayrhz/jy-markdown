@@ -1,16 +1,16 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: caobo-web-config-prod
-  namespace: app-caobo
+  name: office-web-config-prod
+  namespace: app-office
 data:
-  web-env: caobo
+  web-env: office
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: caobo-web-pvc
-  namespace: app-caobo
+  name: office-web-pvc
+  namespace: app-office
 spec:
   storageClassName: demo-hwy
   accessModes:
@@ -22,24 +22,24 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: caobo-web
-  namespace: app-caobo
+  name: office-web
+  namespace: app-office
   labels:
-    app: caobo-web
+    app: office-web
 spec:
   selector:
     matchLabels:
-      app: caobo-web
+      app: office-web
   replicas: 1
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        app: caobo-web
+        app: office-web
     spec:
       containers:
-        - name: caobo-web
+        - name: office-web
           image: 'registry.cn-shanghai.aliyuncs.com/jyjt/caobo-web:202108261434'
           imagePullPolicy: IfNotPresent
           args: ["--spring.profiles.active=$(web-env-key)"]
@@ -49,7 +49,7 @@ spec:
           - name: web-env-key
             valueFrom:
               configMapKeyRef:
-                name: caobo-web-config-prod
+                name: office-web-config-prod
                 key: web-env 
           resources:
             limits:
@@ -64,21 +64,21 @@ spec:
       volumes:
         - name: nfs
           persistentVolumeClaim:
-            claimName: caobo-web-pvc
+            claimName: office-web-pvc
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: caobo-web-service
-  namespace: app-caobo
+  name: office-web-service
+  namespace: app-office
   labels:
-    name: caobo-web-service
+    name: office-web-service
 spec:
   type: NodePort
   ports:
-  - name: caobo-web
+  - name: office-web
     port: 8080
     targetPort: 8080
     nodePort: 30085
   selector:
-    app: caobo-web
+    app: office-web

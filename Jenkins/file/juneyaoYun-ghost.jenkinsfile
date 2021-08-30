@@ -1,0 +1,137 @@
+properties([
+    parameters([
+        [$class: 'ChoiceParameter',
+            choiceType: 'PT_SINGLE_SELECT',
+            description: 'Select the git Name from the Dropdown List',
+            filterLength: 1,
+            filterable: true,
+            name: 'branch',
+            script: [
+                $class: 'GroovyScript',
+                fallbackScript: [
+                    classpath: [],
+                    sandbox: false,
+                    script:
+                        'return[\'Could not get branch name\']'
+                ],
+                script: [
+                    classpath: [],
+                    sandbox: false,
+                    script:
+                        'return["develop","master"]'
+                ]
+            ]
+        ],
+        [$class: 'CascadeChoiceParameter',
+            choiceType: 'PT_SINGLE_SELECT',
+            description: 'Select the Project from the Dropdown List',
+            filterLength: 1,
+            filterable: true,
+            name: 'app',
+            referencedParameters: 'branch',
+            script: [
+                $class: 'GroovyScript',
+                fallbackScript: [
+                    classpath: [],
+                    sandbox: false,
+                    script:
+                        'return[\'Could not get app from branch Param\']'
+                ],
+                script: [
+                    classpath: [],
+                    sandbox: false,
+                    script:
+                        ''' if (branch.equals("develop")){
+                                return["api","web"]
+                            }
+                            else if (branch.equals("master")){
+                                return["api","web"]
+                            }
+                        '''
+                ]
+            ]
+        ],
+        string(name: 'show', defaultValue: 'best wishes', description: 'The sample string text')
+    ])
+])
+
+def createVersion() {    
+    return new Date().format('yyyyMMddHHmm')
+}   
+
+pipeline {
+    agent any
+
+    environment {
+        tag = createVersion()
+        repositry = "registry.cn-shanghai.aliyuncs.com/jyjt/${params.branch}-${params.app}"
+        codesrc = "/usr/local/src/juneyaoYun"
+    }
+
+    stages {
+        stage ('define tags') {
+            agent any
+            steps {
+                echo "${tag}"
+            }
+        }
+
+        stage ('git pull') {
+            steps {
+                sh """
+                    cd $codesrc
+                    pwd
+                    git reset --hard HEAD
+                    git checkout -B ${params.branch}
+                    git checkout -b ${tag}
+                    git branch -D ${params.branch}
+                    git checkout -b ${params.branch}
+                    git branch -D ${tag}
+                    git pull origin ${params.branch}
+                """
+            }
+        }
+
+        
+        stage('compile') {
+            steps {
+                sh """
+                    cd $codesrc
+                    /usr/local/apache-maven-3.8.1/bin/mvn clean install
+                """
+            }
+        }
+
+        stage ('copy jar files') {
+            steps {
+                sh """
+                    cp -fr $codesrc/juneyaoYun-${params.app}/target/juneyaoYun-${params.app}-0.0.1-SNAPSHOT.jar $codesrc/juneyaoYun-${params.app}/to-docker-${params.app}/
+                """
+            }
+        }
+
+        stage ('operation by docker') {
+            steps{
+                sh """
+                    cd $codesrc/juneyaoYun-${params.app}/to-docker-${params.app}
+                    docker build -t ${repositry}:${tag} .
+                    docker push ${repositry}:${tag}
+                    docker rmi -f ${repositry}:${tag}
+                """
+            }
+        }
+        stage ('kubernetes update apps') {
+            steps{
+                sh """
+                 if [ "${params.branch}" == "develop" ];then {
+                    ssh 192.168.177.45 "kubectl set image deployment/yun-${params.app} yun-${params.app}=${repositry}:${tag} -n app-dev"
+                    }
+                 elif [ "${params.branch}" == "master" ];then {
+                    ssh 192.168.177.45 "kubectl set image deployment/yun-${params.app} yun-${params.app}=${repositry}:${tag} -n app-prod"
+                    }
+                 fi
+                """
+            }
+        }
+    }
+}
