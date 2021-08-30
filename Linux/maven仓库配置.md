@@ -1,0 +1,30 @@
+settings.xml文件会在两个目录下存在：
+
+1、Maven安装目录（全局）：%MAVEN_HOME%\conf\settings.xml
+
+2、用户安装目录（用户）：${user.home}\.m2\settings.xml
+
+第一个是全局配置，第二个是用户配置。当两者都存在，它们的内容将被合并，特定于用户的settings.xml文件占主导地位。
+
+如果从头开始创建用户特定的配置，可以将全局的settings.xml复制到${user.home}\.m2目录下。
+
+我的Maven安装目录：（%MAVEN_HOME%）/usr/local/apache-maven-3.8.1/
+
+我的用户安装目录：（${user.home}）/root/m.2/
+
+
+阿里maven镜像配置
+
+setting.xml截取
+
+```
+  </mirrors>
+    <mirror>
+      <id>alimaven</id>
+      <name>aliyun maven</name>
+      <url>http://maven.aliyun.com/nexus/content/groups/public/</url>
+      <mirrorOf>central</mirrorOf>
+    </mirror>
+  </mirrors>
+```
+
