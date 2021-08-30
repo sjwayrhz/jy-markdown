@@ -124,10 +124,10 @@ pipeline {
             steps{
                 sh """
                  if [ "${params.branch}" == "develop" ];then {
-                    ssh 192.168.177.45 "kubectl set image deployment/yun-${params.app} yun-${params.app}=${repositry}:${tag} -n app-dev"
+                    ssh 192.168.177.45 "kubectl set image deployment/dev-${params.app} dev-${params.app}=${repositry}:${tag} -n app-dev"
                     }
                  elif [ "${params.branch}" == "master" ];then {
-                    ssh 192.168.177.45 "kubectl set image deployment/yun-${params.app} yun-${params.app}=${repositry}:${tag} -n app-prod"
+                    ssh 192.168.177.45 "kubectl set image deployment/prod-${params.app} prod-${params.app}=${repositry}:${tag} -n app-prod"
                     }
                  fi
                 """
