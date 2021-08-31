@@ -8,8 +8,8 @@ spec:
   accessModes:
     - ReadWriteMany
   nfs:
-    server: 10.230.7.17
-    path: /data/redis/cluster0
+    server: 192.168.177.33
+    path: /data/redis-cluster/cluster0
 
 ---
 apiVersion: v1
@@ -22,8 +22,8 @@ spec:
   accessModes:
     - ReadWriteMany
   nfs:
-    server: 10.230.7.17
-    path: /data/redis/cluster1
+    server: 192.168.177.33
+    path: /data/redis-cluster/cluster1
 
 ---
 apiVersion: v1
@@ -36,8 +36,8 @@ spec:
   accessModes:
     - ReadWriteMany
   nfs:
-    server: 10.230.7.17
-    path: /data/redis/cluster2
+    server: 192.168.177.33
+    path: /data/redis-cluster/cluster2
 
 ---
 apiVersion: v1
@@ -50,8 +50,8 @@ spec:
   accessModes:
     - ReadWriteMany
   nfs:
-    server: 10.230.7.17
-    path: /data/redis/cluster3
+    server: 192.168.177.33
+    path: /data/redis-cluster/cluster3
 
 ---
 apiVersion: v1
@@ -64,8 +64,8 @@ spec:
   accessModes:
     - ReadWriteMany
   nfs:
-    server: 10.230.7.17
-    path: /data/redis/cluster4
+    server: 192.168.177.33
+    path: /data/redis-cluster/cluster4
 
 ---
 apiVersion: v1
@@ -78,5 +78,5 @@ spec:
   accessModes:
     - ReadWriteMany
   nfs:
-    server: 10.230.7.17
-    path: /data/redis/cluster5
+    server: 192.168.177.33
+    path: /data/redis-cluster/cluster5

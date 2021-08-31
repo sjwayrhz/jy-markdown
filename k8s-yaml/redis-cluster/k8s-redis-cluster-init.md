@@ -1,7 +1,3 @@
-参考链接`https://blog.csdn.net/miss1181248983/article/details/106841329`
-
-
-
 启动一个centos来干活
 ```
 kubectl run -it centos --image=centos:7 --restart=Never -n redis-cluster bash
@@ -44,3 +40,7 @@ redis-cli  --cluster add-node `dig +short redis-3.redis.redis-cluster.svc.cluste
 redis-cli  --cluster add-node `dig +short redis-4.redis.redis-cluster.svc.cluster.local`:6379 `dig +short redis-1.redis.redis-cluster.svc.cluster.local`:6379 --cluster-slave --cluster-master-id 47f7d58bff8f6c37691c1ee20e9024f21ce1ccf2
 redis-cli  --cluster add-node `dig +short redis-5.redis.redis-cluster.svc.cluster.local`:6379 `dig +short redis-2.redis.redis-cluster.svc.cluster.local`:6379 --cluster-slave --cluster-master-id 47f7d58bff8f6c37691c1ee20e9024f21ce1ccf2
 ```
+
+
+
+参考链接`https://blog.csdn.net/miss1181248983/article/details/106841329`
