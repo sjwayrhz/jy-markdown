@@ -83,7 +83,7 @@ pipeline {
                     git switch ${params.branch}
                     git fetch --all
                     git reset --hard origin/${params.branch}
-                    git pull
+                    git pull origin ${params.branch}
 
                     git switch office
                     git merge ${params.branch}
