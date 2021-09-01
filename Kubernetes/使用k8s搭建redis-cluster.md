@@ -2,6 +2,19 @@
 
 [TOC]
 
+## 集群规划
+
+| hostname                                      | port | data                         | master or slave |
+| --------------------------------------------- | ---- | ---------------------------- | --------------- |
+| redis-0.redis.redis-cluster.svc.cluster.local | 6379 | /data/redis-cluster/cluster0 | master1         |
+| redis-1.redis.redis-cluster.svc.cluster.local | 6379 | /data/redis-cluster/cluster1 | master2         |
+| redis-2.redis.redis-cluster.svc.cluster.local | 6379 | /data/redis-cluster/cluster2 | master3         |
+| redis-3.redis.redis-cluster.svc.cluster.local | 6379 | /data/redis-cluster/cluster3 | slaveof master1 |
+| redis-4.redis.redis-cluster.svc.cluster.local | 6379 | /data/redis-cluster/cluster4 | slaveof master2 |
+| redis-5.redis.redis-cluster.svc.cluster.local | 6379 | /data/redis-cluster/cluster5 | slaveof master3 |
+
+
+
 ## 创建nfs共享文件夹
 
 拥有一个k8s集群，并且已经做好nfs文件共享。

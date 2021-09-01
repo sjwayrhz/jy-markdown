@@ -22,6 +22,12 @@ kubectl patch pv pvc-357c3dcd-79f8-4b64-9e6d-52de33a12685 -p '{"metadata":{"fina
 
 再次检查pv发现已经被删除
 
+```
+[root@ghost-k8s-master tmp]# kubectl patch pv nfs-pv0 -p '{"metadata":{"finalizers":null}}'
+```
+
+
+
 
 ## failed for volume  mountfailed: exit status 32
 我在k8s集群中添加了k8s-node-05,但是没有给他挂载nfs磁盘，所以出现以下错误
