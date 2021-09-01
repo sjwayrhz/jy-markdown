@@ -82,7 +82,7 @@ pipeline {
 
                     git switch ${params.branch}
                     git fetch --all
-                    git reset --hard ${params.branch}
+                    git reset --hard origin/${params.branch}
                     git pull
 
                     git switch office
