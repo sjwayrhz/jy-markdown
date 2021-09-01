@@ -79,7 +79,7 @@ pipeline {
         stage ('git pull') {
             steps {
                 sh """
-
+                    cd $WORKSPACE/juneyaoYun
                     git switch ${params.branch}
                     git fetch --all
                     git reset --hard origin/${params.branch}
