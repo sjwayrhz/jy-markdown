@@ -82,16 +82,13 @@ pipeline {
                 sh """
                     cd $codesrc
                     pwd
-                    git reset --hard HEAD
-                    git checkout -B ${params.branch}
-                    git checkout -b ${tag}
-                    git branch -D ${params.branch}
-                    git checkout -b ${params.branch}
-                    git branch -D ${tag}
-                    git pull origin ${params.branch}
+                    git fetch --all
+                    git reset --hard ${params.branch}
+                    git pull
 
                     git switch office
                     git merge ${params.branch}
+                    git push
                 """
             }
         }
