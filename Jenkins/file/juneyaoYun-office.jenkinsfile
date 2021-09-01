@@ -67,6 +67,7 @@ pipeline {
         tag = createVersion()
         repositry = "registry.cn-shanghai.aliyuncs.com/jyjt/${params.branch}-${params.app}"
         codesrc = "/usr/local/src/juneyaoYun"
+
     }
 
     stages {
@@ -80,6 +81,8 @@ pipeline {
         stage ('git pull') {
             steps {
                 sh """
+                    cd $WORKSPACE
+                    pwd
                     cd $codesrc
                     pwd
                     git fetch --all
