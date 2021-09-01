@@ -66,8 +66,6 @@ pipeline {
     environment {
         tag = createVersion()
         repositry = "registry.cn-shanghai.aliyuncs.com/jyjt/${params.branch}-${params.app}"
-        codesrc = "/usr/local/src/juneyaoYun"
-
     }
 
     stages {
@@ -81,10 +79,8 @@ pipeline {
         stage ('git pull') {
             steps {
                 sh """
-                    cd $WORKSPACE
-                    pwd
-                    cd $codesrc
-                    pwd
+
+                    git switch ${params.branch}
                     git fetch --all
                     git reset --hard ${params.branch}
                     git pull
@@ -100,7 +96,7 @@ pipeline {
         stage('compile') {
             steps {
                 sh """
-                    cd $codesrc
+                    cd $WORKSPACE/juneyaoYun
                     /usr/local/apache-maven-3.8.1/bin/mvn clean install
                 """
             }
@@ -109,7 +105,7 @@ pipeline {
         stage ('copy jar files') {
             steps {
                 sh """
-                    cp -fr $codesrc/juneyaoYun-${params.app}/target/juneyaoYun-${params.app}-0.0.1-SNAPSHOT.jar $codesrc/juneyaoYun-${params.app}/to-docker-${params.app}/
+                    cp -fr $WORKSPACE/juneyaoYun/juneyaoYun-${params.app}/target/juneyaoYun-${params.app}-0.0.1-SNAPSHOT.jar $WORKSPACE/juneyaoYun/juneyaoYun-${params.app}/to-docker-${params.app}/
                 """
             }
         }
@@ -117,7 +113,7 @@ pipeline {
         stage ('operation by docker') {
             steps{
                 sh """
-                    cd $codesrc/juneyaoYun-${params.app}/to-docker-${params.app}
+                    cd $WORKSPACE/juneyaoYun/juneyaoYun-${params.app}/to-docker-${params.app}
                     sudo docker build -t ${repositry}:${tag} .
                     sudo docker push ${repositry}:${tag}
                     sudo docker rmi -f ${repositry}:${tag}
