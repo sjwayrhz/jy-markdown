@@ -40,7 +40,7 @@ spec:
     spec:
       containers:
         - name: office-web
-          image: 'registry.cn-shanghai.aliyuncs.com/jyjt/develop-web:202108301223'
+          image: 'registry.cn-shanghai.aliyuncs.com/jyjt/develop-web:202109020732'
           imagePullPolicy: IfNotPresent
           args: ["--spring.profiles.active=$(web-env-key)"]
           ports:
@@ -53,11 +53,27 @@ spec:
                 key: web-env 
           resources:
             limits:
-              cpu: "1800m"
-              memory: "4Gi"
+              cpu: "800m"
+              memory: "2Gi"
             requests:
-              cpu: "1200m"
-              memory: "2Gi" 
+              cpu: "400m"
+              memory: "1Gi" 
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 10
+            timeoutSeconds: 2
+            successThreshold: 1
+            failureThreshold: 3
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /swagger-ui.html
+              port: 8080
+            initialDelaySeconds: 120
+            failureThreshold: 3
+            periodSeconds: 10
           volumeMounts: 
             - name: nfs
               mountPath: /logs
