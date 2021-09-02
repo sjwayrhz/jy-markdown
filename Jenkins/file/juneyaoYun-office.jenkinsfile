@@ -80,6 +80,7 @@ pipeline {
             steps {
                 sh """
                     cd $WORKSPACE/juneyaoYun
+                    git reset --hard HEAD
                     git switch ${params.branch}
                     git fetch --all
                     git reset --hard origin/${params.branch}
