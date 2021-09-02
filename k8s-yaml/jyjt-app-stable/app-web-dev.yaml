@@ -55,25 +55,25 @@ spec:
             httpGet:
               path: /
               port: 8080
-            initialDelaySeconds: 10
+            initialDelaySeconds: 100
             timeoutSeconds: 2
             successThreshold: 1
             failureThreshold: 3
-            periodSeconds: 30
+            periodSeconds: 10
           readinessProbe:
             httpGet:
               path: /swagger-ui.html
               port: 8080
             initialDelaySeconds: 120
-            failureThreshold: 3
+            failureThreshold: 5
             periodSeconds: 10
           resources:
             limits:
-              cpu: "1800m"
-              memory: "4Gi"
+              cpu: "800m"
+              memory: "2Gi"
             requests:
-              cpu: "1200m"
-              memory: "2Gi" 
+              cpu: "400m"
+              memory: "1Gi" 
           volumeMounts: 
             - name: nfs
               mountPath: /logs

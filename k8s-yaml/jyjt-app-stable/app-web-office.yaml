@@ -62,17 +62,17 @@ spec:
             httpGet:
               path: /
               port: 8080
-            initialDelaySeconds: 10
+            initialDelaySeconds: 100
             timeoutSeconds: 2
             successThreshold: 1
             failureThreshold: 3
-            periodSeconds: 30
+            periodSeconds: 10
           readinessProbe:
             httpGet:
               path: /swagger-ui.html
               port: 8080
             initialDelaySeconds: 120
-            failureThreshold: 3
+            failureThreshold: 5
             periodSeconds: 10
           volumeMounts: 
             - name: nfs
