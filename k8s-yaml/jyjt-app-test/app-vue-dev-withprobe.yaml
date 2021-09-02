@@ -1,15 +1,15 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: dev-web-config
+  name: dev-vue-config
   namespace: app-dev
 data:
-  web-env: dev
+  vue-env: dev
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: dev-web-pvc
+  name: dev-vue-pvc
   namespace: app-dev
 spec:
   storageClassName: nfs-client
@@ -17,84 +17,84 @@ spec:
     - ReadWriteMany
   resources:
     requests:
-      storage: 20G
+      storage: 1G
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: dev-web
+  name: dev-vue
   namespace: app-dev
   labels:
-    app: dev-web
+    app: dev-vue
 spec:
   selector:
     matchLabels:
-      app: dev-web
+      app: dev-vue
   replicas: 2
   strategy:
     type: RollingUpdate
   template:
     metadata:
       labels:
-        app: dev-web
+        app: dev-vue
     spec:
       containers:
-        - name: dev-web
-          image: 'registry.cn-shanghai.aliyuncs.com/jyjt/develop-web:202108301436'
+        - name: dev-vue
+          image: 'registry.cn-shanghai.aliyuncs.com/jyjt/develop-vue:202109021510'
           imagePullPolicy: IfNotPresent
-          args: ["--spring.profiles.active=$(web-env-key)"]
+          args: ["--spring.profiles.active=$(vue-env-key)"]
           ports:
-          - containerPort: 8080 
+          - containerPort: 8082
           env:
-          - name: web-env-key
+          - name: vue-env-key
             valueFrom:
               configMapKeyRef:
-                name: dev-web-config
-                key: web-env 
+                name: dev-vue-config
+                key: vue-env 
           livenessProbe:
             httpGet:
               path: /
-              port: 8080
-            initialDelaySeconds: 100
+              port: 8082
+            initialDelaySeconds: 25
             timeoutSeconds: 2
             successThreshold: 1
             failureThreshold: 3
             periodSeconds: 10
           readinessProbe:
             httpGet:
-              path: /swagger-ui.html
-              port: 8080
-            initialDelaySeconds: 120
+              path: /#/login
+              port: 8082
+            initialDelaySeconds: 30
             failureThreshold: 5
             periodSeconds: 10
           resources:
             limits:
-              cpu: "1800m"
-              memory: "4Gi"
-            requests:
               cpu: "800m"
-              memory: "2Gi" 
+              memory: "1Gi"
+            requests:
+              cpu: "400m"
+              memory: "500Mi" 
           volumeMounts: 
             - name: nfs
-              mountPath: /logs
+              mountPath: /var/log/nginx
       volumes:
         - name: nfs
           persistentVolumeClaim:
-            claimName: dev-web-pvc
+            claimName: dev-vue-pvc
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: dev-web-service
+  name: dev-vue-service
   namespace: app-dev
   labels:
-    name: dev-web-service
+    name: dev-vue-service
 spec:
   type: NodePort
   ports:
-  - name: dev-web
-    port: 8080
-    targetPort: 8080
-    nodePort: 30084
+  - name: dev-vue
+    port: 8082
+    targetPort: 8082
+    nodePort: 30086
   selector:
-    app: dev-web
+    app: dev-vue

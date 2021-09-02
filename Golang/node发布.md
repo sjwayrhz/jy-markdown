@@ -13,9 +13,11 @@ Dockerfile
 FROM node:14.17.5
 
 WORKDIR /vue
+RUN rm -rf node_modules
 COPY . .
 
-RUN npm install --registry https://registry.npm.taobao.org --unsafe-perm
+RUN npm i --registry=http://registry.npm.taobao.org --unsafe-perm --unsafe-perm
+
 RUN npm run build
 
 FROM nginx:alpine
@@ -25,7 +27,7 @@ RUN mkdir -p /usr/local/nginx/html
 COPY --from=0 /vue/dist /usr/share/nginx/html
 
 EXPOSE 8082
-CMD ["nginx", "-g", "daemon off;"]
+ENTRYPOINT nginx -g 'daemon off;' 
 
 ```
 
@@ -36,12 +38,14 @@ server {
   server_name localhost;
 
   location / {
-    root /usr/share/nginx/html;
+    root /usr/share/nginx/html; 
     index  index.html;
   }
 
   location /juneyao {
     proxy_pass http://dev-web.windfindtech.com;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header Host $host;
   }
 }
 ```
