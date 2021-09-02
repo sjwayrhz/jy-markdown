@@ -1,46 +1,46 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: office-web-config
-  namespace: app-office
+  name: prod-web-config
+  namespace: app-prod
 data:
-  web-env: office
+  web-env: prod
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: office-web-pvc
-  namespace: app-office
+  name: prod-web-pvc
+  namespace: app-prod
 spec:
-  storageClassName: demo-hwy
+  storageClassName: nfs-client
   accessModes:
     - ReadWriteMany
   resources:
     requests:
-      storage: 20G
+      storage: 80G
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: office-web
-  namespace: app-office
+  name: prod-web
+  namespace: app-prod
   labels:
-    app: office-web
+    app: prod-web
 spec:
   selector:
     matchLabels:
-      app: office-web
-  replicas: 1
+      app: prod-web
+  replicas: 2
   strategy:
     type: RollingUpdate
   template:
     metadata:
       labels:
-        app: office-web
+        app: prod-web
     spec:
       containers:
-        - name: office-web
-          image: 'registry.cn-shanghai.aliyuncs.com/jyjt/develop-web:202109020732'
+        - name: prod-web
+          image: 'registry.cn-shanghai.aliyuncs.com/jyjt/develop-web:202109021810'
           imagePullPolicy: IfNotPresent
           args: ["--spring.profiles.active=$(web-env-key)"]
           ports:
@@ -49,15 +49,18 @@ spec:
           - name: web-env-key
             valueFrom:
               configMapKeyRef:
-                name: office-web-config
+                name: prod-web-config
                 key: web-env 
           resources:
             limits:
-              cpu: "800m"
+              cpu: "1500m"
               memory: "2Gi"
             requests:
-              cpu: "400m"
+              cpu: "1000m"
               memory: "1Gi" 
+          volumeMounts: 
+            - name: nfs
+              mountPath: /logs
           livenessProbe:
             httpGet:
               path: /
@@ -74,27 +77,24 @@ spec:
             initialDelaySeconds: 120
             failureThreshold: 5
             periodSeconds: 10
-          volumeMounts: 
-            - name: nfs
-              mountPath: /logs
       volumes:
         - name: nfs
           persistentVolumeClaim:
-            claimName: office-web-pvc
+            claimName: prod-web-pvc
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: office-web-service
-  namespace: app-office
+  name: prod-web-service
+  namespace: app-prod
   labels:
-    name: office-web-service
+    name: prod-web-service
 spec:
   type: NodePort
   ports:
-  - name: office-web
+  - name: prod-web
     port: 8080
     targetPort: 8080
-    nodePort: 30085
+    nodePort: 30083
   selector:
-    app: office-web
+    app: prod-web

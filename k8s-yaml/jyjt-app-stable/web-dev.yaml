@@ -1,46 +1,46 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: prod-web-config
-  namespace: app-prod
+  name: dev-web-config
+  namespace: app-dev
 data:
-  web-env: prod
+  web-env: dev
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: prod-web-pvc
-  namespace: app-prod
+  name: dev-web-pvc
+  namespace: app-dev
 spec:
   storageClassName: nfs-client
   accessModes:
     - ReadWriteMany
   resources:
     requests:
-      storage: 80G
+      storage: 20G
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: prod-web
-  namespace: app-prod
+  name: dev-web
+  namespace: app-dev
   labels:
-    app: prod-web
+    app: dev-web
 spec:
   selector:
     matchLabels:
-      app: prod-web
+      app: dev-web
   replicas: 2
   strategy:
     type: RollingUpdate
   template:
     metadata:
       labels:
-        app: prod-web
+        app: dev-web
     spec:
       containers:
-        - name: prod-web
-          image: 'registry.cn-shanghai.aliyuncs.com/jyjt/develop-web:202108271723'
+        - name: dev-web
+          image: 'registry.cn-shanghai.aliyuncs.com/jyjt/develop-web:202109021810'
           imagePullPolicy: IfNotPresent
           args: ["--spring.profiles.active=$(web-env-key)"]
           ports:
@@ -49,23 +49,13 @@ spec:
           - name: web-env-key
             valueFrom:
               configMapKeyRef:
-                name: prod-web-config
+                name: dev-web-config
                 key: web-env 
-          resources:
-            limits:
-              cpu: "800m"
-              memory: "2Gi"
-            requests:
-              cpu: "400m"
-              memory: "1Gi" 
-          volumeMounts: 
-            - name: nfs
-              mountPath: /logs
           livenessProbe:
             httpGet:
               path: /
               port: 8080
-            initialDelaySeconds: 100
+            initialDelaySeconds: 45
             timeoutSeconds: 2
             successThreshold: 1
             failureThreshold: 3
@@ -74,27 +64,37 @@ spec:
             httpGet:
               path: /swagger-ui.html
               port: 8080
-            initialDelaySeconds: 120
-            failureThreshold: 5
-            periodSeconds: 10
+            initialDelaySeconds: 50
+            failureThreshold: 10
+            periodSeconds: 5
+          resources:
+            limits:
+              cpu: "1500m"
+              memory: "2Gi"
+            requests:
+              cpu: "1000m"
+              memory: "1Gi" 
+          volumeMounts: 
+            - name: nfs
+              mountPath: /logs
       volumes:
         - name: nfs
           persistentVolumeClaim:
-            claimName: prod-web-pvc
+            claimName: dev-web-pvc
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: prod-web-service
-  namespace: app-prod
+  name: dev-web-service
+  namespace: app-dev
   labels:
-    name: prod-web-service
+    name: dev-web-service
 spec:
   type: NodePort
   ports:
-  - name: prod-web
+  - name: dev-web
     port: 8080
     targetPort: 8080
-    nodePort: 30083
+    nodePort: 30084
   selector:
-    app: prod-web
+    app: dev-web
