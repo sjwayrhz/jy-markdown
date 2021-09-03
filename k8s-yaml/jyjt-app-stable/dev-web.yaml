@@ -58,14 +58,14 @@ spec:
             initialDelaySeconds: 45
             timeoutSeconds: 2
             successThreshold: 1
-            failureThreshold: 3
+            failureThreshold: 10
             periodSeconds: 10
           readinessProbe:
             httpGet:
               path: /swagger-ui.html
               port: 8080
             initialDelaySeconds: 50
-            failureThreshold: 10
+            failureThreshold: 15
             periodSeconds: 5
           resources:
             limits:

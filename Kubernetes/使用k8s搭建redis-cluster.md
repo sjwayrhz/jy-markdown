@@ -217,7 +217,35 @@ cluster_stats_messages_received:955
 ~]# kubectl delete po centos -n redis-cluster
 ```
 
+## 应用重启遇到的故障
 
+当redis集群发生重启，redis-cluster就会出现故障
+
+```
+2021-09-03 13:36:56,143 [lettuce-nioEventLoop-4-7] WARN  [io.lettuce.core.cluster.topology.DefaultClusterTopologyRefresh] - Unable to connect to [10.4.116.156:6379]: connection timed out: /10.4.116.156:6379
+
+2021-09-03 13:36:56,143 [lettuce-nioEventLoop-4-10] WARN  [io.lettuce.core.cluster.topology.DefaultClusterTopologyRefresh] - Unable to connect to [10.4.177.104:6379]: connection timed out: /10.4.177.104:6379
+
+2021-09-03 13:36:56,143 [lettuce-nioEventLoop-4-8] WARN  [io.lettuce.core.cluster.topology.DefaultClusterTopologyRefresh] - Unable to connect to [10.4.148.33:6379]: connection timed out: /10.4.148.33:6379
+
+2021-09-03 13:36:56,172 [lettuce-nioEventLoop-4-9] WARN  [io.lettuce.core.cluster.topology.DefaultClusterTopologyRefresh] - Unable to connect to [10.4.177.103:6379]: java.nio.channels.ClosedChannelException
+
+2021-09-03 13:36:56,173 [lettuce-nioEventLoop-4-12] WARN  [io.lettuce.core.cluster.topology.DefaultClusterTopologyRefresh] - Unable to connect to [10.4.218.22:6379]: connection timed out: /10.4.218.22:6379
+
+2021-09-03 13:36:56,172 [lettuce-nioEventLoop-4-11] WARN  [io.lettuce.core.cluster.topology.DefaultClusterTopologyRefresh] - Unable to connect to [10.4.212.88:6379]: java.nio.channels.ClosedChannelException
+```
+
+进入cluster nodes发现如下
+
+```
+10.4.177.118:6379> cluster nodes
+09ed3d5e83fae567e0bcff6ca8e82f34daf11734 10.4.218.22:6379@16379 master,fail - 1630644804070 1630644804070 2 connected
+cae8db2d8dd71d56b42414b065b352b006b84c95 10.4.116.156:6379@16379 slave,fail 73b3674e43df115f76843b116b090d0267bca16d 1630644804070 1630644804070 1 connected
+5adc97fddd9fb7e21efc2bc9e5f99c5a87247219 10.4.212.88:6379@16379 master,fail - 1630644804070 1630644804070 3 connected
+56adecf184e654c5a5872f8ccf449248698fdb9c 10.4.177.104:6379@16379 master,fail? - 1630644804075 1630644804070 4 connected 10923-16383
+73b3674e43df115f76843b116b090d0267bca16d 10.4.177.103:6379@16379 myself,master - 0 1630644804070 1 connected 0-5460
+a785d3b169be23eb5d904e9949b92e43a1a509c9 10.4.148.33:6379@16379 master,fail? - 1630644804075 1630644804070 6 connected 5461-10922
+```
 
 ## 附录：scripts
 
