@@ -1,16 +1,16 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: dev-vue-config
-  namespace: app-dev
+  name: vue-config
+  namespace: app-prod
 data:
-  vue-env: dev
+  vue-env: office
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: dev-vue-pvc
-  namespace: app-dev
+  name: vue-pvc
+  namespace: app-prod
 spec:
   storageClassName: nfs-client
   accessModes:
@@ -22,25 +22,25 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: dev-vue
-  namespace: app-dev
+  name: vue
+  namespace: app-prod
   labels:
-    app: dev-vue
+    app: vue
 spec:
   selector:
     matchLabels:
-      app: dev-vue
+      app: vue
   replicas: 2
   strategy:
     type: RollingUpdate
   template:
     metadata:
       labels:
-        app: dev-vue
+        app: vue
     spec:
       containers:
-        - name: dev-vue
-          image: 'registry.cn-shanghai.aliyuncs.com/jyjt/develop-vue:202109021510'
+        - name: vue
+          image: 'registry.cn-shanghai.aliyuncs.com/jyjt/develop-vue:202109021519'
           imagePullPolicy: IfNotPresent
           args: ["--spring.profiles.active=$(vue-env-key)"]
           ports:
@@ -49,7 +49,7 @@ spec:
           - name: vue-env-key
             valueFrom:
               configMapKeyRef:
-                name: dev-vue-config
+                name: vue-config
                 key: vue-env 
           livenessProbe:
             httpGet:
@@ -69,32 +69,32 @@ spec:
             periodSeconds: 10
           resources:
             limits:
-              cpu: "500m"
-              memory: "200Mi"
-            requests:
               cpu: "200m"
-              memory: "100Mi" 
+              memory: "100Mi"
+            requests:
+              cpu: "100m"
+              memory: "50Mi" 
           volumeMounts: 
             - name: nfs
               mountPath: /var/log/nginx
       volumes:
         - name: nfs
           persistentVolumeClaim:
-            claimName: dev-vue-pvc
+            claimName: vue-pvc
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: dev-vue-service
-  namespace: app-dev
+  name: vue-service
+  namespace: app-prod
   labels:
-    name: dev-vue-service
+    name: vue-service
 spec:
   type: NodePort
   ports:
-  - name: dev-vue
+  - name: vue
     port: 8082
     targetPort: 8082
-    nodePort: 30086
+    nodePort: 30085
   selector:
-    app: dev-vue
+    app: vue
