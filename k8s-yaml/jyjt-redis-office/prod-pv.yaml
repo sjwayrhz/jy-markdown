@@ -1,0 +1,82 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: office-redis-nfs-pv0
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteMany
+  nfs:
+    server: 10.230.7.17
+    path: /data/redis-cluster/office0
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: office-redis-nfs-pv1
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteMany
+  nfs:
+    server: 10.230.7.17
+    path: /data/redis-cluster/office1
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: office-redis-nfs-pv2
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteMany
+  nfs:
+    server: 10.230.7.17
+    path: /data/redis-cluster/office2
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: office-redis-nfs-pv3
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteMany
+  nfs:
+    server: 10.230.7.17
+    path: /data/redis-cluster/office3
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: office-redis-nfs-pv4
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteMany
+  nfs:
+    server: 10.230.7.17
+    path: /data/redis-cluster/office4
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: office-redis-nfs-pv5
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteMany
+  nfs:
+    server: 10.230.7.17
+    path: /data/redis-cluster/office5

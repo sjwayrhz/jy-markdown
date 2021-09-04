@@ -4,14 +4,14 @@
 
 ## 集群规划
 
-| hostname                                      | port | data                         | master or slave |
-| --------------------------------------------- | ---- | ---------------------------- | --------------- |
-| redis-0.redis.redis-cluster.svc.cluster.local | 6379 | /data/redis-cluster/cluster0 | master1         |
-| redis-1.redis.redis-cluster.svc.cluster.local | 6379 | /data/redis-cluster/cluster1 | master2         |
-| redis-2.redis.redis-cluster.svc.cluster.local | 6379 | /data/redis-cluster/cluster2 | master3         |
-| redis-3.redis.redis-cluster.svc.cluster.local | 6379 | /data/redis-cluster/cluster3 | slaveof master1 |
-| redis-4.redis.redis-cluster.svc.cluster.local | 6379 | /data/redis-cluster/cluster4 | slaveof master2 |
-| redis-5.redis.redis-cluster.svc.cluster.local | 6379 | /data/redis-cluster/cluster5 | slaveof master3 |
+| hostname                                   | port | data                      | master or slave |
+| ------------------------------------------ | ---- | ------------------------- | --------------- |
+| redis-0.redis.app-office.svc.cluster.local | 6379 | /data/app-office/cluster0 | master1         |
+| redis-1.redis.app-office.svc.cluster.local | 6379 | /data/app-office/cluster1 | master2         |
+| redis-2.redis.app-office.svc.cluster.local | 6379 | /data/app-office/cluster2 | master3         |
+| redis-3.redis.app-office.svc.cluster.local | 6379 | /data/app-office/cluster3 | slaveof master1 |
+| redis-4.redis.app-office.svc.cluster.local | 6379 | /data/app-office/cluster4 | slaveof master2 |
+| redis-5.redis.app-office.svc.cluster.local | 6379 | /data/app-office/cluster5 | slaveof master3 |
 
 
 
@@ -27,17 +27,17 @@
 共享路径为 /data
 ```
 
-为redis-cluster中的6个节点创建集群内共享文件夹，并授予777权限
+为app-office中的6个节点创建集群内共享文件夹，并授予777权限
 
 ```bash
-[root@ghost-nfs-server ~]# mkdir -p /data/redis-cluster/cluster0
-[root@ghost-nfs-server ~]# mkdir -p /data/redis-cluster/cluster1
-[root@ghost-nfs-server ~]# mkdir -p /data/redis-cluster/cluster2
-[root@ghost-nfs-server ~]# mkdir -p /data/redis-cluster/cluster3
-[root@ghost-nfs-server ~]# mkdir -p /data/redis-cluster/cluster4
-[root@ghost-nfs-server ~]# mkdir -p /data/redis-cluster/cluster5
+[root@ghost-nfs-server ~]# mkdir -p /data/app-office/cluster0
+[root@ghost-nfs-server ~]# mkdir -p /data/app-office/cluster1
+[root@ghost-nfs-server ~]# mkdir -p /data/app-office/cluster2
+[root@ghost-nfs-server ~]# mkdir -p /data/app-office/cluster3
+[root@ghost-nfs-server ~]# mkdir -p /data/app-office/cluster4
+[root@ghost-nfs-server ~]# mkdir -p /data/app-office/cluster5
 
-[root@ghost-nfs-server ~]# chmod -R 777 /data/redis-cluster
+[root@ghost-nfs-server ~]# chmod -R 777 /data/app-office
 ```
 
 ## 创建pv
@@ -64,7 +64,7 @@
 检查
 
 ```bash
-~]# kubectl get svc,pod,pvc -n redis-cluster
+~]# kubectl get svc,pod,pvc -n app-office
 NAME                   TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)    AGE
 service/redis          ClusterIP   None         <none>        6379/TCP   8m53s
 service/redis-access   ClusterIP   10.6.93.95   <none>        6379/TCP   8m53s
@@ -91,19 +91,13 @@ persistentvolumeclaim/data-redis-5   Bound    nfs-pv5   1Gi        RWX          
 ### 启动一个centos镜像来做设置
 
 ```bash
-~]# kubectl run -it centos --image=centos:7 --restart=Never -n redis-cluster bash
+~]# kubectl run -it rockylinux --image=rockylinux/rockylinux:8.4 -n app-office bash
 ```
 
 在centos镜像里面安装redis
 
 ```bash
-[root@centos /]# yum install -y epel-release 
-[root@centos /]# yum install -y wget bind-utils
-[root@centos /]# wget http://download.redis.io/releases/redis-5.0.13.tar.gz
-[root@centos /]# tar xzf redis-5.0.13.tar.gz -C /usr/local/
-[root@centos /]# cd /usr/local/redis-5.0.13/
-[root@centos redis-5.0.13]# yum install -y gcc make
-[root@centos redis-5.0.13]# make && make install
+[root@rockylinux /]# dnf install -y bind-utils redis
 ```
 
 ### 创建cluster-master
@@ -113,10 +107,10 @@ persistentvolumeclaim/data-redis-5   Bound    nfs-pv5   1Gi        RWX          
 首先创建cluster的master 为 redis-0,redis-1,redis-2
 
 ```bash
-[root@centos /]# redis-cli --cluster create \
-  `dig +short redis-0.redis.redis-cluster.svc.cluster.local`:6379 \
-  `dig +short redis-1.redis.redis-cluster.svc.cluster.local`:6379 \
-  `dig +short redis-2.redis.redis-cluster.svc.cluster.local`:6379
+[root@rockylinux /]# /usr/bin/redis-cli --cluster create \
+  `dig +short redis-0.redis.app-office.svc.cluster.local`:6379 \
+  `dig +short redis-1.redis.app-office.svc.cluster.local`:6379 \
+  `dig +short redis-2.redis.app-office.svc.cluster.local`:6379
 ```
 
 日志如下
@@ -126,11 +120,11 @@ persistentvolumeclaim/data-redis-5   Bound    nfs-pv5   1Gi        RWX          
 Master[0] -> Slots 0 - 5460
 Master[1] -> Slots 5461 - 10922
 Master[2] -> Slots 10923 - 16383
-M: 7ffd3d68a40e2bba485862b88161fdb6553184c3 10.4.116.152:6379
+M: 9aaa3073d82732628a3940e8cb89f80ba8acb8d2 10.2.44.253:6379
    slots:[0-5460] (5461 slots) master
-M: 27bbfc2655466912c7d58f6661b8dcbaeca6814a 10.4.177.98:6379
+M: d6f16b1bb015eaf69f98d3c506dfdf6e6ec92823 10.2.154.228:6379
    slots:[5461-10922] (5462 slots) master
-M: 9a14a8b5d8365f5b8bd7d5b29cfc4e55b0b30f35 10.4.218.18:6379
+M: 1d7920f8d2de8a1f249c12feb041c4b6c8836aec 10.2.127.196:6379
    slots:[10923-16383] (5461 slots) master
 Can I set the above configuration? (type 'yes' to accept): yes
 >>> Nodes configuration updated
@@ -138,17 +132,17 @@ Can I set the above configuration? (type 'yes' to accept): yes
 >>> Sending CLUSTER MEET messages to join the cluster
 Waiting for the cluster to join
 .
->>> Performing Cluster Check (using node 10.4.116.152:6379)
-M: 7ffd3d68a40e2bba485862b88161fdb6553184c3 10.4.116.152:6379
+>>> Performing Cluster Check (using node 10.2.44.253:6379)
+M: 9aaa3073d82732628a3940e8cb89f80ba8acb8d2 10.2.44.253:6379
    slots:[0-5460] (5461 slots) master
-M: 27bbfc2655466912c7d58f6661b8dcbaeca6814a 10.4.177.98:6379
-   slots:[5461-10922] (5462 slots) master
-M: 9a14a8b5d8365f5b8bd7d5b29cfc4e55b0b30f35 10.4.218.18:6379
+M: 1d7920f8d2de8a1f249c12feb041c4b6c8836aec 10.2.127.196:6379
    slots:[10923-16383] (5461 slots) master
+M: d6f16b1bb015eaf69f98d3c506dfdf6e6ec92823 10.2.154.228:6379
+   slots:[5461-10922] (5462 slots) master
 [OK] All nodes agree about slots configuration.
 >>> Check for open slots...
 >>> Check slots coverage...
-[OK] All 16384 slots covered.
+[OK] All 16384 slots covered. 
 ```
 
 ### 添加cluster-slave
@@ -164,9 +158,9 @@ redis-cli  --cluster add-node的命令规则为
 **--cluster-master-id：表示slave对应的master的node ID**
 
 ```bash
-[root@centos /]# redis-cli  --cluster add-node `dig +short redis-3.redis.redis-cluster.svc.cluster.local`:6379 `dig +short redis-0.redis.redis-cluster.svc.cluster.local`:6379 --cluster-slave --cluster-master-id 7ffd3d68a40e2bba485862b88161fdb6553184c3
-[root@centos /]# redis-cli  --cluster add-node `dig +short redis-4.redis.redis-cluster.svc.cluster.local`:6379 `dig +short redis-1.redis.redis-cluster.svc.cluster.local`:6379 --cluster-slave --cluster-master-id 27bbfc2655466912c7d58f6661b8dcbaeca6814a
-[root@centos /]# redis-cli  --cluster add-node `dig +short redis-5.redis.redis-cluster.svc.cluster.local`:6379 `dig +short redis-2.redis.redis-cluster.svc.cluster.local`:6379 --cluster-slave --cluster-master-id 9a14a8b5d8365f5b8bd7d5b29cfc4e55b0b30f35
+[root@rockylinux /]# /usr/bin/redis-cli  --cluster add-node `dig +short redis-3.redis.app-office.svc.cluster.local`:6379 `dig +short redis-0.redis.app-office.svc.cluster.local`:6379 --cluster-slave --cluster-master-id 9aaa3073d82732628a3940e8cb89f80ba8acb8d2
+[root@rockylinux /]# /usr/bin/redis-cli  --cluster add-node `dig +short redis-4.redis.app-office.svc.cluster.local`:6379 `dig +short redis-1.redis.app-office.svc.cluster.local`:6379 --cluster-slave --cluster-master-id 1d7920f8d2de8a1f249c12feb041c4b6c8836aec
+[root@rockylinux /]# /usr/bin/redis-cli  --cluster add-node `dig +short redis-5.redis.app-office.svc.cluster.local`:6379 `dig +short redis-2.redis.app-office.svc.cluster.local`:6379 --cluster-slave --cluster-master-id d6f16b1bb015eaf69f98d3c506dfdf6e6ec92823
 ```
 
 ### 查找cluster id
@@ -174,7 +168,8 @@ redis-cli  --cluster add-node的命令规则为
 继续在临时centos中，做以下操作，验证cluster nodes 和cluster info
 
 ```bash
-[root@centos /]# redis-cli -h `dig +short redis-0.redis.redis-cluster.svc.cluster.local` -p 6379
+~]# kubectl exec -it rockylinux -n app-office -- sh
+[root@rockylinux /]# /usr/bin/redis-cli -h `dig +short redis-0.redis.app-office.svc.cluster.local` -p 6379
 ```
 
 查看集群节点
@@ -214,7 +209,7 @@ cluster_stats_messages_received:955
 完毕，推出临时centos并删除该pod
 
 ```bash
-~]# kubectl delete po centos -n redis-cluster
+~]# kubectl delete po centos -n app-office
 ```
 
 
@@ -237,7 +232,7 @@ redis实例在启动过程中，会根据nodes.conf信息寻找集群地址，�
 首先我们查看所有节点的容器ip地址：
 
 ```
-[root@kubemaster redis-5.0.5-cluster]# kubectl get pod -owide --namespace=redis-cluster |awk '{print $6}' |grep -v IP
+[root@kubemaster redis-5.0.5-cluster]# kubectl get pod -owide --namespace=app-office |awk '{print $6}' |grep -v IP
 10.244.2.245
 10.244.0.187
 10.244.1.49
@@ -249,17 +244,17 @@ redis实例在启动过程中，会根据nodes.conf信息寻找集群地址，�
 记录这些ip地址后，我们手动删除5个pod，仅保留ip为10.244.0.188的pod:redis-app-5
 
 ```
-kubectl delete pod -n redis-cluster redis-app-0
-kubectl delete pod -n redis-cluster redis-app-1
-kubectl delete pod -n redis-cluster redis-app-2
-kubectl delete pod -n redis-cluster redis-app-3
-kubectl delete pod -n redis-cluster redis-app-4
+kubectl delete pod -n app-office redis-app-0
+kubectl delete pod -n app-office redis-app-1
+kubectl delete pod -n app-office redis-app-2
+kubectl delete pod -n app-office redis-app-3
+kubectl delete pod -n app-office redis-app-4
 ```
 
 全部删除成功后查看下现在的容器状态：
 
 ```
-[root@kubemaster redis-5.0.5-cluster]# kubectl get pod -owide -n redis-cluster
+[root@kubemaster redis-5.0.5-cluster]# kubectl get pod -owide -n app-office
 NAME          READY     STATUS    RESTARTS   AGE       IP             NODE
 redis-app-0   1/1       Running   0          1m        10.244.2.247   slave2
 redis-app-1   1/1       Running   0          1m        10.244.0.190   kubemaster
@@ -308,7 +303,7 @@ c0fcd18205a3455f9877d3c36ea0a53e47091619 10.244.2.248:6379@16379 slave 8434b3117
 删除所有pod
 
 ```
-[root@kubemaster ~]# kubectl delete pod --namespace=redis-cluster $(kubectl get pod --namespace=redis-cluster | awk '{print $1}'|grep -v NAME)
+[root@kubemaster ~]# kubectl delete pod --namespace=app-office $(kubectl get pod --namespace=app-office | awk '{print $1}'|grep -v NAME)
 ```
 
 等待容器全部恢复后，进入到任一一台节点
@@ -343,7 +338,7 @@ cluster_state:ok
 调整好后，查看pod状态:
 
 ```
-[root@kubemaster redis-5.0.5-cluster]# kubectl get pod -owide -n redis-cluster
+[root@kubemaster redis-5.0.5-cluster]# kubectl get pod -owide -n app-office
 NAME          READY     STATUS    RESTARTS   AGE       IP             NODE
 redis-app-0   1/1       Running   0          13m       10.244.0.191   kubemaster
 redis-app-1   1/1       Running   0          13m       10.244.2.8     slave2
@@ -386,7 +381,7 @@ cluster_stats_messages_received:920
 
 ```
 kubectl delete -f addons/.
-kubectl delete pvc -n redis-cluster $(kubectl get pvc -n redis-cluster |awk '{print $1}' |grep -v NAME)
+kubectl delete pvc -n app-office $(kubectl get pvc -n app-office |awk '{print $1}' |grep -v NAME)
 ```
 
 ## 附录：scripts
@@ -405,7 +400,7 @@ spec:
     - ReadWriteMany
   nfs:
     server: 192.168.177.33
-    path: /data/redis-cluster/cluster0
+    path: /data/app-office/cluster0
 
 ---
 apiVersion: v1
@@ -419,7 +414,7 @@ spec:
     - ReadWriteMany
   nfs:
     server: 192.168.177.33
-    path: /data/redis-cluster/cluster1
+    path: /data/app-office/cluster1
 
 ---
 apiVersion: v1
@@ -433,7 +428,7 @@ spec:
     - ReadWriteMany
   nfs:
     server: 192.168.177.33
-    path: /data/redis-cluster/cluster2
+    path: /data/app-office/cluster2
 
 ---
 apiVersion: v1
@@ -447,7 +442,7 @@ spec:
     - ReadWriteMany
   nfs:
     server: 192.168.177.33
-    path: /data/redis-cluster/cluster3
+    path: /data/app-office/cluster3
 
 ---
 apiVersion: v1
@@ -461,7 +456,7 @@ spec:
     - ReadWriteMany
   nfs:
     server: 192.168.177.33
-    path: /data/redis-cluster/cluster4
+    path: /data/app-office/cluster4
 
 ---
 apiVersion: v1
@@ -475,16 +470,16 @@ spec:
     - ReadWriteMany
   nfs:
     server: 192.168.177.33
-    path: /data/redis-cluster/cluster5
+    path: /data/app-office/cluster5
 ```
 
-### namespace-redis-cluster.yaml
+### namespace-app-office.yaml
 
 ```
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: redis-cluster
+  name: app-office
 ```
 
 ### redis.yaml
@@ -494,13 +489,13 @@ apiVersion: v1
 kind: Service
 metadata:
   name: redis
-  namespace: redis-cluster
+  namespace: app-office
   labels:
     app: redis
 spec:
   selector:
     app: redis
-    appCluster: redis-cluster
+    appCluster: app-office
   ports:
   - name: redis
     port: 6379
@@ -511,13 +506,13 @@ apiVersion: v1
 kind: Service
 metadata:
   name: redis-access
-  namespace: redis-cluster
+  namespace: app-office
   labels:
     app: redis
 spec:
   selector:
     app: redis
-    appCluster: redis-cluster
+    appCluster: app-office
   ports:
   - name: redis-access
     protocol: TCP
@@ -529,19 +524,19 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: redis
-  namespace: redis-cluster
+  namespace: app-office
 spec:
   serviceName: redis
   replicas: 6
   selector:
     matchLabels:
       app: redis
-      appCluster: redis-cluster
+      appCluster: app-office
   template:
     metadata:
       labels:
         app: redis
-        appCluster: redis-cluster
+        appCluster: app-office
     spec:
       terminationGracePeriodSeconds: 20
       affinity:
@@ -591,7 +586,7 @@ spec:
   volumeClaimTemplates:
   - metadata:
       name: data
-      namespace: redis-cluster
+      namespace: app-office
     spec:
       accessModes: [ "ReadWriteMany" ]
       resources:
@@ -606,7 +601,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: redis-conf
-  namespace: redis-cluster
+  namespace: app-office
 data:
   redis.conf: |
     appendonly yes
