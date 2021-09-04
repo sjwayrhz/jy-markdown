@@ -44,7 +44,7 @@ spec:
           imagePullPolicy: IfNotPresent
           args: ["--spring.profiles.active=$(vue-env-key)"]
           ports:
-          - containerPort: 8082
+          - containerPort: 8083
           env:
           - name: vue-env-key
             valueFrom:
@@ -54,7 +54,7 @@ spec:
           livenessProbe:
             httpGet:
               path: /
-              port: 8082
+              port: 8083
             initialDelaySeconds: 25
             timeoutSeconds: 2
             successThreshold: 1
@@ -63,7 +63,7 @@ spec:
           readinessProbe:
             httpGet:
               path: /#/login
-              port: 8082
+              port: 8083
             initialDelaySeconds: 30
             failureThreshold: 5
             periodSeconds: 10
@@ -93,8 +93,8 @@ spec:
   type: NodePort
   ports:
   - name: vue
-    port: 8082
-    targetPort: 8082
+    port: 8083
+    targetPort: 8083
     nodePort: 30085
   selector:
     app: vue
