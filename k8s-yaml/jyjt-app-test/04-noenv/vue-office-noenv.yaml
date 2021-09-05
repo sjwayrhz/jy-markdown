@@ -40,7 +40,7 @@ spec:
     spec:
       containers:
         - name: vue
-          image: 'registry.cn-shanghai.aliyuncs.com/jyjt/develop-vue:202109021519'
+          image: 'registry.cn-shanghai.aliyuncs.com/jyjt/develop-vue:202109050945'
           imagePullPolicy: IfNotPresent
           args: ["--spring.profiles.active=$(vue-env-key)"]
           ports:

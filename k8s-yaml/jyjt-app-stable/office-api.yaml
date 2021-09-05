@@ -4,7 +4,7 @@ metadata:
   name:  api-config
   namespace: app-office
 data:
-  api-env: dev
+  api-env: office
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim

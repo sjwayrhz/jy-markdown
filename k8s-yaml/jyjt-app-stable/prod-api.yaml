@@ -4,7 +4,7 @@ metadata:
   name:  api-config
   namespace: app-prod
 data:
-  api-env: dev
+  api-env: prod
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
