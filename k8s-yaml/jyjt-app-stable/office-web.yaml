@@ -95,6 +95,6 @@ spec:
   - name: office-web
     port: 8080
     targetPort: 8080
-    nodePort: 30085
+    nodePort: 30088
   selector:
     app: office-web
