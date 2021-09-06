@@ -2,28 +2,28 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: web-config
-  namespace: app-dev
+  namespace: app-prod
 data:
-  web-env: dev
+  web-env: prod
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: web-pvc
-  namespace: app-dev
+  namespace: app-prod
 spec:
   storageClassName: nfs-client
   accessModes:
     - ReadWriteMany
   resources:
     requests:
-      storage: 20G
+      storage: 80G
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: web
-  namespace: app-dev
+  namespace: app-prod
   labels:
     app: web
 spec:
@@ -40,7 +40,7 @@ spec:
     spec:
       containers:
         - name: web
-          image: 'registry.cn-shanghai.aliyuncs.com/jyjt/develop-web:202109061540'
+          image: 'registry.cn-shanghai.aliyuncs.com/jyjt/develop-web:202109060901'
           imagePullPolicy: IfNotPresent
           args: ["--spring.profiles.active=$(web-env-key)"]
           ports:
@@ -51,6 +51,16 @@ spec:
               configMapKeyRef:
                 name: web-config
                 key: web-env 
+          resources:
+            limits:
+              cpu: "1500m"
+              memory: "2Gi"
+            requests:
+              cpu: "1000m"
+              memory: "1Gi" 
+          volumeMounts: 
+            - name: nfs
+              mountPath: /logs
           startupProbe:
             httpGet:
               path: /
@@ -71,16 +81,7 @@ spec:
             successThreshold: 1
             failureThreshold: 3
             periodSeconds: 10
-          resources:
-            limits:
-              cpu: "1500m"
-              memory: "2Gi"
-            requests:
-              cpu: "1000m"
-              memory: "1Gi" 
-          volumeMounts: 
-            - name: nfs
-              mountPath: /logs
+      dnsPolicy: Default
       volumes:
         - name: nfs
           persistentVolumeClaim:
@@ -90,7 +91,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: web-service
-  namespace: app-dev
+  namespace: app-prod
   labels:
     name: web-service
 spec:
@@ -99,6 +100,6 @@ spec:
   - name: web
     port: 8082
     targetPort: 8082
-    nodePort: 30084
+    nodePort: 30083
   selector:
     app: web
