@@ -40,11 +40,13 @@ spec:
   selector:
     app: redis
     appCluster: redis-cluster
+  type: NodePort
   ports:
   - name: redis-access
     protocol: TCP
     port: 6379
     targetPort: 6379
+    nodePort: 30379
 
 ---
 apiVersion: apps/v1
