@@ -40,11 +40,11 @@ spec:
     spec:
       containers:
         - name: web
-          image: 'registry.cn-shanghai.aliyuncs.com/jyjt/develop-web:202109021810'
+          image: 'registry.cn-shanghai.aliyuncs.com/jyjt/develop-web:202109060901'
           imagePullPolicy: IfNotPresent
           args: ["--spring.profiles.active=$(web-env-key)"]
           ports:
-          - containerPort: 8080 
+          - containerPort: 8082 
           env:
           - name: web-env-key
             valueFrom:
@@ -61,21 +61,25 @@ spec:
           volumeMounts: 
             - name: nfs
               mountPath: /logs
+          startupProbe:
+            httpGet:
+              path: /
+              port: 8082
+            failureThreshold: 30
+            periodSeconds: 10
           livenessProbe:
             httpGet:
               path: /
-              port: 8080
-            initialDelaySeconds: 100
-            timeoutSeconds: 2
-            successThreshold: 1
-            failureThreshold: 3
+              port: 8082
+            failureThreshold: 1
             periodSeconds: 10
           readinessProbe:
             httpGet:
               path: /swagger-ui.html
-              port: 8080
-            initialDelaySeconds: 120
-            failureThreshold: 5
+              port: 8082
+            initialDelaySeconds: 40
+            successThreshold: 1
+            failureThreshold: 3
             periodSeconds: 10
       volumes:
         - name: nfs
@@ -93,8 +97,8 @@ spec:
   type: NodePort
   ports:
   - name: web
-    port: 8080
-    targetPort: 8080
+    port: 8082
+    targetPort: 8082
     nodePort: 30083
   selector:
     app: web

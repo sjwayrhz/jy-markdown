@@ -4,35 +4,52 @@ metadata:
   name: vue-config
   namespace: app-prod
 data:
-  vue-env: prod
+  vue.conf: |-
+    upstream vue{
+      server 192.168.177.35:30083;
+    }
+    
+    server {
+      listen  8083;
+      server_name localhost;
+    
+      location / {
+        root /usr/share/nginx/html; 
+        index  index.html;
+      }
+      
+      location /juneyao {
+        proxy_pass http://vue;
+      }
+    }
 ---
+kind: Service
 apiVersion: v1
-kind: PersistentVolumeClaim
 metadata:
-  name: vue-pvc
+  name: vue
   namespace: app-prod
 spec:
-  storageClassName: nfs-client
-  accessModes:
-    - ReadWriteMany
-  resources:
-    requests:
-      storage: 1G
+  selector:
+    app: vue
+  type: NodePort
+  ports:
+    - protocol: "TCP"
+      port: 8083
+      targetPort: 8083
+      nodePort: 30085
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: vue
   namespace: app-prod
-  labels:
-    app: vue
+  annotations:
+    reloader.stakater.com/auto: "true"
 spec:
   selector:
     matchLabels:
       app: vue
   replicas: 2
-  strategy:
-    type: RollingUpdate
   template:
     metadata:
       labels:
@@ -40,61 +57,15 @@ spec:
     spec:
       containers:
         - name: vue
-          image: 'registry.cn-shanghai.aliyuncs.com/jyjt/develop-vue:202109050945'
-          imagePullPolicy: IfNotPresent
-          args: ["--spring.profiles.active=$(vue-env-key)"]
+          image: registry.cn-shanghai.aliyuncs.com/jyjt/develop-vue:0.0.1
           ports:
-          - containerPort: 8083
-          env:
-          - name: vue-env-key
-            valueFrom:
-              configMapKeyRef:
-                name: vue-config
-                key: vue-env 
-          livenessProbe:
-            httpGet:
-              path: /
-              port: 8083
-            initialDelaySeconds: 25
-            timeoutSeconds: 2
-            successThreshold: 1
-            failureThreshold: 3
-            periodSeconds: 10
-          readinessProbe:
-            httpGet:
-              path: /#/login
-              port: 8083
-            initialDelaySeconds: 30
-            failureThreshold: 5
-            periodSeconds: 10
-          resources:
-            limits:
-              cpu: "200m"
-              memory: "100Mi"
-            requests:
-              cpu: "100m"
-              memory: "50Mi" 
-          volumeMounts: 
-            - name: nfs
-              mountPath: /var/log/nginx
+          - name: http
+            containerPort: 8083
+          volumeMounts:
+          - name: vueconf
+            mountPath: /etc/nginx/conf.d/
+            readOnly: true
       volumes:
-        - name: nfs
-          persistentVolumeClaim:
-            claimName: vue-pvc
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: vue-service
-  namespace: app-prod
-  labels:
-    name: vue-service
-spec:
-  type: NodePort
-  ports:
-  - name: vue
-    port: 8083
-    targetPort: 8083
-    nodePort: 30085
-  selector:
-    app: vue
+      - name: vueconf
+        configMap:
+          name: vue-config

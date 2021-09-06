@@ -40,7 +40,7 @@ spec:
     spec:
       containers:
         - name:  api
-          image: 'registry.cn-shanghai.aliyuncs.com/jyjt/develop-api:202109031157'
+          image: 'registry.cn-shanghai.aliyuncs.com/jyjt/develop-api:202109060936'
           imagePullPolicy: IfNotPresent
           args: ["--spring.profiles.active=$(api-env-key)"]
           ports:
@@ -51,22 +51,26 @@ spec:
               configMapKeyRef:
                 name:  api-config
                 key: api-env 
+          startupProbe:
+            httpGet:
+              path: /
+              port: 8081
+            failureThreshold: 30
+            periodSeconds: 10
           livenessProbe:
             httpGet:
               path: /
               port: 8081
-            initialDelaySeconds: 45
-            timeoutSeconds: 2
-            successThreshold: 1
-            failureThreshold: 3
+            failureThreshold: 1
             periodSeconds: 10
           readinessProbe:
             httpGet:
               path: /swagger-ui.html
               port: 8081
-            initialDelaySeconds: 50
-            failureThreshold: 10
-            periodSeconds: 5
+            initialDelaySeconds: 40
+            successThreshold: 1
+            failureThreshold: 3
+            periodSeconds: 10
           resources:
             limits:
               cpu: "1800m"
