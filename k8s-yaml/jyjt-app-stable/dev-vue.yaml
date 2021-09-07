@@ -6,7 +6,7 @@ metadata:
 data:
   vue.conf: |-
     upstream vue{
-      server 192.168.177.35:30084;
+      server 192.168.177.35:30085;
     }
     
     server {
