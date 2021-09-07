@@ -40,7 +40,7 @@ spec:
     spec:
       containers:
         - name:  api
-          image: 'registry.cn-shanghai.aliyuncs.com/jyjt/develop-api:202109060936'
+          image: 'registry.cn-shanghai.aliyuncs.com/jyjt/master-api:202109061659'
           imagePullPolicy: IfNotPresent
           args: ["--spring.profiles.active=$(api-env-key)"]
           ports:

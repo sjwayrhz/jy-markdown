@@ -40,7 +40,7 @@ spec:
     spec:
       containers:
         - name: web
-          image: 'registry.cn-shanghai.aliyuncs.com/jyjt/develop-web:202109061540'
+          image: 'registry.cn-shanghai.aliyuncs.com/jyjt/develop-web:202109061651'
           imagePullPolicy: IfNotPresent
           args: ["--spring.profiles.active=$(web-env-key)"]
           ports:
