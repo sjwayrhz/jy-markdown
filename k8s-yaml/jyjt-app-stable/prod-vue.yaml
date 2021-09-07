@@ -36,7 +36,7 @@ spec:
     - protocol: "TCP"
       port: 8083
       targetPort: 8083
-      nodePort: 30085
+      nodePort: 30083
 ---
 apiVersion: apps/v1
 kind: Deployment

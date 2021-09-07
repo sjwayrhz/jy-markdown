@@ -99,6 +99,6 @@ spec:
   - name: web
     port: 8082
     targetPort: 8082
-    nodePort: 30084
+    nodePort: 30085
   selector:
     app: web
