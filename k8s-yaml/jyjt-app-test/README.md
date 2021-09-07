@@ -11,3 +11,6 @@ app-web-dev-withprobe.yaml
 
 web-dev-noenv.yaml
 取消`app-`
+
+office-vue-secret.yaml
+通过secret拉镜像

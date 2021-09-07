@@ -1,0 +1,81 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vue-config
+  namespace: app-office
+data:
+  vue.conf: |-
+    upstream vue{
+      server 10.230.7.20:30088;
+    }
+    
+    server {
+      listen  8083;
+      server_name localhost;
+    
+      location / {
+        root /usr/share/nginx/html; 
+        index  index.html;
+      }
+      
+      location /juneyao {
+        proxy_pass http://vue;
+      }
+    }
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: registry-pull-secret
+data:
+  .dockerconfigjson: ewoJImF1dGhzIjogewoJCSJyZWdpc3RyeS5jbi1zaGFuZ2hhaS5hbGl5dW5jcy5jb20iOiB7CgkJCSJhdXRoIjogImRHRnZhWE4wYlc5dWEwQXhOak11WTI5dE9sWjNkalUyZEhrMyIKCQl9Cgl9Cn0=
+type: kubernetes.io/dockerconfigjson
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: vue
+  namespace: app-office
+spec:
+  selector:
+    app: vue
+  type: NodePort
+  ports:
+    - protocol: "TCP"
+      port: 8083
+      targetPort: 8083
+      nodePort: 30089
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vue
+  namespace: app-office
+  annotations:
+    reloader.stakater.com/auto: "true"
+spec:
+  selector:
+    matchLabels:
+      app: vue
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: vue
+    spec:
+      imagePullSecrets: 
+        - name: registry-pull-secret
+      containers:
+        - name: vue
+          image: registry.cn-shanghai.aliyuncs.com/jyjt/develop-vue:0.0.1
+          ports:
+          - name: http
+            containerPort: 8083
+          volumeMounts:
+          - name: vueconf
+            mountPath: /etc/nginx/conf.d/
+            readOnly: true
+      volumes:
+      - name: vueconf
+        configMap:
+          name: vue-config
