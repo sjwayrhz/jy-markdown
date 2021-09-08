@@ -7,6 +7,14 @@ data:
   web-env: dev
 ---
 apiVersion: v1
+kind: Secret
+metadata:
+  name: registry-pull-secret
+data:
+  .dockerconfigjson: ewoJImF1dGhzIjogewoJCSJyZWdpc3RyeS5jbi1zaGFuZ2hhaS5hbGl5dW5jcy5jb20iOiB7CgkJCSJhdXRoIjogImRHRnZhWE4wYlc5dWEwQXhOak11WTI5dE9sWjNkalUyZEhrMyIKCQl9Cgl9Cn0=
+type: kubernetes.io/dockerconfigjson
+---
+apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: web-pvc
@@ -38,6 +46,8 @@ spec:
       labels:
         app: web
     spec:
+      imagePullSecrets:
+        - name: registry-pull-secret
       containers:
         - name: web
           image: 'registry.cn-shanghai.aliyuncs.com/jyjt/develop-web:202109061651'
@@ -73,10 +83,10 @@ spec:
             periodSeconds: 10
           resources:
             limits:
-              cpu: "1500m"
+              cpu: "1800m"
               memory: "2Gi"
             requests:
-              cpu: "1000m"
+              cpu: "1200m"
               memory: "1Gi" 
           volumeMounts: 
             - name: nfs

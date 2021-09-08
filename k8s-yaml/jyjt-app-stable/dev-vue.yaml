@@ -12,6 +12,7 @@ data:
     server {
       listen  8083;
       server_name localhost;
+      access_log /var/log/nginx/vue_access_log main;
     
       location / {
         root /usr/share/nginx/html; 
@@ -22,6 +23,27 @@ data:
         proxy_pass http://vue;
       }
     }
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: registry-pull-secret
+data:
+  .dockerconfigjson: ewoJImF1dGhzIjogewoJCSJyZWdpc3RyeS5jbi1zaGFuZ2hhaS5hbGl5dW5jcy5jb20iOiB7CgkJCSJhdXRoIjogImRHRnZhWE4wYlc5dWEwQXhOak11WTI5dE9sWjNkalUyZEhrMyIKCQl9Cgl9Cn0=
+type: kubernetes.io/dockerconfigjson
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: vue-pvc
+  namespace: app-dev
+spec:
+  storageClassName: nfs-client
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1G
 ---
 kind: Service
 apiVersion: v1
@@ -55,9 +77,38 @@ spec:
       labels:
         app: vue
     spec:
+      imagePullSecrets: 
+        - name: registry-pull-secret
       containers:
         - name: vue
           image: registry.cn-shanghai.aliyuncs.com/jyjt/develop-vue:0.0.1
+          startupProbe:
+            httpGet:
+              path: /
+              port: 8083
+            failureThreshold: 15
+            periodSeconds: 1
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8083
+            failureThreshold: 2
+            periodSeconds: 14
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8083
+            initialDelaySeconds: 5
+            successThreshold: 1
+            failureThreshold: 3
+            periodSeconds: 10
+          resources:
+            limits:
+              cpu: "200m"
+              memory: "200Mi"
+            requests:
+              cpu: "100m"
+              memory: "100Mi"
           ports:
           - name: http
             containerPort: 8083
@@ -65,7 +116,12 @@ spec:
           - name: vueconf
             mountPath: /etc/nginx/conf.d/
             readOnly: true
+          - name: vuelog
+            mountPath: /var/log/nginx/
       volumes:
       - name: vueconf
         configMap:
           name: vue-config
+      - name: vuelog
+        persistentVolumeClaim:
+          claimName: vue-pvc
