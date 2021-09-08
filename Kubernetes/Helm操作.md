@@ -10,10 +10,10 @@ github地址如下
 https://github.com/helm/helm
 ```
 
-下载目前最新版本3.5.1的helm
+下载目前最新版本v3.6.3的helm
 
 ```
-~]# wget https://get.helm.sh/helm-v3.5.1-linux-amd64.tar.gz
+~]# wget https://get.helm.sh/helm-v3.6.3-linux-amd64.tar.gz
 ```
 
 将tar.gz文件解压并将helm可执行文件放到 /usr/local/bin 下即可使用
