@@ -18,7 +18,7 @@ properties([
                     classpath: [],
                     sandbox: false,
                     script:
-                        'return["develop","master"]'
+                        'return["office","develop","master"]'
                 ]
             ]
         ],
@@ -41,18 +41,20 @@ properties([
                     classpath: [],
                     sandbox: false,
                     script:
-                        ''' 
-                            if (branch.equals("develop")){
-                                return["api","web"]
+                        ''' if (branch.equals("develop")){
+                                return["api","web","vue"]
                             }
                             else if (branch.equals("master")){
-                                return["api","web"]
+                                return["api","web","vue"]
+                            }
+                            else if (branch.equals("office")){
+                                return["api","web","vue"]
                             }
                         '''
                 ]
             ]
         ],
-        string(name: 'show', defaultValue: 'best wishes', description: 'only deploy on app-caobo namespace')
+        string(name: 'show', defaultValue: 'best wishes', description: 'The sample string text')
     ])
 ])
 
@@ -79,16 +81,16 @@ pipeline {
         stage ('git pull') {
             steps {
                 sh """
-                    cd $WORKSPACE/juneyaoYun
+                    if [ ${params.app} == "vue" ] ; then 
+                        cd $WORKSPACE/group-app-manage
+                    elif [[ ${params.app} == "api" || ${params.app} == "web" ]] ;then
+                        cd $WORKSPACE/juneyaoYun
+                    fi
                     git reset --hard HEAD
                     git switch ${params.branch}
                     git fetch --all
                     git reset --hard origin/${params.branch}
                     git pull origin ${params.branch}
-
-                    git switch office
-                    git merge ${params.branch}
-                    git push
                 """
             }
         }
@@ -97,8 +99,12 @@ pipeline {
         stage('compile') {
             steps {
                 sh """
-                    cd $WORKSPACE/juneyaoYun
-                    /usr/local/apache-maven-3.8.1/bin/mvn clean install
+                    if [[ ${params.app} == "api" || ${params.app} == "web" ]] ;then
+                        cd $WORKSPACE/juneyaoYun
+                        /usr/local/apache-maven-3.8.1/bin/mvn clean install
+                    elif [ ${params.app} == "vue" ];then
+                        echo "vue don't need compile"
+                    fi                  
                 """
             }
         }
@@ -106,7 +112,11 @@ pipeline {
         stage ('copy jar files') {
             steps {
                 sh """
-                    cp -fr $WORKSPACE/juneyaoYun/juneyaoYun-${params.app}/target/juneyaoYun-${params.app}-0.0.1-SNAPSHOT.jar $WORKSPACE/juneyaoYun/juneyaoYun-${params.app}/to-docker-${params.app}/
+                    if [[ ${params.app} == "api" || ${params.app} == "web" ]] ;then
+                        cp -fr $WORKSPACE/juneyaoYun/juneyaoYun-${params.app}/target/juneyaoYun-${params.app}-0.0.1-SNAPSHOT.jar $WORKSPACE/juneyaoYun/juneyaoYun-${params.app}/to-docker-${params.app}/
+                    elif [ ${params.app} == "vue" ];then
+                        echo "vue don't need copy files"
+                    fi     
                 """
             }
         }
@@ -114,17 +124,31 @@ pipeline {
         stage ('operation by docker') {
             steps{
                 sh """
-                    cd $WORKSPACE/juneyaoYun/juneyaoYun-${params.app}/to-docker-${params.app}
-                    sudo docker build -t ${repositry}:${tag} .
-                    sudo docker push ${repositry}:${tag}
-                    sudo docker rmi -f ${repositry}:${tag}
+                    if [[ ${params.app} == "api" || ${params.app} == "web" ]] ;then
+                        cd $WORKSPACE/juneyaoYun/juneyaoYun-${params.app}/to-docker-${params.app}
+                    elif [ ${params.app} == "vue" ];then
+                        cd $WORKSPACE/group-app-manage
+                    fi     
+                    
+                    docker build -t ${repositry}:${tag} .
+                    docker push ${repositry}:${tag}
+                    docker rmi -f ${repositry}:${tag}
                 """
             }
         }
         stage ('kubernetes update apps') {
             steps{
                 sh """
-                    ssh root@10.230.7.20 "kubectl set image deployment/office-${params.app} office-${params.app}=${repositry}:${tag} -n app-office"
+                 if [ "${params.branch}" == "office" ];then {
+                    ssh 10.230.7.20 "kubectl set image deployment/${params.app} ${params.app}=${repositry}:${tag} -n app-office"
+                    }
+                 elif [ "${params.branch}" == "develop" ];then {
+                    ssh 192.168.177.45 "kubectl set image deployment/${params.app} ${params.app}=${repositry}:${tag} -n app-dev"
+                    }
+                 elif [ "${params.branch}" == "master" ];then {
+                    ssh 192.168.177.45 "kubectl set image deployment/${params.app} ${params.app}=${repositry}:${tag} -n app-prod"
+                    }
+                 fi
                 """
             }
         }

@@ -42,10 +42,10 @@ properties([
                     sandbox: false,
                     script:
                         ''' if (branch.equals("develop")){
-                                return["api","web"]
+                                return["api","web","vue"]
                             }
                             else if (branch.equals("master")){
-                                return["api","web"]
+                                return["api","web","vue"]
                             }
                         '''
                 ]
@@ -65,7 +65,6 @@ pipeline {
     environment {
         tag = createVersion()
         repositry = "registry.cn-shanghai.aliyuncs.com/jyjt/${params.branch}-${params.app}"
-        codesrc = "/usr/local/src/juneyaoYun"
     }
 
     stages {
@@ -79,14 +78,15 @@ pipeline {
         stage ('git pull') {
             steps {
                 sh """
-                    cd $codesrc
-                    pwd
+                    if [ ${params.app} == "vue" ] ; then 
+                        cd $WORKSPACE/group-app-manage
+                    elif [[ ${params.app} == "api" || ${params.app} == "web" ]] ;then
+                        cd $WORKSPACE/juneyaoYun
+                    fi
                     git reset --hard HEAD
-                    git checkout -B ${params.branch}
-                    git checkout -b ${tag}
-                    git branch -D ${params.branch}
-                    git checkout -b ${params.branch}
-                    git branch -D ${tag}
+                    git switch ${params.branch}
+                    git fetch --all
+                    git reset --hard origin/${params.branch}
                     git pull origin ${params.branch}
                 """
             }
@@ -96,8 +96,12 @@ pipeline {
         stage('compile') {
             steps {
                 sh """
-                    cd $codesrc
-                    /usr/local/apache-maven-3.8.1/bin/mvn clean install
+                    if [[ ${params.app} == "api" || ${params.app} == "web" ]] ;then
+                        cd $WORKSPACE/juneyaoYun
+                        /usr/local/apache-maven-3.8.1/bin/mvn clean install
+                    elif [ ${params.app} == "vue" ];then
+                        echo "vue don't need compile"
+                    fi                  
                 """
             }
         }
@@ -105,7 +109,11 @@ pipeline {
         stage ('copy jar files') {
             steps {
                 sh """
-                    cp -fr $codesrc/juneyaoYun-${params.app}/target/juneyaoYun-${params.app}-0.0.1-SNAPSHOT.jar $codesrc/juneyaoYun-${params.app}/to-docker-${params.app}/
+                    if [[ ${params.app} == "api" || ${params.app} == "web" ]] ;then
+                        cp -fr $WORKSPACE/juneyaoYun/juneyaoYun-${params.app}/target/juneyaoYun-${params.app}-0.0.1-SNAPSHOT.jar $WORKSPACE/juneyaoYun/juneyaoYun-${params.app}/to-docker-${params.app}/
+                    elif [ ${params.app} == "vue" ];then
+                        echo "vue don't need copy files"
+                    fi     
                 """
             }
         }
@@ -113,7 +121,12 @@ pipeline {
         stage ('operation by docker') {
             steps{
                 sh """
-                    cd $codesrc/juneyaoYun-${params.app}/to-docker-${params.app}
+                    if [[ ${params.app} == "api" || ${params.app} == "web" ]] ;then
+                        cd $WORKSPACE/juneyaoYun/juneyaoYun-${params.app}/to-docker-${params.app}
+                    elif [ ${params.app} == "vue" ];then
+                        cd $WORKSPACE/group-app-manage
+                    fi     
+                    
                     docker build -t ${repositry}:${tag} .
                     docker push ${repositry}:${tag}
                     docker rmi -f ${repositry}:${tag}
@@ -124,10 +137,10 @@ pipeline {
             steps{
                 sh """
                  if [ "${params.branch}" == "develop" ];then {
-                    ssh 192.168.177.45 "kubectl set image deployment/dev-${params.app} dev-${params.app}=${repositry}:${tag} -n app-dev"
+                    ssh 192.168.177.45 "kubectl set image deployment/${params.app} ${params.app}=${repositry}:${tag} -n app-dev"
                     }
                  elif [ "${params.branch}" == "master" ];then {
-                    ssh 192.168.177.45 "kubectl set image deployment/prod-${params.app} prod-${params.app}=${repositry}:${tag} -n app-prod"
+                    ssh 192.168.177.45 "kubectl set image deployment/${params.app} ${params.app}=${repositry}:${tag} -n app-prod"
                     }
                  fi
                 """
