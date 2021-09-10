@@ -1,4 +1,4 @@
-文章摘录于
+
 ```
-https://blog.zuolinux.com/2020/06/28/about-ingress-controller.html
+ingress-nginx.yaml 安装ingress 到ingress-nginx命名空间，并将ingress-nginx-controller安装在k8s-master
 ```

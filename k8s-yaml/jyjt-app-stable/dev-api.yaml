@@ -50,7 +50,7 @@ spec:
         - name: registry-pull-secret
       containers:
         - name:  api
-          image: 'registry.cn-shanghai.aliyuncs.com/jyjt/master-api:202109061659'
+          image: 'registry.cn-shanghai.aliyuncs.com/jyjt/develop-api:202109091506'
           imagePullPolicy: IfNotPresent
           args: ["--spring.profiles.active=$(api-env-key)"]
           ports:
@@ -84,10 +84,10 @@ spec:
           resources:
             limits:
               cpu: "1800m"
-              memory: "2Gi"
+              memory: "4Gi"
             requests:
               cpu: "1200m"
-              memory: "1Gi" 
+              memory: "2Gi" 
           volumeMounts: 
             - name: nfs
               mountPath: /logs
