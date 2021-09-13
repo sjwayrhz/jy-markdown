@@ -96,17 +96,8 @@ spec:
             - containerPort: 7848
               name: old-raft-rpc
           env:
-            - name: NACOS_REPLICAS
-              value: "3"
-            - name: SERVICE_NAME
-              value: "nacos-headless"
-            - name: DOMAIN_NAME
-              value: "cluster.local"
-            - name: POD_NAMESPACE
-              valueFrom:
-                fieldRef:
-                  apiVersion: v1
-                  fieldPath: metadata.namespace
+            - name: NACOS_SERVERS
+              value: "nacos-0.nacos-headless.default.svc.cluster.local:8848,nacos-1.nacos-headless.default.svc.cluster.local:8848,nacos-2.nacos-headless.default.svc.cluster.local:8848"
             - name: MYSQL_SERVICE_HOST
               valueFrom:
                 configMapKeyRef:
