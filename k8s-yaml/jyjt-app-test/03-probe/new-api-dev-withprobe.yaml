@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: web-config
+  name:  api-config
   namespace: app-dev
 data:
-  web-env: dev
+  api-env: dev
 ---
 apiVersion: v1
 kind: Secret
@@ -17,7 +17,7 @@ type: kubernetes.io/dockerconfigjson
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: web-pvc
+  name:  api-pvc
   namespace: app-dev
 spec:
   storageClassName: nfs-client
@@ -30,53 +30,54 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: web
+  name:  api
   namespace: app-dev
   labels:
-    app: web
+    app:  api
 spec:
   selector:
     matchLabels:
-      app: web
+      app:  api
   replicas: 2
   strategy:
     type: RollingUpdate
   template:
     metadata:
       labels:
-        app: web
+        app:  api
     spec:
       imagePullSecrets:
         - name: registry-pull-secret
       containers:
-        - name: web
-          image: 'registry.cn-shanghai.aliyuncs.com/jyjt/develop-web:202109061651'
+        - name:  api
+          image: 'registry.cn-shanghai.aliyuncs.com/jyjt/develop-api:202109081333'
           imagePullPolicy: IfNotPresent
-          args: ["--spring.profiles.active=$(web-env-key)"]
+          args: ["--spring.profiles.active=$(api-env-key)"]
           ports:
-          - containerPort: 8082 
+          - containerPort: 8081 
           env:
-          - name: web-env-key
+          - name: api-env-key
             valueFrom:
               configMapKeyRef:
-                name: web-config
-                key: web-env 
+                name:  api-config
+                key: api-env 
           startupProbe:
             httpGet:
               path: /
-              port: 8082
+              port: 8081
             failureThreshold: 30
             periodSeconds: 10
           livenessProbe:
-            httpGet:
-              path: /
-              port: 8082
+            exec:
+              command:
+                - ls
+                - /tmp
             failureThreshold: 1
             periodSeconds: 10
           readinessProbe:
             httpGet:
               path: /swagger-ui.html
-              port: 8082
+              port: 8081
             initialDelaySeconds: 40
             successThreshold: 1
             failureThreshold: 3
@@ -84,31 +85,31 @@ spec:
           resources:
             limits:
               cpu: "1800m"
-              memory: "3Gi"
+              memory: "2Gi"
             requests:
               cpu: "1200m"
-              memory: "1500Mi" 
+              memory: "1Gi" 
           volumeMounts: 
             - name: nfs
               mountPath: /logs
       volumes:
         - name: nfs
           persistentVolumeClaim:
-            claimName: web-pvc
+            claimName:  api-pvc
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: web-service
+  name:  api-service
   namespace: app-dev
   labels:
-    name: web-service
+    name:  api-service
 spec:
   type: NodePort
   ports:
-  - name: web
-    port: 8082
-    targetPort: 8082
-    nodePort: 30085
+  - name:  api
+    port: 8081
+    targetPort: 8081
+    nodePort: 30084
   selector:
-    app: web
+    app:  api

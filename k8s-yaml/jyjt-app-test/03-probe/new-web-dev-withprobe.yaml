@@ -50,17 +50,17 @@ spec:
         - name: registry-pull-secret
       containers:
         - name: web
-          image: 'registry.cn-shanghai.aliyuncs.com/jyjt/develop-web:202109061651'
+          image: "registry.cn-shanghai.aliyuncs.com/jyjt/develop-web:202109081523"
           imagePullPolicy: IfNotPresent
           args: ["--spring.profiles.active=$(web-env-key)"]
           ports:
-          - containerPort: 8082 
+            - containerPort: 8082
           env:
-          - name: web-env-key
-            valueFrom:
-              configMapKeyRef:
-                name: web-config
-                key: web-env 
+            - name: web-env-key
+              valueFrom:
+                configMapKeyRef:
+                  name: web-config
+                  key: web-env
           startupProbe:
             httpGet:
               path: /
@@ -68,9 +68,10 @@ spec:
             failureThreshold: 30
             periodSeconds: 10
           livenessProbe:
-            httpGet:
-              path: /
-              port: 8082
+            exec:
+              command:
+                - ls
+                - /tmp
             failureThreshold: 1
             periodSeconds: 10
           readinessProbe:
@@ -84,11 +85,11 @@ spec:
           resources:
             limits:
               cpu: "1800m"
-              memory: "3Gi"
+              memory: "2Gi"
             requests:
               cpu: "1200m"
-              memory: "1500Mi" 
-          volumeMounts: 
+              memory: "1Gi"
+          volumeMounts:
             - name: nfs
               mountPath: /logs
       volumes:
@@ -106,9 +107,9 @@ metadata:
 spec:
   type: NodePort
   ports:
-  - name: web
-    port: 8082
-    targetPort: 8082
-    nodePort: 30085
+    - name: web
+      port: 8082
+      targetPort: 8082
+      nodePort: 30085
   selector:
     app: web

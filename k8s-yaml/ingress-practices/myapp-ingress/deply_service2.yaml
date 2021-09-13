@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp-deploy2
+  namespace: default
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: myapp
+      release: v2
+  template:
+    metadata:
+      labels:
+        app: myapp
+        release: v2
+        env: test
+    spec:
+      containers:
+      - name: myapp
+        image: registry.cn-beijing.aliyuncs.com/google_registry/myapp:v2
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: http
+          containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: myapp-clusterip2
+  namespace: default
+spec:
+  type: ClusterIP  # 默认类型
+  selector:
+    app: myapp
+    release: v2
+  ports:
+  - name: http
+    port: 80
+    targetPort: 80
