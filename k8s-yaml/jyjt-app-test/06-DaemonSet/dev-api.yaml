@@ -28,7 +28,7 @@ spec:
       storage: 20G
 ---
 apiVersion: apps/v1
-kind: Deployment
+kind: DaemonSet
 metadata:
   name:  api
   namespace: app-dev
@@ -38,9 +38,9 @@ spec:
   selector:
     matchLabels:
       app:  api
-  replicas: 2
-  strategy:
-    type: RollingUpdate
+# replicas: 2
+#  strategy:
+#    type: RollingUpdate
   template:
     metadata:
       labels:

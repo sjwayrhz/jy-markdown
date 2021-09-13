@@ -50,7 +50,7 @@ spec:
         - name: registry-pull-secret
       containers:
         - name: web
-          image: 'registry.cn-shanghai.aliyuncs.com/jyjt/develop-web:202109061651'
+          image: 'registry.cn-shanghai.aliyuncs.com/jyjt/develop-web:202109101447'
           imagePullPolicy: IfNotPresent
           args: ["--spring.profiles.active=$(web-env-key)"]
           ports:
@@ -84,7 +84,7 @@ spec:
           resources:
             limits:
               cpu: "1800m"
-              memory: "3Gi"
+              memory: "2Gi"
             requests:
               cpu: "1200m"
               memory: "1500Mi" 
