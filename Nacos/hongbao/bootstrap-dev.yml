@@ -1,0 +1,21 @@
+spring:
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 192.168.32.139:8848,192.168.32.141:8848,192.168.32.142:8848
+        namespace: 6421afc0-0a0d-4447-b297-c2112d064e9d
+      config:
+        server-addr: 192.168.32.139:8848,192.168.32.141:8848,192.168.32.142:8848
+        file-extension: yml
+        namespace: 6421afc0-0a0d-4447-b297-c2112d064e9d  #属于哪个组
+        group: dev
+        ext-config:
+          - data-id: biz.yml
+            group: dev
+            refresh: true
+logback:
+  path: /app/logs/app/logs/ajxt_pay_center
+  servername: ajxt_pay_center_dev
+  kafka:
+    topic: jykc_log_java_application_dev
+    servers: 192.168.32.152:9092,192.168.32.153:9092,192.168.32.155:9092
