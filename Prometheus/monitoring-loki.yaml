@@ -91,10 +91,12 @@ metadata:
     app: loki
     release: loki
 spec:
+  type: NodePort
   ports:
   - name: http-metrics
     port: 3100
     protocol: TCP
+    nodePort: 30004
     targetPort: http-metrics
   selector:
     app: loki
@@ -145,7 +147,7 @@ spec:
       containers:
       - args:
         - -config.file=/etc/loki/loki.yaml
-        image: grafana/loki:2.0.0
+        image: grafana/loki:2.3.0
         imagePullPolicy: IfNotPresent
         name: loki
         ports:

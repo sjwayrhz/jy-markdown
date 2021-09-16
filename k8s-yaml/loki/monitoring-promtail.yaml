@@ -363,7 +363,7 @@ spec:
             fieldRef:
               apiVersion: v1
               fieldPath: spec.nodeName
-        image: grafana/promtail:2.0.0
+        image: grafana/promtail:2.3.0
         imagePullPolicy: IfNotPresent
         name: promtail
         ports:
