@@ -82,6 +82,13 @@ spec:
       containers:
         - name: vue
           image: registry.cn-shanghai.aliyuncs.com/jyjt/office-vue:202109160810
+          readinessProbe:
+            httpGet:
+              path: /#/login
+              port: 8083
+            initialDelaySeconds: 3
+            failureThreshold: 5
+            periodSeconds: 3
           resources:
             limits:
               cpu: "200m"

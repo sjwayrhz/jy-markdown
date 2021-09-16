@@ -81,27 +81,14 @@ spec:
         - name: registry-pull-secret
       containers:
         - name: vue
-          image: registry.cn-shanghai.aliyuncs.com/jyjt/develop-vue:0.0.1
-          startupProbe:
-            httpGet:
-              path: /
-              port: 8083
-            failureThreshold: 15
-            periodSeconds: 1
-          livenessProbe:
-            httpGet:
-              path: /
-              port: 8083
-            failureThreshold: 2
-            periodSeconds: 14
+          image: registry.cn-shanghai.aliyuncs.com/jyjt/office-vue:202109160810
           readinessProbe:
             httpGet:
-              path: /
+              path: /#/login
               port: 8083
-            initialDelaySeconds: 5
-            successThreshold: 1
-            failureThreshold: 3
-            periodSeconds: 10
+            initialDelaySeconds: 3
+            failureThreshold: 5
+            periodSeconds: 3
           resources:
             limits:
               cpu: "200m"
