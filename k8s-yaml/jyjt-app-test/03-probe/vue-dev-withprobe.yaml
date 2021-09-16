@@ -1,15 +1,41 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: dev-vue-config
+  name: vue-config
   namespace: app-dev
 data:
-  vue-env: dev
+  vue.conf: |-
+    upstream vue{
+      server 192.168.177.35:30085;
+    }
+    
+    server {
+      listen  8083;
+      server_name localhost;
+      access_log /var/log/nginx/vue_access_log main;
+    
+      location / {
+        root /usr/share/nginx/html; 
+        try_files $uri $uri/ index.html;
+      }
+      
+      location /juneyao {
+        proxy_pass http://vue;
+      }
+    }
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: registry-pull-secret
+data:
+  .dockerconfigjson: ewoJImF1dGhzIjogewoJCSJyZWdpc3RyeS5jbi1zaGFuZ2hhaS5hbGl5dW5jcy5jb20iOiB7CgkJCSJhdXRoIjogImRHRnZhWE4wYlc5dWEwQXhOak11WTI5dE9sWjNkalUyZEhrMyIKCQl9Cgl9Cn0=
+type: kubernetes.io/dockerconfigjson
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: dev-vue-pvc
+  name: vue-pvc
   namespace: app-dev
 spec:
   storageClassName: nfs-client
@@ -19,82 +45,63 @@ spec:
     requests:
       storage: 1G
 ---
+kind: Service
+apiVersion: v1
+metadata:
+  name: vue
+  namespace: app-dev
+spec:
+  selector:
+    app: vue
+  type: NodePort
+  ports:
+    - protocol: "TCP"
+      port: 8083
+      targetPort: 8083
+      nodePort: 30086
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: dev-vue
+  name: vue
   namespace: app-dev
-  labels:
-    app: dev-vue
+  annotations:
+    reloader.stakater.com/auto: "true"
 spec:
   selector:
     matchLabels:
-      app: dev-vue
+      app: vue
   replicas: 2
-  strategy:
-    type: RollingUpdate
   template:
     metadata:
       labels:
-        app: dev-vue
+        app: vue
     spec:
+      imagePullSecrets: 
+        - name: registry-pull-secret
       containers:
-        - name: dev-vue
-          image: 'registry.cn-shanghai.aliyuncs.com/jyjt/develop-vue:202109021510'
-          imagePullPolicy: IfNotPresent
-          args: ["--spring.profiles.active=$(vue-env-key)"]
-          ports:
-          - containerPort: 8082
-          env:
-          - name: vue-env-key
-            valueFrom:
-              configMapKeyRef:
-                name: dev-vue-config
-                key: vue-env 
-          livenessProbe:
-            httpGet:
-              path: /
-              port: 8082
-            initialDelaySeconds: 25
-            timeoutSeconds: 2
-            successThreshold: 1
-            failureThreshold: 3
-            periodSeconds: 10
-          readinessProbe:
-            httpGet:
-              path: /#/login
-              port: 8082
-            initialDelaySeconds: 30
-            failureThreshold: 5
-            periodSeconds: 10
+        - name: vue
+          image: registry.cn-shanghai.aliyuncs.com/jyjt/office-vue:202109160810
           resources:
             limits:
-              cpu: "500m"
+              cpu: "200m"
               memory: "200Mi"
             requests:
-              cpu: "200m"
-              memory: "100Mi" 
-          volumeMounts: 
-            - name: nfs
-              mountPath: /var/log/nginx
+              cpu: "100m"
+              memory: "100Mi"
+          ports:
+          - name: http
+            containerPort: 8083
+          volumeMounts:
+          - name: vueconf
+            mountPath: /etc/nginx/conf.d/
+            readOnly: true
+          - name: vuelog
+            mountPath: /var/log/nginx/
       volumes:
-        - name: nfs
-          persistentVolumeClaim:
-            claimName: dev-vue-pvc
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: dev-vue-service
-  namespace: app-dev
-  labels:
-    name: dev-vue-service
-spec:
-  type: NodePort
-  ports:
-  - name: dev-vue
-    port: 8082
-    targetPort: 8082
-    nodePort: 30086
-  selector:
-    app: dev-vue
+      - name: vueconf
+        configMap:
+          name: vue-config
+      - name: vuelog
+        persistentVolumeClaim:
+          claimName: vue-pvc
