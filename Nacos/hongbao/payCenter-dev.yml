@@ -1,0 +1,184 @@
+server:
+  port: 9066
+  servlet:
+    context-path: /api
+  tomcat:
+    uri-encoding: UTF-8
+  
+spring:
+  # 编码设置
+  http:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+
+  # ======rabbitmq config
+  rabbitmq:
+    #host: ${rabbitmq.host}
+    host: 192.168.32.139
+    port: 5672
+    username: ajxt
+    password: tJzXvkoL/Oz8WYWdsybk9Q==
+    virtual-host: ajxt_vhost
+    publisher-confirms: true
+    publisher-returns: true
+    listener:
+      concurrency: 3
+      max-concurrency: 5
+      prefetch: 3
+    # ======redis cluster config
+  redis:
+    clusterNodes: 192.168.64.32:7001,192.168.64.32:7002,192.168.64.33:7001,192.168.64.33:7002,192.168.64.34:7001,192.168.64.34:7002
+    testOnReturn: true
+    testOnBorrow: true
+    maxIdle: 10             # 最大空闲连接数
+    minIdle: 2              # 最小空闲连接数
+    maxWaitMills: 3000     # 获取连接的最大等待时间
+    maxTotal: 100          # 最大连接数
+    commandTimeout: 10000 # redis命令操作的超时时间
+    password: 2cfXpyayISj0sJ6h7q+8sA==
+  #http连接池属性：最大连接数，超时时间等
+  httpclient:
+    maxTotalConns: 100
+    maxConnsPerHost: 100
+    defaultMaxPerRoute: 20
+    connectTimeout: 60000
+    connectionRequestTimeout: 60000
+    socketTimeout: 60000
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 30MB
+      location: c://temp
+    # ======mysql datasource config
+  datasource:
+    # 数据源名称
+    name: ajc_datasource
+    # 数据源类型：阿里巴巴druid数据源
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      # 配置监控统计拦截的filters，去掉后监控界面sql无法统计，'wall'用于防火墙
+      filters: stat,wall
+      # 连接数据库的驱动程序
+      driver-class-name: com.mysql.jdbc.Driver
+      # 基本属性，链接，用户/密码
+      url: jdbc:mysql://192.168.32.140:3306/payCenterDB?zeroDateTimeBehavior=convertToNull&autoReconnect=true&useSSL=false&failOverReadOnly=false&allowMultiQueries=true
+      username: ajxt
+      password: tJzXvkoL/Oz8WYWdsybk9Q==
+      # 配置连接池初始化大小/最小/最大
+      initial-size: 5
+      min-idle: 5
+      max-active: 100
+      #获取连接等待超时时间
+      max-wait: 60000
+      # 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒
+      time-between-eviction-runs-millis: 60000
+      remove-abandoned: true
+      remove-abandoned-timeout: 1800
+      #一个连接在池中最小生存的时间
+      min-evictable-idle-time-millis: 300000
+      # 检查空闲连接是否有效
+      validation-query: SELECT 'x'
+      test-while-idle: true
+      test-on-borrow: false
+      test-on-return: false
+      #打开PSCache，并指定每个连接上PSCache的大小。oracle设为true，mysql设为false。分库分表较多推荐设置为false
+      pool-prepared-statements: false
+      max-pool-prepared-statement-per-connection-size: 20
+      log-abandoned: true
+      # 通过connectProperties属性来打开mergeSql功能；慢SQL记录
+      connection-properties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=500
+# ======mybatis的映射文件和java的bean对象的位置
+    # ======mongodb config
+  data:
+    mongodb:
+      address: 192.168.64.32:23000,192.168.64.33:23000,192.168.64.34:23000
+      username: ajxt
+      password: PCW90c9czdUtbCrW1eAnJA==
+      database: ajdb
+      replicaSet:
+      #options:
+      minConnectionsPerHost: 10
+      maxConnectionsPerHost : 20
+      threadsAllowedToBlockForConnectionMultiplier: 5
+      serverSelectionTimeout: 30000
+      maxWaitTime: 120000
+      maxConnectionIdleTime: 0
+      maxConnectionLifeTime: 0
+      connectTimeout: 10000
+      socketTimeout: 0
+      socketKeepAlive: false
+      sslEnabled: false
+      sslInvalidHostNameAllowed: false
+      alwaysUseMBeans: false
+      heartbeatSocketTimeout: 20000
+      heartbeatConnectTimeout: 20000
+      minHeartbeatFrequency: 500
+      heartbeatFrequency: 10000
+      localThreshold: 15
+mybatis:
+  mapper-locations: classpath:mybatis/mapper/*/*.xml
+  type-aliases-package: com.ajc.pay.model.*.entity
+# mapper
+mapper:
+  mappers:
+    - com.ajc.pay.dao.base.BasePayMapper
+  not-empty: true
+  identity: MYSQL
+  style: camelhumpanduppercase
+# pagehelper
+pagehelper:
+  helper-dialect: mysql
+  #分页合理化参数，默认值为false。当该参数设置为 true 时，pageNum<=0 时会查询第一页， pageNum>pages（超过总数时），会查询最后一页。默认false 时，直接根据参数进行查询
+  reasonable: "false"
+  #支持通过 Mapper 接口参数来传递分页参数，默认值false，分页插件会从查询方法的参数值中，自动根据上面 params 配置的字段中取值，查找到合适的值时就会自动分页
+  support-methods-arguments: "false"
+  params: count=countSql
+#FTP配置
+sftp:
+  app:
+    address: 192.168.32.143
+    port: 22
+    userName: ph_sftp
+    password: 123456
+    sftpPath: /upload/file/ajxtpay
+    fileHttpUrl: http://10.20.64.223:18099/file  #http://10.20.64.223:18099/file/aifang
+  ta:
+    address: 192.168.32.35
+    port: 21
+    userName: Administrator
+    password: ajxt@123
+    sftpPath: /upload/test
+    ftpType: ftp
+  crm:
+    address: 192.168.32.94
+    port: 22
+    userName: root
+    password: ajxt@123
+  bosc: 
+    address: 192.168.32.194
+    port: 18299
+    userName: shyh_sftp
+    password: 123456
+    sftpPath: /public/upload
+
+common:
+  file:
+    uploadDir: C:/temp/file
+    faceSftpUrl: /upload/file/face/
+  sftp:
+    username: ph_sftp
+    password: 123456
+    host: 192.168.32.143
+    port: 22
+
+bankCard:
+  imgLocalPath: C:/temp/bank/
+idCard:
+  imgLocalPath: C:/temp/idcard/
+  encodeFile: C:/temp/encode/
+inAndOutCount:
+  inAndOutCountPath: C:/temp/inAndOutCount/
+orderTradeCount:
+  orderTradeCountPath: C:/temp/orderTradeCount/
