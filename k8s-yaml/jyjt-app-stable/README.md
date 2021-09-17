@@ -1,2 +1,0 @@
-集团app的k8s中的yaml脚本分为test和stable版本
-其中test版本会做各种尝试，确认可用的情况下，会将yaml脚本克隆一份到stable版本。
