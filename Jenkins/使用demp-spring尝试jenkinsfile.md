@@ -22,7 +22,7 @@ jenkins工作空间目录 `/opt/jenkins/workspace/demo-spring`
 
 ```
 Name		-> 	m2
-MAVEN_HOME	->	/usr/local/apache-maven-3.8.1
+MAVEN_HOME	->	/usr/local/apache-maven-3.8.2
 ```
 
 ### 配置sharelibrary

@@ -2,12 +2,28 @@
 
 [TOC]
 
-### 修改默认安装目录
+### 修改默认启动配置
 
-打开tomcat的bin目录，编辑catalina.sh文件。
-
-```
-在# OS specific support.  $var _must_ be set to either true or false.上面添加：export JENKINS_HOME=""
+```bash
+$ cat  /etc/sysconfig/jenkins|grep -Ev '^$|#'
+JENKINS_HOME="/var/lib/jenkins"
+JENKINS_JAVA_CMD=""
+JENKINS_USER="jenkins"
+JENKINS_JAVA_OPTIONS="-Djava.awt.headless=true"
+JENKINS_PORT="8080"
+JENKINS_LISTEN_ADDRESS=""
+JENKINS_HTTPS_PORT=""
+JENKINS_HTTPS_KEYSTORE=""
+JENKINS_HTTPS_KEYSTORE_PASSWORD=""
+JENKINS_HTTPS_LISTEN_ADDRESS=""
+JENKINS_HTTP2_PORT=""
+JENKINS_HTTP2_LISTEN_ADDRESS=""
+JENKINS_DEBUG_LEVEL="5"
+JENKINS_ENABLE_ACCESS_LOG="no"
+JENKINS_HANDLER_MAX="100"
+JENKINS_HANDLER_IDLE="20"
+JENKINS_EXTRA_LIB_FOLDER=""
+JENKINS_ARGS=""
 ```
 
 在引号中填入你的路径。
@@ -32,6 +48,36 @@ Git Parameter
 Gitlab
 GitHub Authentication
 Publish Over SSH
+
+### 添加密钥
+
+```
+Manage Jenkins -> Manage Credentials -> Jenkins -> Global credentials (unrestricted) -> Add Credentials
+```
+
+一般情况下，添加ssh密钥即可
+
+### 配置maven
+
+```
+Manage Jenkins -> Global Tool Configuration -> Maven
+
+Name: m2
+MAVEN_HOME: /usr/local/apache-maven-3.8.2
+```
+
+之后在代码中引用maven
+
+```
+mvnHome = tool "m2"
+sh """
+  cd ${warehouse}                      
+  ${mvnHome}/bin/mvn clean install
+  cp -fr ${warehouse}/target/demo-0.0.1-SNAPSHOT.jar ${warehouse}/docker
+"""
+```
+
+
 
 
 

@@ -7,7 +7,7 @@
 这将是启动Jenkins的基础依赖
 
 ```
-~]# sudo dnf install java-1.8.0-openjdk -y
+~]# sudo dnf install java-1.8.0-openjdk java-devel -y
 ```
 
 ### 使用rpm包安装
@@ -84,18 +84,6 @@ EOF
 ```
 
 修改镜像源之后，就可以安装插件了。
-
-
-
-### 遇到的问题
-
-centos下maven编译 mvn package 报错：No compiler is provided in this environment. Perhaps you are running on a JRE rather than a JDK?
-
-解决方案
-
-```
-yum install java-devel 
-```
 
 
 
