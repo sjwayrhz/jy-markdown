@@ -113,7 +113,7 @@ Export list for 10.230.7.21:
 
 ```bash
 # Set the subject of the RBAC objects to the current namespace where the provisioner is being deployed
-nfs-subdir-external-provisioner]# NAMESPACE=k
+nfs-subdir-external-provisioner]# NAMESPACE=kube-system
 nfs-subdir-external-provisioner]# sed -i'' "s/namespace:.*/namespace: $NAMESPACE/g" ./deploy/rbac.yaml ./deploy/deployment.yaml
 nfs-subdir-external-provisioner]# kubectl create -f deploy/rbac.yaml
 ```
