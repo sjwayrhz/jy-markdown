@@ -158,3 +158,51 @@ pipeline {
 
 ```
 
+### 定时任务
+
+```
+cron
+这里采用和Linux系统一样的定时任务管理方案，加入一些简单的参数项，以应对某些需要定期执行的场景。
+
+pipeline {
+    agent any
+    triggers {
+        cron('* * * * *')
+    }
+    stages {
+        stage('cron job') {
+            steps {
+                echo 'cron job test'
+            }
+        }
+    }
+}
+
+这里参数可以参考linux cron来配置。
+
+pollSCM
+这里表示定期对代码仓库进行检测，如果有变化，则自动触发构建。
+
+pipeline {
+    agent any
+    triggers {
+        pollSCM('* * * * *')
+    }
+    stages {
+        stage('cron job') {
+            steps {
+                echo '每一小时检测一次仓库的变化'
+            }
+        }
+    }
+}
+
+upstream
+当B项目的执行依赖A项目的执行结果是，A就是B的上游项目，在Jenkins2.22以上的版本中，可以通过upstream关键字进行这种关系的表示。
+
+triggers { 
+      // job1,job2都是任务名称
+      upstream(upstreamProjects: 'job1,job2', threshold: hudson.model.Result.SUCCESS) 
+}
+```
+
