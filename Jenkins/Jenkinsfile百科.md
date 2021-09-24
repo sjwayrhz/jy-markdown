@@ -119,3 +119,42 @@ node {
 
 ```
 
+### 定义和使用map
+
+```groovy
+@Library('Jenkinslib') _
+
+def country_capital = [
+    Australia: [
+        best: 'xx1',
+        good: 'xx2',
+        bad: 'xx3'
+    ],
+    America: [
+        best: 'yy1',
+        good: 'yy2',
+        bad: 'yy3'
+    ]
+]
+
+def map = [
+  "demo-spring-a": "hwy-1",
+  "demo-spring-b": "hwy-2"
+]
+
+pipeline {
+    agent any    
+    stages {
+        stage('Test Map') {
+            steps {
+                script {
+                    echo country_capital.Australia.best
+                    echo map."demo-spring-a"
+                }
+            }
+        }
+    }
+}
+
+```
+
