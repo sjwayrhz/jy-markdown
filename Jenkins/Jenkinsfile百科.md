@@ -119,6 +119,10 @@ node {
 
 ```
 
+### 生成token
+
+点击登录的账户，比如 admin ,点击configure,可以看到“API Token”，点击“Add new token” ，记得生成的token需要save 保存
+
 ### 定义和使用map
 
 ```groovy
