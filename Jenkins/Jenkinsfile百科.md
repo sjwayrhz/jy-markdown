@@ -21,7 +21,7 @@ jenkins工作空间目录 `/opt/jenkins/workspace/demo-spring`
 在 "Manage Jenkins" -> "Global Tool Configuration"当中配置maven
 
 ```
-Name		-> 	m2
+Name		-> 	maven
 MAVEN_HOME	->	/usr/local/apache-maven-3.8.2
 ```
 
@@ -29,7 +29,7 @@ maven作为变量的使用方法一
 
 ```groovy
 tools {
-    maven 'apache-maven-3.0.1' 
+    maven 'maven' 
 }
 stages {
     stage('Example') {
@@ -88,3 +88,34 @@ stage('git') {
 ```
 
 即可使用jenkinslib
+
+
+
+### 插件
+
+build user vars
+
+```
+https://plugins.jenkins.io/build-user-vars-plugin/
+
+Variables provided
+
+The plugin provides the following environment variables:
+Variable 	Description
+BUILD_USER 	Full name (first name + last name)
+BUILD_USER_FIRST_NAME 	First name
+BUILD_USER_LAST_NAME 	Last name
+BUILD_USER_ID 	Jenkins user ID
+BUILD_USER_GROUPS 	Jenkins user groups
+BUILD_USER_EMAIL 	Email address
+
+Pipeline Examples
+
+node {
+  wrap([$class: 'BuildUser']) {
+    def user = env.BUILD_USER_ID
+  }
+}
+
+```
+
