@@ -18,7 +18,7 @@ Jenkins -> helloworld -> configure -> Build Triggers ->
 Build when a change is pushed to GitLab. GitLab webhook URL: http://192.168.177.57:8080/jenkins/project/helloworld
 ```
 
-### 在gitlab中导入webhook
+### 方法一：无密钥 不安全
 
 登录gitlab
 
@@ -34,7 +34,7 @@ URL -> http://192.168.177.57:8080/jenkins/project/helloworld
 
 其他值默认即可
 
-### 关闭jenkins中的gitlab 验证(不安全)
+关闭jenkins中的gitlab 验证(不安全)
 
 ```
 Manage Jenkins -> Configure System -> Gitlab
@@ -42,7 +42,9 @@ Manage Jenkins -> Configure System -> Gitlab
 
 取消 `Enable authentication for '/project' end-point`
 
-### 生成access-token
+### 方法二：用密钥 安全
+
+#### Gitlab生成access-token
 
 如果关闭jenkins中的gitlab 验证，任何人只要知道你项目的钩子地址(webhook URL)就可以疯狂触发任务，所以建议在gitlab中生成access_token
 
@@ -74,7 +76,15 @@ Your New Personal Access Token
 Make sure you save it - you won't be able to access it again.
 ```
 
-登录jenkins创建Credentials    
+#### Jenkins生成API token
+
+Jenkins User ID: sjwayrhz
+
+```
+User ID -> Configure -> API Token -> Add new Token
+```
+
+#### Jenkins创建gitlab的Credentials   
 
 ```
 Manage Jenkins -> Manage Credentials -> Jenkins -> Global credentials (unrestricted) -> Add Credentials    
@@ -90,7 +100,7 @@ ID -> gitlab-access-token
 Description -> null
 ```
 
-配置jenkins中的gitlab 验证
+#### 配置jenkins中的gitlab 验证
 
 ```
 Manage Jenkins -> Configure System -> Gitlab
@@ -106,6 +116,8 @@ Credentials -> Gitlab API token
 ```
 
 点击`Test Connection` 测试是否连接成功
+
+#### 配置gitlab中的jenkins构建路径
 
 此时，gitlab中的webhook的url就不可以是匿名的URL了，需要使用jenkins的用户与tokens了。
 
