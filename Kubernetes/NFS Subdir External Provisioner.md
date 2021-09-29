@@ -89,7 +89,7 @@ spec:
       serviceAccountName: nfs-client-provisioner
       containers:
         - name: nfs-client-provisioner
-          image: k8s.gcr.io/sig-storage/nfs-subdir-external-provisioner:v4.0.2
+          image: registry.cn-shanghai.aliyuncs.com/taoistmonk/images:nfs-subdir-external-provisioner-v4.0.2
           volumeMounts:
             - name: nfs-client-root
               mountPath: /persistentvolumes

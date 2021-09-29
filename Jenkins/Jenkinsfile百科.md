@@ -210,3 +210,43 @@ triggers {
 }
 ```
 
+### projectName与app对应
+
+在使用Jenkins的过程中，会牵涉到workspace的概念，一般我会在workspace中创建与项目对应的软链接。
+
+例如 ` ln -s /usr/local/src/devops /opt/jenkins/workspace/syncGit`
+
+那么，如何创建app与projectName对应呢
+
+```groovy
+def road = [
+  "api": "juneyaoYun",
+  "web": "juneyaoYun",
+  "vue": "group-app-manage"
+]
+
+def projectName
+pipeline {
+    agent any
+
+    stages {                 
+         stage ('git pull') {
+            steps { 
+                script {
+                    projectName = road."${params.app}"
+                    sh """
+                        cd $WORKSPACE/$projectName
+                        git reset --hard HEAD
+                        git switch ${params.branch}
+                        git fetch --all
+                        git reset --hard origin/${params.branch}
+                        git pull origin ${params.branch}
+                    """
+                }              
+                
+            }
+        }
+    }
+}
+```
+
