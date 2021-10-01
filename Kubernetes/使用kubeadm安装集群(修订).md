@@ -272,6 +272,13 @@ I1001 12:21:20.438453   32513 version.go:254] remote version is much newer: v1.2
 ~]# systemctl restart kubelet
 ```
 
+如果安装calico网络
+release will be found on this site . `https://docs.projectcalico.org/releases`
+
+```bash
+~]# kubectl apply -f https://docs.projectcalico.org/v3.19/manifests/calico.yaml
+```
+
 ## 配置nfs-storage
 
 登陆nfs-server，创建nfs共享存储
