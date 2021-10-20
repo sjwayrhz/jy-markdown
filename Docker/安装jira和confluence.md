@@ -12,13 +12,16 @@ Docker镜像 Github链接 `https://github.com/cptactionhank/`
 
 如果是选择外部数据库，大家可以按照这样创建：
 ```
+#mysql root密码
+root / 2wsx#EDC
+
 # 创建jira数据库及用户
 CREATE DATABASE jiradb CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
-grant all on jiradb.* to 'jirauser'@'%' identified by 'tVxxxb6n';
+grant all on jiradb.* to 'jirauser'@'%' identified by '1qaz@WSX';
 
 # 创建confluence数据库及用户
 CREATE DATABASE confdb CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
-grant all on confdb.* to 'confuser'@'%' identified by '7FxxxzhO';
+grant all on confdb.* to 'confuser'@'%' identified by '3edc$RFV';
 
 # confluence要求设置事务级别为READ-COMMITTED
 set global tx_isolation='READ-COMMITTED';
