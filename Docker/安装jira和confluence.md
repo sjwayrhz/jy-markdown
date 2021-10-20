@@ -179,6 +179,33 @@ HjrqUviCM0LCNnmh13L8izfcfBd53sTq1rkBZXw/z379O7jbJTV+38H7dQ6C4v6tAexPGyl7iSmd
 h0vyDfL9EfqQhoHm78HYMflMCwCFEGC+TW7sWRwr2Q9WLHGEm4MQlRaAhQ3SJf/EFAfkU+qG8O/5
 jeHXjeXww==X02k0
 ```
+
+## 破解应用商城的markdown
+如果下载的markdown收费应用程序，则在应用管理中找到该应用程序，并复制该应用程序的应用秘钥。
+例如本次得到的密钥是org.swift.confluence.markdown，然后做如下破解操作：
+
+```
+java -jar atlassian-agent.jar -d -m i@sjhz.tk -n BAT -p org.swift.confluence.markdown -o http://confluence.sjhz.tk -s B88F-V1GL-HIQ8-UA4Y
+
+====================================================
+=======     Atlassian Crack Agent v1.3.1     =======
+=======           https://zhile.io           =======
+=======          QQ Group: 30347511          =======
+====================================================
+
+Your license code(Don't copy this line!!!):
+
+AAABqA0ODAoPeJyNUl1vozAQfPevQLpnwJA0IZEsNQFyiS4fbb6qy5tDl+ALGM42ofTX1yFEd6pO6
+kn2g3fk2Zmd/fYCr8YqUoaLDewN3cEQO4a/2eq36yBfAFUs5wFVQK4V08Gmi9GcRcAlbOsCljQD4
+q8Wi3Dtz0ZzFF5oWjafSExTCSgAGQlWNJUdT1nGlG6Z3hiMY20kShVyaNvvCUvBYjlaiRPlTN5Ir
+qgGo5zHaQk8Akv+St4tdUa5OFmyYrGy/gIzKs6vecUt4ApEIZgEokQJyM+5opEKF5SlhD3+H8lGU
+aFpWiet5imVCVn4lT8J/HifHGw5XUSHYG8/x+V2Vr2d1u74NErWxxdWd35nhx9KTeMHyinY6kkcy
+klWEYK0Dq2QU90vfCuYqNsZewMT9/X5Qpm2wi6ttQ2IC4hZQMaeNzH3zve5OZ09e+Zu1P2JzlDvQ
+cjrKJ0exn3sdToOWpbZEcQq3kmNEdO5J/pvKU+liBIq4fMatAO587toUx7/hH3TFi6Jvubc6XW6P
+W/Q7zr4oXdPo1me8Wj7hVndl/pNoA3pB42q7OwwLQIUV3be02pea2Ofq4C51W32BR4cvtkCFQCXX
+evCcPcuRn6jQh77rBPGfuYz5A==X02kg
+```
+
 ## 乱码问题
 在我们正常安装之后，中文可能会有乱码，我们修改一下连接字符串，在 confluence 的家目录下面，有一个配置文件confluence.cfg.xml，找到hibernate.connection.url，在数据库字符串后面加上如下字符，整体结果如下：
 ```
