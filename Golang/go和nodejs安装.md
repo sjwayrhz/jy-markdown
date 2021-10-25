@@ -12,7 +12,7 @@ GOPROXY         ->      https://goproxy.io
 
 ```shell
 ~]# cd /tmp
-tmp]# wget https://dl.google.com/go/go1.15.6.linux-amd64.tar.gz
+tmp]# wget https://dl.google.com/go/go1.17.linux-amd64.tar.gz
 ```
 
 解压缩下载的 tar，然后安装到系统中的所需位置。但是通常遵循文档最好将其安装在 /user/local/go 下。在终端中运行以下命令进行安装。
