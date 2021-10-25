@@ -148,3 +148,34 @@ server {
 	}
 }
 ```
+
+## 查看数据库的配置
+```
+~]# grep -C 10 "mariadb" /etc/my.cnf.d/server.cnf
+# Optional setting
+#wsrep_slave_threads=1
+#innodb_flush_log_at_trx_commit=0
+
+# this is only for embedded server
+[embedded]
+
+# This group is only read by MariaDB servers, not by MySQL.
+# If you use the same .cnf file for MySQL and MariaDB,
+# you can put MariaDB-only options here
+[mariadb]
+innodb_log_file_size=256M
+max_allowed_packet=34M
+transaction-isolation=READ-COMMITTED
+
+# This group is only read by MariaDB-10.6 servers.
+# If you use the same .cnf file for MariaDB of different versions,
+# use this group for options that older servers don't understand
+[mariadb-10.6]
+```
+
+## 乱码问题
+在我们正常安装之后，中文可能会有乱码，我们修改一下连接字符串，在 confluence 的家目录下面，有一个配置文件confluence.cfg.xml，找到hibernate.connection.url，在数据库字符串后面加上如下字符，整体结果如下：
+```
+~]# cat /home/data/www/confluence.sjhz.tk/confluence.cfg.xml | grep jdbc:mysql
+    <property name="hibernate.connection.url">jdbc:mysql://10.230.7.33:3306/confdb?useUnicode=true&amp;characterEncoding=utf8</property>
+```
