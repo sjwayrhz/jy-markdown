@@ -1,6 +1,10 @@
-# 不使用SSL证书
+# 快速部署confluence
 
-## nossl_docker启动
+[TOC]
+
+## 不使用SSL证书
+
+### nossl_docker启动
 ```
 docker run -d --name confluence   \
     --restart always   \
@@ -10,7 +14,7 @@ docker run -d --name confluence   \
     sjwayrhz/confluence:1.1
 ```
 
-## nossl_nginx配置
+### nossl_nginx配置
 ```
 upstream confluence_8090 {
     server 127.0.0.1:8090;
@@ -50,8 +54,17 @@ server {
 }
 ```
 
-# 使用SSL证书
-## 添加server.xml
+## 使用SSL证书
+
+### 思路
+
+如果需要使用ssl证书，则首先需要自定义dockerfile文件，修改confluence默认的tomcat文件中的conf/server.xml，添加https域名的关键配置`proxyName="confluence.sjhz.tk" proxyPort="443" scheme="https"`
+
+重新构建docker镜像，启动docker镜像。
+
+然后再配置nginx，使得其支持https。
+
+### 添加server.xml
 ```
 <?xml version="1.0"?>
 <Server port="8000" shutdown="SHUTDOWN">
@@ -86,7 +99,7 @@ server {
 proxyName="confluence.sjhz.tk" proxyPort="443" scheme="https"/>
 ```
 
-## 制作Dockerfile
+### 制作Dockerfile
 ```
 FROM cptactionhank/atlassian-confluence:latest
 USER root
@@ -94,7 +107,7 @@ COPY "atlassian-agent.jar" /opt/atlassian/confluence/
 COPY server.xml /opt/atlassian/confluence/conf/server.xml
 RUN echo 'export CATALINA_OPTS="-javaagent:/opt/atlassian/confluence/atlassian-agent.jar ${CATALINA_OPTS}"' >> /opt/atlassian/confluence/bin/setenv.sh
 ```
-## 制作docker镜像
+### 制作docker镜像
 ```
 docker build -t sjwayrhz/confluence:confluence.sjhz.tk .
 ```
@@ -149,7 +162,7 @@ server {
 }
 ```
 
-## 查看数据库的配置
+### 查看数据库的配置
 ```
 ~]# grep -C 10 "mariadb" /etc/my.cnf.d/server.cnf
 # Optional setting
