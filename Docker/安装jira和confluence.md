@@ -215,3 +215,14 @@ evCcPcuRn6jQh77rBPGfuYz5A==X02kg
 ~]# cat /home/data/www/confluence.sjhz.tk/confluence.cfg.xml | grep jdbc:mysql
     <property name="hibernate.connection.url">jdbc:mysql://10.230.7.33:3306/confdb?useUnicode=true&amp;characterEncoding=utf8</property>
 ```
+
+## confluence支持ssl
+添加自定义的server.xml文件到Dockerfile根目录
+Dockerfile修改如下：
+```
+FROM cptactionhank/atlassian-confluence:latest
+USER root
+COPY "atlassian-agent.jar" /opt/atlassian/confluence/
+COPY server.xml /opt/atlassian/confluence/conf/server.xml
+RUN echo 'export CATALINA_OPTS="-javaagent:/opt/atlassian/confluence/atlassian-agent.jar ${CATALINA_OPTS}"' >> /opt/atlassian/confluence/bin/setenv.sh
+```
