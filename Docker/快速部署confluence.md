@@ -113,6 +113,7 @@ docker run -d --name confluence   \
 ```
 server {
 	listen        80;
+  server_name   confluence.sjhz.tk;
 	if ($scheme != "https") {
             return 301 https://$host$request_uri;
         }
