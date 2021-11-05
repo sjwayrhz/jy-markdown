@@ -12,10 +12,10 @@
 
 ### 使用rpm包安装
 
-目前最新是jenkins-2.289.3-1.1.noarch.rpm
+目前最新是jenkins-2.303.3-1.1.noarch.rpm
 
 ```
-~]# rpm -ivh https://mirrors.tuna.tsinghua.edu.cn/jenkins/redhat-stable/jenkins-2.289.3-1.1.noarch.rpm
+~]# rpm -ivh https://mirrors.tuna.tsinghua.edu.cn/jenkins/redhat-stable/jenkins-2.303.3-1.1.noarch.rpm
 ```
 
 ### 修改jenkins默认配置
