@@ -14,9 +14,13 @@ certbot --nginx
 ```
 
 4. 自动更新
-```
+   
 crontab -e
 
-0 0 1 * * /usr/bin/certbot renew --force-renewal
+```
+SHELL=/bin/bash
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+
+0 0 1 */2 * certbot renew --quiet --force-renewal
 ```
 
