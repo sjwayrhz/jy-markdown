@@ -20,7 +20,7 @@ soul用户的客户端配置文件路径：/root/soul.ovpn
 
 ## 配置使用账号密码验证
 
-1\.创建脚本:vim /etc/openvpn/checkpsw.sh
+### 创建脚本:vim /etc/openvpn/checkpsw.sh
 
 ```
 #!/bin/sh
@@ -59,19 +59,19 @@ echo "${TIME_STAMP}: Incorrect password: username=\"${username}\", password=\"${
 exit 1
 ```
 
-2\.添加权限
+### 添加权限
 
 ```
 chmod 755 /etc/openvpn/checkpsw.sh
 ```
 
-3\.添加账号密码
+### 添加账号密码
 
 ```
 echo 'username1 password1' >> /etc/openvpn/psw-file
 ```
 
-4\.修改/etc/openvpn/server/server.conf
+### 修改/etc/openvpn/server/server.conf
 
 ```
 # 追加以下内容
@@ -82,13 +82,13 @@ verify-client-cert none
 log /var/log/openvpn.log
 ```
 
-5\.重启服务
+### 重启服务
 
 ```
 systemctl restart openvpn-server@server
 ```
 
-6\.修改客户端文件soul.ovpn
+### 修改客户端文件soul.ovpn
 
 ```
 # 追加以下内容,<cert>和<key>部分可以删掉
@@ -97,10 +97,28 @@ auth-user-pass
 
 客户端填写用户名密码,即可使用
 
-7\.添加用户
+### 添加用户
 
 ```
 vi /etc/openvpn/psw-file
 ```
 
 在这个文件下添加即可
+
+### 设置局部路由
+```
+route-nopull #不添加路由， 也就是不会有任何网络请求走OpenVPN 
+
+route 192.168.2.0 255.255.255.0 vpn_gateway #指定此網段才走VPN代理
+
+#max-routes 参数表示可以添加路由的条数
+max-routes 1000
+
+#net_gateway則與vpn_gateway 相反，它是指定哪些IP不走VPN代理
+route 172.121.0.0 255.255.0.0 net_gateway
+
+##請注意，你可能需要註釋或者刪除以下配置，否則可能導致無法DNS(域名)解析
+#setenv opt block-outside-dns
+```
+
+至此，我們就可以重新連接一下VPN，測試一下配置是否達到預期效果
