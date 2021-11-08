@@ -106,19 +106,44 @@ vi /etc/openvpn/psw-file
 在这个文件下添加即可
 
 ### 设置局部路由
+
+主要由 route-nopull、vpn_gateway、net_gateway 三个参数决定
+
+> route-nopull
+
+当客户端加入这个参数后,openvpn 连接后不会添加路由,也就是不会有任何网络请求走 
+> vpn_gateway
+
+当客户端加入 route-nopull 后,所有出去的访问都不从 Openvpn 出去,但可通过添加 vpn_gateway 参数使部分IP访问走 Openvpn 出去
 ```
-route-nopull #不添加路由， 也就是不会有任何网络请求走OpenVPN 
+route 192.168.1.0 255.255.0.0 vpn_gateway
+route 172.121.0.0 255.255.0.0 vpn_gateway
+```
+> net_gateway
 
-route 192.168.2.0 255.255.255.0 vpn_gateway #指定此網段才走VPN代理
-
-#max-routes 参数表示可以添加路由的条数
+这个参数和 vpn_gateway 相反,表示在默认出去的访问全部走 Openvpn 时,强行指定部分IP访问不通过 Openvpn 出去. max-routes 参数表示可以添加路由的条数,默认只允许添加100条路由,如果少于100条路由可不加这个参数.
+```
 max-routes 1000
-
-#net_gateway則與vpn_gateway 相反，它是指定哪些IP不走VPN代理
 route 172.121.0.0 255.255.0.0 net_gateway
-
-##請注意，你可能需要註釋或者刪除以下配置，否則可能導致無法DNS(域名)解析
-#setenv opt block-outside-dns
 ```
+比较常用做法是在客户端配置文件中加上 route-nopull 再使用 vpn-gateway 逐条添加需要走 Openvpn 的 ip。
 
-至此，我們就可以重新連接一下VPN，測試一下配置是否達到預期效果
+设置如下：
+```
+#block-outside-dns
+route-nopull
+#以下路由根据自己实际情况进行添加调整
+route 172.16.0.0 255.255.0.0 vpn_gateway
+route 172.17.0.0 255.255.0.0 vpn_gateway
+```
+遇到的问题
+
+Linux 上没有问题，但是在 Win 10 上 OpenVPN，配置中写入了route-nopull，发现没有用，因为发现所有流量都走了 VPN。
+
+可以通过route 命令进行查看
+
+以管理员的身份运行CMD,打开CMD运行界面。首先分析路由情况，打印路由表。输入如下的命令：route print -4解决：
+
+如果设置了 block-outside-dns
+
+这样 OpenVPN 会添加 Windows 防火墙记录，拦掉除 tap 以外的所有网络接口上的 DNS 请求。需要把这行从你配置文件中删掉
