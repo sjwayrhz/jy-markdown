@@ -93,11 +93,13 @@ ceph-node-03
 
 ### 安装containerd
 
-如果不是用k8s模板部署的rocky linux，可以使用如下脚本初始化环境
+需要rocky linux安装wget ，更换过国内源并且`.ssh/authorized_keys`中储存好公钥，然后可以使用如下脚本初始化环境
 
 ```shell
-~]# ansible all -m shell -a "wget -O- https://gitee.com/sjwayrhz/one_key_install/raw/master/k8s_init.sh | sh"
+~]# ansible all -m shell -a "wget -O- https://gitee.com/sjwayrhz/one_key_install/raw/master/rocky_linux_8.4_init.sh | sh"
 ```
+
+初始化之后，或许需要重启linux系统，但是vmware中的镜像系统，只需执行下面的一步：
 
 如果已经是模版rocky linux了，仅需在ansible虚拟机中执行如下命令安装1.22.3版本运行时
 
