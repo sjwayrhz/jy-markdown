@@ -134,9 +134,9 @@ EOF
 使用如下命令安装k8s依赖组建
 
 ```bash
-~]# ansible all -m yum -a "name=kubeadm-1.21.5 state=installed"
-~]# ansible all -m yum -a "name=kubectl-1.21.5 state=installed"
-~]# ansible all -m yum -a "name=kubelet-1.21.5 state=installed"
+~]# ansible all -m yum -a "name=kubeadm-1.21.6 state=installed"
+~]# ansible all -m yum -a "name=kubectl-1.21.6 state=installed"
+~]# ansible all -m yum -a "name=kubelet-1.21.6 state=installed"
 
 ~]# ansible all -m systemd -a "name=kubelet enabled=yes state=started"
 ```
@@ -149,7 +149,7 @@ EOF
 ~]# kubeadm init \
   --apiserver-advertise-address=192.168.177.210 \
   --image-repository registry.aliyuncs.com/google_containers \
-  --kubernetes-version v1.21.5 \
+  --kubernetes-version v1.21.6 \
   --service-cidr=10.7.0.0/16 \
   --pod-network-cidr=10.3.0.0/16
 ```
@@ -212,7 +212,7 @@ data:
         dataDir: /var/lib/etcd
     imageRepository: registry.aliyuncs.com/google_containers
     kind: ClusterConfiguration
-    kubernetesVersion: v1.21.5
+    kubernetesVersion: v1.21.6
     networking:
       dnsDomain: cluster.local
       podSubnet: 10.3.0.0/16
