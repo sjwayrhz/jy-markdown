@@ -104,6 +104,9 @@ ceph-node-03
 如果已经是模版rocky linux了，仅需在ansible虚拟机中执行如下命令安装1.22.3版本运行时
 
 ```bash
+~]# ansible all -m shell -a "modprobe br_netfilter"
+~]# ansible all -m shell -a "echo 1 > /proc/sys/net/bridge/bridge-nf-call-iptables"
+
 ~]# ansible all -m shell -a "wget -O- https://gitee.com/sjwayrhz/one_key_install/raw/master/install_containerd.sh | bash -s 1.22.3"
 ```
 
