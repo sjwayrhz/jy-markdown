@@ -69,7 +69,9 @@ $ kubectl -n rook-ceph get secret rook-ceph-dashboard-password -o jsonpath="{['d
 xjDadabefO
 ```
 
-### 创建storageclass
+### 创建和使用rbd插件的storageclass
+
+rbd只支持ReadWriteOnce，cephfs能够支持ReadWriteMany。
 
 执行如下命令创建
 
@@ -85,12 +87,53 @@ NAME              PROVISIONER                  RECLAIMPOLICY   VOLUMEBINDINGMODE
 rook-ceph-block   rook-ceph.rbd.csi.ceph.com   Delete          Immediate           true                   46m
 ```
 
-### 使用storageclass
+使用rbd插件的storageclass
 
 这里用一个busybox样例来使用storageclass
 
 ```bash
 $ kubectl apply -f devops/rook/busybox-ceph-sc-pvc.yaml
+```
+
+### 创建和使用cephfs的storageclass
+
+```bash
+$ kubectl  apply -f devops/rook/ceph-1.7/filesystem.yaml
+$ kubectl  apply -f devops/rook/ceph-1.7/csi/cephfs/storageclass.yaml
+```
+
+查看storeageclass
+
+```bash
+~]# kubectl -n rook-ceph get pod -l app=rook-ceph-mds
+NAME                                    READY   STATUS    RESTARTS   AGE
+rook-ceph-mds-myfs-a-679bf4c8c7-bfnnf   1/1     Running   0          11s
+rook-ceph-mds-myfs-b-7bb98d4c65-5nmct   1/1     Running   0          10s
+```
+
+查看现有的storageclass
+
+```bash
+~]# kubectl get sc
+NAME              PROVISIONER                     RECLAIMPOLICY   VOLUMEBINDINGMODE   ALLOWVOLUMEEXPANSION   AGE
+rook-ceph-block   rook-ceph.rbd.csi.ceph.com      Delete          Immediate           true                   3d1h
+rook-cephfs       rook-ceph.cephfs.csi.ceph.com   Delete          Immediate           true                   34s
+```
+
+pv的三种访问模式
+
+```
+ReadWriteOnce，RWO，仅可被单个节点读写挂载
+ReadOnlyMany，ROX，可被多节点同时只读挂载
+ReadWriteMany，RWX，可被多节点同时读写挂载
+```
+
+pv回收策略
+
+```
+Retain，保持不动，由管理员手动回收
+Recycle，空间回收，删除全部文件，仅NFS和hostPath支持
+Delete，删除存储卷，仅部分云端存储支持
 ```
 
 
