@@ -1,212 +1,105 @@
-# Kubernetes NFS Subdir External Provisioner
+* 配置nfs-storage
 
-**NFS subdir external provisioner** is an automatic provisioner that use your _existing and already configured_ NFS server to support dynamic provisioning of Kubernetes Persistent Volumes via Persistent Volume Claims. Persistent volumes are provisioned as `${namespace}-${pvcName}-${pvName}`.
+  登陆nfs-server，创建nfs共享存储
 
-Note: This repository is migrated from https://github.com/kubernetes-incubator/external-storage/tree/master/nfs-client. As part of the migration:
-- The container image name and repository has changed to `k8s.gcr.io/sig-storage` and `nfs-subdir-external-provisioner` respectively.
-- To maintain backward compatibility with earlier deployment files, the naming of NFS Client Provisioner is retained as `nfs-client-provisioner` in the deployment YAMLs.
-- One of the pending areas for development on this repository is to add automated e2e tests. If you would like to contribute, please raise an issue or reach us on the Kubernetes slack #sig-storage channel.
+  ### 配置nfs-server
 
-## How to deploy NFS Subdir External Provisioner to your cluster
+  ```bash
+  ~]# dnf -y install nfs-utils rpcbind
+  ```
 
-To note again, you must _already_ have an NFS Server.
+  配置 nfs，nfs 的默认配置文件在 /etc/exports 文件下，在该文件中添加下面的配置信息：
 
-### With Helm
+  ```
+  ~]# vi /etc/exports
+  /data  *(rw,sync,no_root_squash)
+  ```
 
-Follow the instructions from the helm chart [README](charts/nfs-subdir-external-provisioner/README.md).
+  配置说明：
 
-The tl;dr is
+  ```
+  /nfs：是共享的数据目录
+  *：表示任何人都有权限连接，当然也可以是一个网段，一个 IP，也可以是域名
+  rw：读写的权限
+  sync：表示文件同时写入硬盘和内存
+  no_root_squash：当登录 NFS 主机使用共享目录的使用者是 root 时，其权限将被转换成为匿名使用者，通常它的 UID 与 GID，都会变成 nobody 身份
+  ```
 
-```console
-$ helm repo add nfs-subdir-external-provisioner https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner/
-$ helm install nfs-subdir-external-provisioner nfs-subdir-external-provisioner/nfs-subdir-external-provisioner \
-    --set nfs.server=x.x.x.x \
-    --set nfs.path=/exported/path
-```
+  启动rpcbind 、nfs
 
-### Without Helm
+  ```bash
+  ~]# systemctl enable --now rpcbind
+  ~]# systemctl enable --now nfs-server
+  ```
 
-**Step 1: Get connection information for your NFS server**
+  确认nfs开启
 
-Make sure your NFS server is accessible from your Kubernetes cluster and get the information you need to connect to it. At a minimum you will need its hostname.
+  ```bash
+  ~]# rpcinfo -p|grep nfs
+      100003    3   tcp   2049  nfs
+      100003    4   tcp   2049  nfs
+      100227    3   tcp   2049  nfs_acl
+  ```
 
-**Step 2: Get the NFS Subdir External Provisioner files**
+  创建并查看nfs共享文件夹
 
-To setup the provisioner you will download a set of YAML files, edit them to add your NFS server's connection information and then apply each with the `kubectl` / `oc` command.
+  ```bash
+  ~]# mkdir /data
+  ~]# showmount -e
+  Export list for nfs-server:
+  /data *
+  ```
 
-Get all of the files in the [deploy](https://github.com/kubernetes-sigs/nfs-subdir-external-provisioner/tree/master/deploy) directory of this repository. These instructions assume that you have cloned the [kubernetes-sigs/nfs-subdir-external-provisioner](https://github.com/kubernetes-sigs/nfs-subdir-external-provisioner/) repository and have a bash-shell open in the root directory.
+  ### 配置nfs-client
 
-**Step 3: Setup authorization**
+  使用ansible为k8s集群安装nfs-utils
 
-If your cluster has RBAC enabled or you are running OpenShift you must authorize the provisioner. If you are in a namespace/project other than "default" edit `deploy/rbac.yaml`.
+  ```bash
+  ~]# ansible all -m yum -a "name=nfs-utils state=installed"
+  ```
 
-**Kubernetes:**
+  创建挂载的/data目录
 
-```sh
-# Set the subject of the RBAC objects to the current namespace where the provisioner is being deployed
-$ NS=$(kubectl config get-contexts|grep -e "^\*" |awk '{print $5}')
-$ NAMESPACE=${NS:-default}
-$ sed -i'' "s/namespace:.*/namespace: $NAMESPACE/g" ./deploy/rbac.yaml ./deploy/deployment.yaml
-$ kubectl create -f deploy/rbac.yaml
-```
+  ```bash
+  ~]# ansible all -m shell -a "mkdir /data"
+  ```
 
-**OpenShift:**
+  假设nfs-server的ip地址为 192.168.177.206
 
-On some installations of OpenShift the default admin user does not have cluster-admin permissions. If these commands fail refer to the OpenShift documentation for **User and Role Management** or contact your OpenShift provider to help you grant the right permissions to your admin user.
-On OpenShift the service account used to bind volumes does not have the necessary permissions required to use the `hostmount-anyuid` SCC. See also [Role based access to SCC](https://docs.openshift.com/container-platform/4.4/authentication/managing-security-context-constraints.html#role-based-access-to-ssc_configuring-internal-oauth) for more information. If these commands fail refer to the OpenShift documentation for **User and Role Management** or contact your OpenShift provider to help you grant the right permissions to your admin user.
+  抽取k8s-node-10作为实验，在k8s-node-10虚拟机中查看开启的 nfs目录
 
-```sh
-# Set the subject of the RBAC objects to the current namespace where the provisioner is being deployed
-$ NAMESPACE=`oc project -q`
-$ sed -i'' "s/namespace:.*/namespace: $NAMESPACE/g" ./deploy/rbac.yaml ./deploy/deployment.yaml
-$ oc create -f deploy/rbac.yaml
-$ oc adm policy add-scc-to-user hostmount-anyuid system:serviceaccount:$NAMESPACE:nfs-client-provisioner
-```
+  ```bash
+  ~]# showmount -e 192.168.177.206
+  Export list for 192.168.177.206:
+  /data *
+  ```
 
-**Step 4: Configure the NFS subdir external provisioner**
+  创建data目录，并挂载nfs-server中的/data目录
 
-If you would like to use a custom built nfs-subdir-external-provisioner image, you must edit the provisioner's deployment file to specify the correct location of your `nfs-client-provisioner` container image.
+  ```bash
+  ~]# mount 192.168.177.206:/data /data
+  ```
 
-Next you must edit the provisioner's deployment file to add connection information for your NFS server. Edit `deploy/deployment.yaml` and replace the two occurences of <YOUR NFS SERVER HOSTNAME> with your server's hostname.
+  测试完成后，卸载挂载
 
-```yaml
-kind: Deployment
-apiVersion: apps/v1
-metadata:
-  name: nfs-client-provisioner
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: nfs-client-provisioner
-  strategy:
-    type: Recreate
-  template:
-    metadata:
-      labels:
-        app: nfs-client-provisioner
-    spec:
-      serviceAccountName: nfs-client-provisioner
-      containers:
-        - name: nfs-client-provisioner
-          image: registry.cn-shanghai.aliyuncs.com/taoistmonk/images:nfs-subdir-external-provisioner-v4.0.2
-          volumeMounts:
-            - name: nfs-client-root
-              mountPath: /persistentvolumes
-          env:
-            - name: PROVISIONER_NAME
-              value: k8s-sigs.io/nfs-subdir-external-provisioner
-            - name: NFS_SERVER
-              value: <YOUR NFS SERVER HOSTNAME>
-            - name: NFS_PATH
-              value: /var/nfs
-      volumes:
-        - name: nfs-client-root
-          nfs:
-            server: <YOUR NFS SERVER HOSTNAME>
-            path: /var/nfs
-```
+  ```bash
+  ~]# umount 192.168.177.206:/data
+  ```
 
-Note: If you want to change the PROVISIONER_NAME above from `k8s-sigs.io/nfs-subdir-external-provisioner` to something else like `myorg/nfs-storage`, remember to also change the PROVISIONER_NAME in the storage class definition below.
+  登陆到ansible虚拟机，修改集群的/etc/fstab
 
-To disable leader election, define an env variable named ENABLE_LEADER_ELECTION and set its value to false.
+  ```bash
+  ~]# ansible all -m shell -a "echo '192.168.177.206:/data /data nfs defaults 0 0' >> /etc/fstab"
+  ```
 
-**Step 5: Deploying your storage class**
+  先尝试重启k8s-node-10，观测是否可以正常启动，如果可以，则重启k8s集群所有虚拟机
 
-**_Parameters:_**
+  ```bash
+  ~]# ansible all -m shell -a "reboot"
+  ```
 
-| Name            | Description                                                                                                                                                                  |                             Default                              |
-| --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :--------------------------------------------------------------: |
-| onDelete        | If it exists and has a delete value, delete the directory, if it exists and has a retain value, save the directory.                                                          | will be archived with name on the share: `archived-<volume.Name>` |
-| archiveOnDelete | If it exists and has a false value, delete the directory. if `onDelete` exists, `archiveOnDelete` will be ignored.                                                           | will be archived with name on the share: `archived-<volume.Name>` |
-| pathPattern     | Specifies a template for creating a directory path via PVC metadata's such as labels, annotations, name or namespace. To specify metadata use `${.PVC.<metadata>}`. Example: If folder should be named like `<pvc-namespace>-<pvc-name>`, use `${.PVC.namespace}-${.PVC.name}` as pathPattern. |                               n/a                                |
+  等待启动完成后，使用如下命令检测挂载成功
 
-This is `deploy/class.yaml` which defines the NFS subdir external provisioner's Kubernetes Storage Class:
-
-```yaml
-apiVersion: storage.k8s.io/v1
-kind: StorageClass
-metadata:
-  name: managed-nfs-storage
-provisioner: k8s-sigs.io/nfs-subdir-external-provisioner # or choose another name, must match deployment's env PROVISIONER_NAME'
-parameters:
-  pathPattern: "${.PVC.namespace}/${.PVC.annotations.nfs.io/storage-path}" # waits for nfs.io/storage-path annotation, if not specified will accept as empty string.
-  onDelete: delete
-```
-
-**Step 6: Finally, test your environment!**
-
-Now we'll test your NFS subdir external provisioner.
-
-Deploy:
-
-```sh
-$ kubectl create -f deploy/test-claim.yaml -f deploy/test-pod.yaml
-```
-
-Now check your NFS Server for the file `SUCCESS`.
-
-```sh
-kubectl delete -f deploy/test-pod.yaml -f deploy/test-claim.yaml
-```
-
-Now check the folder has been deleted.
-
-**Step 7: Deploying your own PersistentVolumeClaims**
-
-To deploy your own PVC, make sure that you have the correct `storageClassName` as indicated by your `deploy/class.yaml` file.
-
-For example:
-
-```yaml
-kind: PersistentVolumeClaim
-apiVersion: v1
-metadata:
-  name: test-claim
-  annotations:
-    nfs.io/storage-path: "test-path" # not required, depending on whether this annotation was shown in the storage class description
-spec:
-  storageClassName: managed-nfs-storage
-  accessModes:
-    - ReadWriteMany
-  resources:
-    requests:
-      storage: 1Mi
-```
-
-# Build and publish your own container image
-
-To build your own custom container image from this repository, you will have to build and push the nfs-subdir-external-provisioner image using the following instructions.
-
-```sh
-make build
-make container
-# `nfs-subdir-external-provisioner:latest` will be created. 
-# Note: This will build a single-arch image that matches the machine on which container is built.
-# To upload this to your custom registry, say `quay.io/myorg` and arch as amd64, you can use
-# docker tag nfs-subdir-external-provisioner:latest quay.io/myorg/nfs-subdir-external-provisioner-amd64:latest
-# docker push quay.io/myorg/nfs-subdir-external-provisioner-amd64:latest
-```
-
-# Build and publish with GitHub Actions
-
-In a forked repository you can use GitHub Actions pipeline defined in [.github/workflows/release.yml](.github/workflows/release.yml). The pipeline builds Docker images for `linux/amd64`, `linux/arm64`, and `linux/arm/v7` platforms and publishes them using a multi-arch manifest. The pipeline is triggered when you add a tag like `gh-v{major}.{minor}.{patch}` to your commit and push it to GitHub. The tag is used for generating Docker image tags: `latest`, `{major}`, `{major}:{minor}`, `{major}:{minor}:{patch}`.
-
-The pipeline adds several labels:
-* `org.opencontainers.image.title=${{ github.event.repository.name }}`
-* `org.opencontainers.image.description=${{ github.event.repository.description }}`
-* `org.opencontainers.image.url=${{ github.event.repository.html_url }}`
-* `org.opencontainers.image.source=${{ github.event.repository.clone_url }}`
-* `org.opencontainers.image.created=${{ steps.prep.outputs.created }}`
-* `org.opencontainers.image.revision=${{ github.sha }}`
-* `org.opencontainers.image.licenses=${{ github.event.repository.license.spdx_id }}`
-
-**Important:**
-* The pipeline performs the docker login command using `REGISTRY_USERNAME` and `REGISTRY_TOKEN` secrets, which have to be provided.
-* You also need to provide the `DOCKER_IMAGE` secret specifying your Docker image name, e.g., `quay.io/[username]/nfs-subdir-external-provisioner`.
-
-
-## NFS provisioner limitations/pitfalls
-* The provisioned storage is not guaranteed. You may allocate more than the NFS share's total size. The share may also not have enough storage space left to actually accommodate the request.
-* The provisioned storage limit is not enforced. The application can expand to use all the available storage regardless of the provisioned size.
-* Storage resize/expansion operations are not presently supported in any form. You will end up in an error state: `Ignoring the PVC: didn't find a plugin capable of expanding the volume; waiting for an external controller to process this PVC.`
+  ```bash
+  ~]# ansible all -m shell -a "df -h | grep data" 
+  ```
