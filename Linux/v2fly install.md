@@ -39,14 +39,14 @@ config.json
 
 配置v2ray的配置文件,其中，port 、id 、path 是强烈需要更换的
 
-```
+```json
 {
 "inbound": {
         "protocol": "vmess",
         "listen": "::1",
-        "port": 10086,
+        "port": 43716,
         "settings": {"clients": [
-        {"id": "b831381d-6324-4d53-ad4f-8cda48b30811"}
+        {"id": "cfa7c05c-3896-4b64-9e72-db6bf015ae8b"}
     ]},
         "streamSettings": {
             "network": "ws",
@@ -83,7 +83,7 @@ dnf install certbot
 生成证书,域名需要填入自己希望使用的
 
 ```
-certbot certonly --standalone --agree-tos -n -d raye.asjhz.icu -m i@sjhz.cf
+certbot certonly --standalone --agree-tos -n -d v2ray.sjhz.ml -m i@sjhz.cf
 ```
 
 配置证书自动更新
@@ -107,11 +107,11 @@ yum install nginx
 
 其中，### 1: ### 2:### 3:### 4:都是需要修改的
 
-```
+```nginx
 [root@srv16861 ~]# cat /etc/nginx/conf.d/v2ray.conf 
 server {
     ### 1:
-    server_name raye.asjhz.icu;
+    server_name v2ray.sjhz.ml;
 
 #    listen 80 reuseport fastopen=10; 
     listen [::]:80 reuseport fastopen=10;
@@ -123,15 +123,15 @@ server {
 
 server {
     ### 2:
-    ssl_certificate /etc/letsencrypt/live/raye.asjhz.icu/fullchain.pem;
+    ssl_certificate /etc/letsencrypt/live/v2ray.sjhz.ml/fullchain.pem;
 
     ### 3:
-    ssl_certificate_key /etc/letsencrypt/live/raye.asjhz.icu/privkey.pem;
+    ssl_certificate_key /etc/letsencrypt/live/v2ray.sjhz.ml/privkey.pem;
 
     ### 4:
     location /v2fly
     {
-        proxy_pass http://[::1]:10086;
+        proxy_pass http://[::1]:43716;
         proxy_redirect off;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
