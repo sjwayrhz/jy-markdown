@@ -269,6 +269,13 @@ tmp]# kubectl create -f crds.yaml -f common.yaml -f operator.yaml
 tmp]# kubectl create -f cluster.yaml
 ```
 
+部署cephfs
+
+```bash
+tmp]# kubectl  apply -f filesystem.yaml
+tmp]# kubectl  apply -f csi/cephfs/storageclass.yaml
+```
+
 
 
 ## 安装k8s-console
