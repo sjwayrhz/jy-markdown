@@ -155,17 +155,29 @@ $ kubectl delete -f crds.yaml
 
 （其实后面的common和crds可以不删，为了稳妥一点还是删了吧）
 删资源的过程中，可能会出现命名空间rook-ceph卡在Terminating状态，网上能找的通过curl或者--grace-period强删，如果结果不了，直接进etcd里删除。
+
+```
 etcdctl del /registry/namespaces/rook-ceph
+```
+
+
 
 ### 清理所有osd节点的磁盘
 
 #检查硬盘路径
+
+```
 fdisk -l
+```
 
 #删除硬盘分区信息
+
+```
 DISK="/dev/sdb"
 
+yum install gdisk -y
 sgdisk --zap-all $DISK
+```
 
 #清理硬盘数据（hdd硬盘使用dd，ssd硬盘使用blkdiscard）
 
