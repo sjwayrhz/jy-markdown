@@ -114,6 +114,8 @@ ceph-node-03
 
 ### 安装k8s-master
 
+使用kubeadm之前，可以提前导入能生成10年有效期证书的kubeadm文件
+
 进入k8s-master初始化k8s-master
 
 ```bash
@@ -148,6 +150,21 @@ Then you can join any number of worker nodes by running the following on each as
 
 kubeadm join 10.230.7.30:6443 --token c3zgmg.hcaicmx4q9m24lmv \
 	--discovery-token-ca-cert-hash sha256:fbc433da4e43882e3af046704753c3c37e1e532a9d30fa6515fd8e2558f1a23b
+```
+
+### kubectl命令自动补全
+
+安装 bash-completion
+
+```
+$ dnf install bash-completion -y
+```
+
+添加环境变量
+
+```
+$ echo "source <(kubectl completion bash)" >> ~/.bashrc
+$ source ~/.bashrc
 ```
 
 ### 添加master节点
