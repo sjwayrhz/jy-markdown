@@ -114,17 +114,21 @@ $ ansible all -m shell -a "wget -O- https://gitee.com/sjwayrhz/one_key_install/r
 
 ### 安装k8s-master
 
-使用kubeadm之前，可以提前导入能生成10年有效期证书的kubeadm文件
+使用kubeadm之前，可以提前导入能生成10年有效期证书的kubeadm文件,蓝奏云分享链接如下：
+
+```
+https://wwa.lanzoui.com/iHa2jwii1ih
+```
 
 进入k8s-master初始化k8s-master
 
 ```bash
 $ kubeadm init \
-  --apiserver-advertise-address=10.230.7.30 \
   --image-repository registry.aliyuncs.com/google_containers \
   --kubernetes-version v1.21.7 \
   --service-cidr=10.6.0.0/16 \
-  --pod-network-cidr=10.4.0.0/16
+  --pod-network-cidr=10.4.0.0/16 \
+  --apiserver-advertise-address=10.230.7.30 \
 ```
 
 得到如下输出
@@ -260,7 +264,26 @@ $ sed -i 's|- --port=0|#- --port=0|' /etc/kubernetes/manifests/kube-controller-m
 $ systemctl restart kubelet
 ```
 
-如果安装calico网络
+### 安装kube-ovn网络
+
+```bash
+$ wget https://raw.githubusercontent.com/kubeovn/kube-ovn/release-1.8/dist/images/install.sh
+```
+
+修改service,pod,join关键信息，编辑 install.sh
+
+```
+REGISTRY="kubeovn"
+VERSION="v1.8.2"
+IMAGE_PULL_POLICY="IfNotPresent"
+POD_CIDR="10.4.0.0/16"                # Do NOT overlap with NODE/SVC/JOIN CIDR
+POD_GATEWAY="10.4.0.1"
+SVC_CIDR="10.6.0.0/16"                # Do NOT overlap with NODE/POD/JOIN CIDR
+JOIN_CIDR="10.5.0.0/16"              # Do NOT overlap with NODE/POD/SVC CIDR
+```
+
+### 安装calico网络
+
 release will be found on this site . `https://docs.projectcalico.org/releases`
 
 ```bash
