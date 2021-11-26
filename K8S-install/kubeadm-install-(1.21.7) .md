@@ -21,13 +21,13 @@
 在infra虚拟机中部署应用dnsmasq
 
 ```bash
-~]# dnf install -y dnsmasq
+$ dnf install -y dnsmasq
 ```
 
 生成并编辑dnsmasq配置文件
 
 ```bash
-~]# vim /etc/dnsmasq.d/juneyao.conf
+$ vim /etc/dnsmasq.d/juneyao.conf
 ```
 
 添加的主机信息为
@@ -42,14 +42,14 @@ address=/ceph-node-03/10.230.7.33
 启动并设置dnsmasq为自启动,检查启动状态
 
 ```bash
-~]# systemctl enable --now dnsmasq
-~]# systemctl status dnsmasq
+$ systemctl enable --now dnsmasq
+$ systemctl status dnsmasq
 ```
 
 在infra机器中配置局部dns
 
 ```bash
-~]# sed -i '1inameserver 10.230.7.35' /etc/resolv.conf
+$ sed -i '1inameserver 10.230.7.35' /etc/resolv.conf
 ```
 
 完成在首行追加后，使用`ping ceph-master`就可以测试是否生效，其他虚拟机也可以添加这一条局部dns。
@@ -59,7 +59,7 @@ address=/ceph-node-03/10.230.7.33
 在infra虚拟机，配置免确认ssh
 
 ```bash
-~]# vim  /etc/ssh/ssh_config
+$ vim  /etc/ssh/ssh_config
 ```
 
 将 “#  StrictHostKeyChecking ask” 改为“StrictHostKeyChecking no”
@@ -69,7 +69,7 @@ address=/ceph-node-03/10.230.7.33
 **然后修改ansible主机的 /etc/hosts和/etc/ansible/hosts**
 
 ```bash
-~]# cat /etc/ansible/hosts
+$ cat /etc/ansible/hosts
 [ceph]
 ceph-master
 ceph-node-01
@@ -80,7 +80,7 @@ ceph-node-03
 使用如下命令检测ansible是否配置成功
 
 ```bash
-~]# ansible ceph -m ping
+$ ansible ceph -m ping
 ```
 
 ### 局部域名解析
@@ -88,7 +88,7 @@ ceph-node-03
 使用ansible复制/etc/hosts到所有节点
 
 ```bash
-~]# ansible ceph -m copy -a "src=/etc/resolv.conf dest=/etc/resolv.conf"
+$ ansible ceph -m copy -a "src=/etc/resolv.conf dest=/etc/resolv.conf"
 ```
 
 ### 安装containerd
@@ -96,7 +96,7 @@ ceph-node-03
 需要rocky linux安装wget ，更换过国内源并且`.ssh/authorized_keys`中储存好公钥，然后可以使用如下脚本初始化环境
 
 ```shell
-~]# ansible all -m shell -a "wget -O- https://gitee.com/sjwayrhz/one_key_install/raw/master/rocky_linux_8.4_init.sh | sh"
+$ ansible all -m shell -a "wget -O- https://gitee.com/sjwayrhz/one_key_install/raw/master/rocky_linux_8.4_init.sh | sh"
 ```
 
 初始化之后，或许需要重启linux系统，但是vmware中的镜像系统，只需执行下面的一步：
@@ -104,10 +104,10 @@ ceph-node-03
 如果已经是模版rocky linux了，仅需在ansible虚拟机中执行如下命令安装1.21.7版本运行时
 
 ```bash
-~]# ansible all -m shell -a "modprobe br_netfilter"
-~]# ansible all -m shell -a "echo 1 > /proc/sys/net/bridge/bridge-nf-call-iptables"
+$ ansible all -m shell -a "modprobe br_netfilter"
+$ ansible all -m shell -a "echo 1 > /proc/sys/net/bridge/bridge-nf-call-iptables"
 
-~]# ansible all -m shell -a "wget -O- https://gitee.com/sjwayrhz/one_key_install/raw/master/install_containerd.sh | bash -s 1.21.7"
+$ ansible all -m shell -a "wget -O- https://gitee.com/sjwayrhz/one_key_install/raw/master/install_containerd.sh | bash -s 1.21.7"
 ```
 
 ## 安装kubernetes
@@ -119,7 +119,7 @@ ceph-node-03
 进入k8s-master初始化k8s-master
 
 ```bash
-~]# kubeadm init \
+$ kubeadm init \
   --apiserver-advertise-address=10.230.7.30 \
   --image-repository registry.aliyuncs.com/google_containers \
   --kubernetes-version v1.21.7 \
@@ -156,13 +156,13 @@ kubeadm join 10.230.7.30:6443 --token c3zgmg.hcaicmx4q9m24lmv \
 
 安装 bash-completion
 
-```
+```bash
 $ dnf install bash-completion -y
 ```
 
 添加环境变量
 
-```
+```bash
 $ echo "source <(kubectl completion bash)" >> ~/.bashrc
 $ source ~/.bashrc
 ```
@@ -180,7 +180,7 @@ controlPlaneEndpoint: 10.230.7.30:6443
 具体操作如下：
 
 ```yaml
-~]# kubectl edit -n kube-system cm kubeadm-config
+$ kubectl edit -n kube-system cm kubeadm-config
 apiVersion: v1
 data:
   ClusterConfiguration: |
@@ -225,10 +225,10 @@ metadata:
 登录k8s-master, 获得加入master的命令
 
 ```bash
-~]# kubeadm token create --print-join-command
+$ kubeadm token create --print-join-command
 kubeadm join 10.230.7.30:6443 --token q96fs4.px2fojztfcr2bxyd --discovery-token-ca-cert-hash sha256:9e9d01d0ef844b387e1453788b5b58fcf74497cbd0ba8e8ffefd762125a380a8 
 
-~]# kubeadm init phase upload-certs --upload-certs
+$ kubeadm init phase upload-certs --upload-certs
 I1001 12:21:20.438453   32513 version.go:254] remote version is much newer: v1.22.2; falling back to: stable-1.21
 [upload-certs] Storing the certificates in Secret "kubeadm-certs" in the "kube-system" Namespace
 [upload-certs] Using certificate key:
@@ -238,7 +238,7 @@ I1001 12:21:20.438453   32513 version.go:254] remote version is much newer: v1.2
 于是，加入master到集群的命令为
 
 ```bash
-~]# kubeadm join 10.230.7.30:6443 \
+$ kubeadm join 10.230.7.30:6443 \
 --token q96fs4.px2fojztfcr2bxyd --discovery-token-ca-cert-hash sha256:9e9d01d0ef844b387e1453788b5b58fcf74497cbd0ba8e8ffefd762125a380a8 \
 --control-plane --certificate-key 6a76fe7da098717cd2871a0f65ea5bce2a135e0f9208fc4659847b33fb87805d
 ```
@@ -248,23 +248,23 @@ I1001 12:21:20.438453   32513 version.go:254] remote version is much newer: v1.2
 然后登陆到ansible，让所有的node节点加入到k8s集群
 
 ```bash
-~]# ansible node -m shell -a "kubeadm join 10.230.7.30:6443 --token q96fs4.px2fojztfcr2bxyd --discovery-token-ca-cert-hash sha256:9e9d01d0ef844b387e1453788b5b58fcf74497cbd0ba8e8ffefd762125a380a8"
+$ ansible node -m shell -a "kubeadm join 10.230.7.30:6443 --token q96fs4.px2fojztfcr2bxyd --discovery-token-ca-cert-hash sha256:9e9d01d0ef844b387e1453788b5b58fcf74497cbd0ba8e8ffefd762125a380a8"
 ```
 
 如何需要使用rancher，三个master还需要做如下操作
 
 ```bash
-~]# sed -i 's|- --port=0|#- --port=0|' /etc/kubernetes/manifests/kube-scheduler.yaml
-~]# sed -i 's|- --port=0|#- --port=0|' /etc/kubernetes/manifests/kube-controller-manager.yaml
+$ sed -i 's|- --port=0|#- --port=0|' /etc/kubernetes/manifests/kube-scheduler.yaml
+$ sed -i 's|- --port=0|#- --port=0|' /etc/kubernetes/manifests/kube-controller-manager.yaml
 
-~]# systemctl restart kubelet
+$ systemctl restart kubelet
 ```
 
 如果安装calico网络
 release will be found on this site . `https://docs.projectcalico.org/releases`
 
 ```bash
-~]# kubectl apply -f https://docs.projectcalico.org/v3.20/manifests/calico.yaml
+$ kubectl apply -f https://docs.projectcalico.org/v3.20/manifests/calico.yaml
 ```
 
 ## 配置ceph存储
@@ -274,23 +274,23 @@ release will be found on this site . `https://docs.projectcalico.org/releases`
 登陆infrastructure，下载安装git，克隆gitee上的devops项目
 
 ```bash
-~]# cd /tmp
-tmp]# git clone git@gitee.com:sjwayrhz/devops.git
-tmp]# cd devops/rook/ceph-1.7
+$ cd /tmp
+$ git clone git@gitee.com:sjwayrhz/devops.git
+$ cd devops/rook/ceph-1.7
 ```
 
 部署到k8s集群
 
 ```bash
-tmp]# kubectl create -f crds.yaml -f common.yaml -f operator.yaml
-tmp]# kubectl create -f cluster.yaml
+$ kubectl create -f crds.yaml -f common.yaml -f operator.yaml
+$ kubectl create -f cluster.yaml
 ```
 
 部署cephfs
 
 ```bash
-tmp]# kubectl  apply -f filesystem.yaml
-tmp]# kubectl  apply -f csi/cephfs/storageclass.yaml
+$ kubectl  apply -f filesystem.yaml
+$ kubectl  apply -f csi/cephfs/storageclass.yaml
 ```
 
 
@@ -304,13 +304,13 @@ tmp]# kubectl  apply -f csi/cephfs/storageclass.yaml
 安装docker
 
 ```bash
-~]# wget -O- https://gitee.com/sjwayrhz/one_key_install/raw/master/install_docker.sh | sh
+$ wget -O- https://gitee.com/sjwayrhz/one_key_install/raw/master/install_docker.sh | sh
 ```
 
 启动rancher
 
 ```bash
-~]# docker run -d --restart=unless-stopped \
+$ docker run -d --restart=unless-stopped \
   --privileged \
   -p 80:80 -p 443:443 \
   -v /opt/rancher:/var/lib/rancher/ \
