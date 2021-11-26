@@ -19,6 +19,8 @@ wget http://www.vim.org/scripts/download_script.php?src_id=14376 -O nginx.vim
 （2）、输入：
 
 ```
-set fencs=utf-8,GB18030,ucs-bom,default,latin1
+set fileencodings=utf-8,ucs-bom,gb18030,gbk,gb2312,cp936
+set termencoding=utf-8
+set encoding=utf-8
 ```
 
