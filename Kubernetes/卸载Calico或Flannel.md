@@ -1,3 +1,7 @@
+# 网络插件的调整
+
+[TOC]
+
 ## 卸载CalicoCNI
 
 ### 卸载Calico组件
@@ -53,10 +57,9 @@ kubectl delete clusterrolebinding calico-kube-controllers
 - 根据环境具体情况，在每台机器执行删除
 
   ```bash
-  $ rm -f /etc/cni/net.d/10-calico.conflist
-  $ rm -f /etc/cni/net.d/calico-kubeconfig
+  $ rm -f /etc/cni/net.d/10-calico.conflist /etc/cni/net.d/calico-kubeconfig
   ```
-
+  
 - 执行reboot命令，重启清理 calico 残留 iptables 和 ipset 规则
 
 
@@ -93,3 +96,28 @@ echo "-------------------------------"
 echo ""
 ```
 
+
+
+## 安装kube-ovn网络
+
+```bash
+$ wget https://raw.githubusercontent.com/kubeovn/kube-ovn/release-1.8/dist/images/install.sh
+```
+
+修改service,pod,join关键信息，编辑 install.sh
+
+```
+REGISTRY="kubeovn"
+VERSION="v1.8.2"
+IMAGE_PULL_POLICY="IfNotPresent"
+POD_CIDR="10.4.0.0/16"                # Do NOT overlap with NODE/SVC/JOIN CIDR
+POD_GATEWAY="10.4.0.1"
+SVC_CIDR="10.6.0.0/16"                # Do NOT overlap with NODE/POD/JOIN CIDR
+JOIN_CIDR="10.5.0.0/16"              # Do NOT overlap with NODE/POD/SVC CIDR
+```
+
+执行安装
+
+```bash
+$ bash install.sh
+```
