@@ -282,6 +282,12 @@ SVC_CIDR="10.6.0.0/16"                # Do NOT overlap with NODE/POD/JOIN CIDR
 JOIN_CIDR="10.5.0.0/16"              # Do NOT overlap with NODE/POD/SVC CIDR
 ```
 
+执行安装
+
+```bash
+$ bash install.sh
+```
+
 ### 安装calico网络
 
 release will be found on this site . `https://docs.projectcalico.org/releases`
@@ -299,7 +305,7 @@ $ kubectl apply -f https://docs.projectcalico.org/v3.20/manifests/calico.yaml
 ```bash
 $ cd /tmp
 $ git clone git@gitee.com:sjwayrhz/devops.git
-$ cd devops/rook/ceph-1.7
+$ cd devops/storage/rook-ceph/ceph-1.7/
 ```
 
 部署到k8s集群
