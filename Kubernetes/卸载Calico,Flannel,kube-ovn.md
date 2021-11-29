@@ -97,6 +97,28 @@ echo ""
 ```
 
 
+## 卸载kube-ovn
+
+使用下面的脚本删除在 Kubernetes 中创建的资源
+```bash
+$ wget https://raw.githubusercontent.com/kubeovn/kube-ovn/release-1.8/dist/images/cleanup.sh
+$ bash cleanup.sh
+```
+在每台机器上执行下列操作，清理 ovsdb 以及 openvswitch 保存的配置
+```bash
+$ rm -rf /var/run/openvswitch
+$ rm -rf /var/run/ovn
+$ rm -rf /etc/origin/openvswitch/
+$ rm -rf /etc/origin/ovn/
+$ rm -rf /etc/cni/net.d/00-kube-ovn.conflist
+$ rm -rf /etc/cni/net.d/01-kube-ovn.conflist
+$ rm -rf /var/log/openvswitch
+$ rm -rf /var/log/ovn
+```
+重启节点，以确保对应的网卡信息，iptable/ipset 规则得以清除
+
+
+
 
 ## 安装kube-ovn网络
 
@@ -121,3 +143,4 @@ JOIN_CIDR="10.5.0.0/16"              # Do NOT overlap with NODE/POD/SVC CIDR
 ```bash
 $ bash install.sh
 ```
+
