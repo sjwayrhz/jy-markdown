@@ -71,7 +71,7 @@ $ helm repo add qfusion https://helm.woqutech.com:8043/qfusion
 
 ```bash
 $ helm install qfusion qfusion/qfusion-installer \
-  --version=v3.12.1 -n qfusion \
+  --version=v3.12.1-p1-rds -n qfusion \
   --set global.registry=registry.cn-hangzhou.aliyuncs.com \
   --set global.repository=tomc \
   --set nodeLabel=false \
