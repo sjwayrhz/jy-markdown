@@ -43,7 +43,7 @@ Docker version 18.09.4, build d14af54266
 ~]# tee /etc/docker/daemon.json <<-'EOF'
 {
   "registry-mirrors": ["http://hub-mirror.c.163.com"],
-  "graph": "/opt/docker",
+  # "graph": "/opt/docker",
   "exec-opts": ["native.cgroupdriver=systemd"]
 }
 EOF

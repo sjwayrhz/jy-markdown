@@ -26,7 +26,7 @@ sudo mkdir -p /etc/docker
 sudo tee /etc/docker/daemon.json <<-'EOF'
 {
   "registry-mirrors": ["https://wlainhm4.mirror.aliyuncs.com"],
-  "graph": "/opt/docker",
+  # "graph": "/opt/docker",
   "exec-opts": ["native.cgroupdriver=systemd"]
 }
 EOF
