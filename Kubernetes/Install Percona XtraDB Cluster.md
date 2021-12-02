@@ -4,7 +4,7 @@ From : `https://www.percona.com/doc/kubernetes-operator-for-pxc/kubernetes.html`
 
 First of all, clone the percona-xtradb-cluster-operator repository:
 ```
-$ git clone -b v1.10.0 https://github.com/percona/percona-xtradb-cluster-operator
+$ git clone -b v1.10.0 https://hub.fastgit.org/percona/percona-xtradb-cluster-operator
 $ cd percona-xtradb-cluster-operator
 ```
 Note
