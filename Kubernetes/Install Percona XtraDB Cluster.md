@@ -5,7 +5,7 @@ From : `https://www.percona.com/doc/kubernetes-operator-for-pxc/kubernetes.html`
 First of all, clone the percona-xtradb-cluster-operator repository:
 ```bash
 $ git clone -b v1.10.0 https://hub.fastgit.org/percona/percona-xtradb-cluster-operator
-$ cd percona-xtradb-cluster-operator
+$ cd percona-xtradb-cluster-operator/deploy
 ```
 Note
 
@@ -15,7 +15,7 @@ Now Custom Resource Definition for Percona XtraDB Cluster should be created from
 
 This step should be done only once; it does not need to be repeated with the next Operator deployments, etc.
 ```bash
-$ kubectl apply -f deploy/crd.yaml
+$ kubectl apply -f crd.yaml
 ```
 The next thing to do is to add the pxc namespace to Kubernetes, not forgetting to set the correspondent context for further steps:
 ```bash
@@ -27,7 +27,7 @@ But I don't want to change defult namespace ,use `-n pxc` instead.
 Now RBAC (role-based access control) for Percona XtraDB Cluster should be set up from the deploy/rbac.yaml file. Briefly speaking, role-based access ibased on specifically defined roles and actions corresponding to them, allowed to be done on specific Kubernetes resources (details about users and rolecan be found in Kubernetes documentation).
 
 ```bash
-$ kubectl -n pxc apply -f deploy/rbac.yaml 
+$ kubectl -n pxc apply -f rbac.yaml 
 ```
 Note
 
@@ -35,14 +35,14 @@ Setting RBAC requires your user to have cluster-admin role privileges. For examp
 
 Finally it’s time to start the operator within Kubernetes:
 ```bash
-$ kubectl -n pxc apply -f deploy/operator.yaml
+$ kubectl -n pxc apply -f operator.yaml
 ```
 Now that’s time to add the Percona XtraDB Cluster Users secrets to Kubernetes. They should be placed in the data section of the deploy/secrets.yaml filas logins and plaintext passwords for the user accounts (see Kubernetes documentation for details).
 
 edit secrets password if you want.
 
 ```bash
-$ cat deploy/secrets.yaml
+$ cat secrets.yaml
 apiVersion: v1
 kind: Secret
 metadata:
@@ -61,7 +61,7 @@ stringData:
 
 After editing is finished, users secrets should be created using the following command:
 ```bash
-$ kubectl -n pxc create -f deploy/secrets.yaml
+$ kubectl -n pxc create -f secrets.yaml
 ```
 More details about secrets can be found in Users.
 
@@ -72,14 +72,14 @@ After the operator is started and user secrets are added, change storageClassNam
 ```shell
 #Before changed#
 
-$ cat deploy/cr.yaml | grep storageClassName
+$ cat cr.yaml | grep storageClassName
 #        storageClassName: standard
 #        storageClassName: standard
 #            storageClassName: standard
 
 #After changed#
 
-$ cat deploy/cr.yaml | grep storageClassName
+$ cat cr.yaml | grep storageClassName
         storageClassName: rook-cephfs
         storageClassName: rook-cephfs
             storageClassName: rook-cephfs
@@ -88,7 +88,7 @@ $ cat deploy/cr.yaml | grep storageClassName
  Percona XtraDB Cluster can be created at any time with the following command:
 
 ```bash
-$ kubectl -n pxc apply -f deploy/cr.yaml
+$ kubectl -n pxc apply -f cr.yaml
 ```
 Creation process will take some time. The process is over when both operator and replica set pod have reached their Running status:
 ```bash
@@ -122,3 +122,12 @@ owners.
 
 Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
 ```
+
+Create a node-port for cluster1
+
+```bash
+$ kubectl apply -f pxc-nodeport.yaml
+
+$ kubectl -n pxc get svc
+```
+
