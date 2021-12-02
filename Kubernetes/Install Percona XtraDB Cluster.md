@@ -3,7 +3,7 @@
 From : `https://www.percona.com/doc/kubernetes-operator-for-pxc/kubernetes.html`
 
 First of all, clone the percona-xtradb-cluster-operator repository:
-```
+```bash
 $ git clone -b v1.10.0 https://hub.fastgit.org/percona/percona-xtradb-cluster-operator
 $ cd percona-xtradb-cluster-operator
 ```
@@ -14,18 +14,19 @@ It is crucial to specify the right branch with -b option while cloning the code 
 Now Custom Resource Definition for Percona XtraDB Cluster should be created from the deploy/crd.yaml file. Custom Resource Definition extends thstandard set of resources which Kubernetes “knows” about with the new items (in our case ones which are the core of the operator).
 
 This step should be done only once; it does not need to be repeated with the next Operator deployments, etc.
-```
+```bash
 $ kubectl apply -f deploy/crd.yaml
 ```
 The next thing to do is to add the pxc namespace to Kubernetes, not forgetting to set the correspondent context for further steps:
-```
+```bash
 $ kubectl create namespace pxc
 ```
 In the office document, the default namespaces will be set for pvc.
 `kubectl config set-context $(kubectl config current-context) --namespace=pxc`
 But I don't want to change defult namespace ,use `-n pxc` instead.
 Now RBAC (role-based access control) for Percona XtraDB Cluster should be set up from the deploy/rbac.yaml file. Briefly speaking, role-based access ibased on specifically defined roles and actions corresponding to them, allowed to be done on specific Kubernetes resources (details about users and rolecan be found in Kubernetes documentation).
-```
+
+```bash
 $ kubectl -n pxc apply -f deploy/rbac.yaml 
 ```
 Note
@@ -33,25 +34,64 @@ Note
 Setting RBAC requires your user to have cluster-admin role privileges. For example, those using Google Kubernetes Engine can grant user needed privilegewith the following command: $ kubectl create clusterrolebinding cluster-admin-binding --clusterrole=cluster-admin --user=$(gcloud config get-value coraccount)
 
 Finally it’s time to start the operator within Kubernetes:
-```
+```bash
 $ kubectl -n pxc apply -f deploy/operator.yaml
 ```
 Now that’s time to add the Percona XtraDB Cluster Users secrets to Kubernetes. They should be placed in the data section of the deploy/secrets.yaml filas logins and plaintext passwords for the user accounts (see Kubernetes documentation for details).
 
-After editing is finished, users secrets should be created using the following command:
+edit secrets password if you want.
+
+```bash
+$ cat deploy/secrets.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: my-cluster-secrets
+type: Opaque
+stringData:
+  root: 2wsx#EDC
+  xtrabackup: backup_password
+  monitor: monitory
+  clustercheck: clustercheckpassword
+  proxyadmin: admin_password
+  pmmserver: admin
+  operator: operatoradmin
+  replication: repl_password
 ```
+
+After editing is finished, users secrets should be created using the following command:
+```bash
 $ kubectl -n pxc create -f deploy/secrets.yaml
 ```
 More details about secrets can be found in Users.
 
 Now certificates should be generated. By default, the Operator generates certificates automatically, and no actions are required at this step. Still, yocan generate and apply your own certificates as secrets according to the TLS instructions.
 
-After the operator is started and user secrets are added, Percona XtraDB Cluster can be created at any time with the following command:
+After the operator is started and user secrets are added, change storageClassName for `rook-cephfs`
+
+```shell
+#Before changed#
+
+$ cat deploy/cr.yaml | grep storageClassName
+#        storageClassName: standard
+#        storageClassName: standard
+#            storageClassName: standard
+
+#After changed#
+
+$ cat deploy/cr.yaml | grep storageClassName
+        storageClassName: rook-cephfs
+        storageClassName: rook-cephfs
+            storageClassName: rook-cephfs
 ```
+
+ Percona XtraDB Cluster can be created at any time with the following command:
+
+```bash
 $ kubectl -n pxc apply -f deploy/cr.yaml
 ```
 Creation process will take some time. The process is over when both operator and replica set pod have reached their Running status:
-```
+```bash
 NAME                                               READY   STATUS    RESTARTS   AGE
 cluster1-haproxy-0                                 2/2     Running   0          6m17s
 cluster1-haproxy-1                                 2/2     Running   0          4m59s
@@ -62,7 +102,7 @@ cluster1-pxc-2                                     3/3     Running   0          
 percona-xtradb-cluster-operator-79966668bd-rswbk   1/1     Running   0          9m54s
 ```
 Check connectivity to newly created cluster
-```
+```bash
 $ kubectl -n pxc run -i --rm --tty percona-client --image=percona:8.0 --restart=Never -- bash -il
 percona-client:/$ mysql -h cluster1-haproxy -uroot -proot_password
 ```
