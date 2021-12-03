@@ -32,9 +32,9 @@ $ mc config host add <ALIAS> <YOUR-S3-ENDPOINT> <YOUR-ACCESS-KEY> <YOUR-SECRET-K
 ```
 $ mc config host add s3 https://s3.amazonaws.com BKIKJAA5BMMU2RHO6IBB V7f1CwQqAcwo80UEIJEjc5gVQUSSx5ohQ9GSrr12 --api s3v4
 ```
-目前210上的k8s可用如下方式添加mino存储服务
+目前k8s可用如下方式添加mino存储服务
 ```
-$ mc config host add minio http://192.168.177.210:30090 root123 adminadmin --api s3v4
+$ mc config host add minio http://10.225.63.50:30090 root123 adminadmin --api s3v4
 ```
 返回值为
 ```
@@ -71,7 +71,7 @@ $ mc ls minio
 ```
 删除bucket02文件桶
 ```
-$ mc rm --dangerous --force minio/bucket02
+$ mc rb minio/bucket02
 Removing `minio/bucket02`.
 ```
 拷贝 1.txt到bucket01
@@ -85,7 +85,22 @@ $ mc cp 1.txt minio/bucket01
 $ mc rm minio/bucket01/1.txt
 Removing `minio/bucket01/1.txt`.
 ```
+创建文件桶备份
+
+```bash
+$ mc mb minio/test-backup
+$ mc cp --recursive  minio/test/ minio/test-backup/
+
+$ mc ls minio/test-backup
+[2021-12-04 07:36:57 CST] 1.1KiB anaconda-ks.cfg
+$ mc ls minio/test
+[2021-12-04 07:02:35 CST] 1.1KiB anaconda-ks.cfg
+```
+
+使用minio cp的时候，`minio/test/`和`minio/test-backup/`末尾的斜杠一点不能少，否则拷贝的路径就是 `minio/test-backup/test`了。
+
 ## 设置文件桶策略
+
 先在做如下模拟操作
 1. 新建minio存储桶名称为test
 2. 设置minio/test文件桶为可下载
@@ -94,15 +109,21 @@ Removing `minio/bucket01/1.txt`.
 5. 删除minio/test文件桶
 
 使用mc的操作命令如下：
-```
+```bash
 $ mc mb minio/test
-$ mc policy set download minio/test
+$ mc policy set public minio/test   							# mc policy set download minio/test
 $ echo "helloworld" > helloworld.txt
-$ mc cp helloworld.txt minio/test/helloworld.txt
+$ mc cp helloworld.txt minio/test
 ```
 获取helloworld.txt的访问链接为：
 ```
-http://192.168.177.210:30090/test/helloworld.txt
+http://10.225.63.50:30090/test/helloworld.txt
 ```
-删除minio/test文件桶目前只能通过浏览器打开管理控制台删除
+删除minio/test文件桶
+
+```
+mc rb minio/test
+```
+
+
 
