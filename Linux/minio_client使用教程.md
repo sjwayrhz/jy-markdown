@@ -24,6 +24,13 @@ http://dl.minio.org.cn/client/mc/release/windows-amd64/mc.exe
 需要将mc.exe加入到环境变量，或者放到`C:\WINDOWS\System32\`目录下
 
 ## 添加一个云存储服务
+
+查看当前云存储
+
+```
+$ mc config host list
+```
+
 公式为
 ```
 $ mc config host add <ALIAS> <YOUR-S3-ENDPOINT> <YOUR-ACCESS-KEY> <YOUR-SECRET-KEY> [--api API-SIGNATURE]
