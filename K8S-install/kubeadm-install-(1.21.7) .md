@@ -114,10 +114,12 @@ $ ansible all -m shell -a "wget -O- https://gitee.com/sjwayrhz/one_key_install/r
 
 ### 安装k8s-master
 
-使用kubeadm之前，可以提前导入能生成10年有效期证书的kubeadm文件,蓝奏云分享链接如下：
+使用kubeadm之前，可以提前导入能生成10年有效期证书的kubeadm文件,蓝奏云分享链接和wget url如下：
 
 ```
 https://wwa.lanzoui.com/iHa2jwii1ih
+
+$ wget http://121.46.238.136:30090/k8s-tools/kubeadm-1.21/kubeadm
 ```
 
 进入k8s-master初始化k8s-master
