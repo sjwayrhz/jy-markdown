@@ -3,8 +3,7 @@
 ①创建集群权限的SA ，并绑定ClusterRole：cluster-admin。
 
 ```bash
-$ cat jumpserver-admin.yaml 
- 
+$ tee /tmp/jumpserver-admin.yaml <<- 'EOF' 
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -23,12 +22,13 @@ roleRef:
   kind: ClusterRole
   name: cluster-admin
   apiGroup: rbac.authorization.k8s.io
+EOF
 ```
 
 部署
 
 ```bash
-$ kubectl apply -f jumpserver-admin.yaml
+$ kubectl apply -f /tmp/jumpserver-admin.yaml
 ```
 
 2、获取jumpserver-admin用户的secrets
