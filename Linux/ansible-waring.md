@@ -12,3 +12,4 @@ change this. See https://docs.ansible.com/ansible/2.9/reference_appendices/inter
 interpreter_python = 选项，例如
 
 interpreter_python = auto_legacy_silent
+
