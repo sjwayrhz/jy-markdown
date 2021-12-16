@@ -8,13 +8,13 @@
 
 准备的资源信息如下
 
-| IP address  |    Hostname    |  Disk   |  Application  |
-| :---------: | :------------: | :-----: | :-----------: |
-| 10.230.7.35 | infrastructure |   30G   | nginx rancher |
-| 10.230.7.30 |  demo-master   |   30G   |    Ingress    |
-| 10.230.7.31 |  demo-node-01  | 40G+70G |     demo      |
-| 10.230.7.32 |  demo-node-02  | 40G+70G |     demo      |
-| 10.230.7.33 |  demo-node-03  | 40G+70G |     demo      |
+|  IP address  |    Hostname    |  Disk   |  Application  |
+| :----------: | :------------: | :-----: | :-----------: |
+| 10.225.63.69 | infrastructure |   30G   | nginx rancher |
+| 10.225.63.60 |  demo-master   |   50G   |    Ingress    |
+| 10.225.63.61 |  demo-node-01  | 50G+70G |     demo      |
+| 10.225.63.62 |  demo-node-02  | 50G+70G |     demo      |
+| 10.225.63.63 |  demo-node-03  | 50G+70G |     demo      |
 
 ### 局部DNS配置
 
@@ -33,10 +33,10 @@ $ vim /etc/dnsmasq.d/juneyao.conf
 添加的主机信息为
 
 ```bash
-address=/demo-master/10.230.7.30
-address=/demo-node-01/10.230.7.31
-address=/demo-node-02/10.230.7.32
-address=/demo-node-03/10.230.7.33
+address=/demo-master/10.225.63.60
+address=/demo-node-01/10.225.63.61
+address=/demo-node-02/10.225.63.62
+address=/demo-node-03/10.225.63.63
 ```
 
 启动并设置dnsmasq为自启动,检查启动状态
@@ -49,7 +49,7 @@ $ systemctl status dnsmasq
 在infra机器中配置局部dns
 
 ```bash
-$ sed -i '1inameserver 10.230.7.35' /etc/resolv.conf
+$ sed -i '1inameserver 10.225.63.69' /etc/resolv.conf
 ```
 
 完成在首行追加后，使用`ping demo-master`就可以测试是否生效，其他虚拟机也可以添加这一条局部dns。
@@ -96,7 +96,7 @@ $ ansible demo -m copy -a "src=/etc/resolv.conf dest=/etc/resolv.conf"
 需要rocky linux安装wget ，更换过国内源并且`.ssh/authorized_keys`中储存好公钥，然后可以使用如下脚本初始化环境
 
 ```shell
-$ ansible all -m shell -a "wget -O- https://gitee.com/sjwayrhz/one_key_install/raw/master/rocky_linux_8.4_init.sh | sh"
+$ ansible all -m shell -a "wget -O- https://gitee.com/sjwayrhz/one_key_install/raw/master/rocky_linux_8.5_init.sh | sh"
 ```
 
 初始化之后，或许需要重启linux系统，但是vmware中的镜像系统，只需执行下面的一步：
@@ -107,7 +107,7 @@ $ ansible all -m shell -a "wget -O- https://gitee.com/sjwayrhz/one_key_install/r
 $ ansible all -m shell -a "modprobe br_netfilter"
 $ ansible all -m shell -a "echo 1 > /proc/sys/net/bridge/bridge-nf-call-iptables"
 
-$ ansible all -m shell -a "wget -O- https://gitee.com/sjwayrhz/one_key_install/raw/master/install_containerd.sh | bash -s 1.21.7"
+$ ansible all -m shell -a "wget -O- https://gitee.com/sjwayrhz/one_key_install/raw/master/install_containerd.sh | bash -s 1.23.0"
 ```
 
 ## 安装kubernetes
@@ -117,9 +117,9 @@ $ ansible all -m shell -a "wget -O- https://gitee.com/sjwayrhz/one_key_install/r
 使用kubeadm之前，可以提前导入能生成10年有效期证书的kubeadm文件,蓝奏云分享链接和wget url如下：
 
 ```
-https://wwa.lanzoui.com/iHa2jwii1ih
+https://www.lanzouv.com/igiqFxjqq8h
 
-$ wget http://121.46.238.136:30090/k8s-tools/kubeadm-1.21/kubeadm
+$ wget http://121.46.238.136:30090/k8s-tools/kubeadm-1.23/kubeadm
 ```
 
 进入k8s-master初始化k8s-master
@@ -127,10 +127,10 @@ $ wget http://121.46.238.136:30090/k8s-tools/kubeadm-1.21/kubeadm
 ```bash
 $ kubeadm init \
   --image-repository registry.aliyuncs.com/google_containers \
-  --kubernetes-version v1.21.7 \
+  --kubernetes-version v1.23.0 \
   --service-cidr=10.6.0.0/16 \
   --pod-network-cidr=10.4.0.0/16 \
-  --apiserver-advertise-address=10.230.7.30 \
+  --apiserver-advertise-address=10.225.63.60 \
 ```
 
 得到如下输出
@@ -154,8 +154,8 @@ Run "kubectl apply -f [podnetwork].yaml" with one of the options listed at:
 
 Then you can join any number of worker nodes by running the following on each as root:
 
-kubeadm join 10.230.7.30:6443 --token c3zgmg.hcaicmx4q9m24lmv \
-	--discovery-token-ca-cert-hash sha256:fbc433da4e43882e3af046704753c3c37e1e532a9d30fa6515fd8e2558f1a23b
+kubeadm join 10.225.63.60:6443 --token opxxa1.6gxeghtw6e2zlpm2 \
+	--discovery-token-ca-cert-hash sha256:80e54122f83d8c7e66d553f24049ecd4c2338a5cbb1a3cd180969b442a9d3828
 ```
 
 ### kubectl命令自动补全
@@ -180,7 +180,7 @@ $ source ~/.bashrc
 在k8s-master的kubeadm-config中添加 `controlPlaneEndpoint: ${ip}:${port}`
 
 ```
-controlPlaneEndpoint: 10.230.7.30:6443
+controlPlaneEndpoint: 10.220.62.60:6443
 ```
 
 具体操作如下：
@@ -197,7 +197,7 @@ data:
     apiVersion: kubeadm.k8s.io/v1beta2
     certificatesDir: /etc/kubernetes/pki
     clusterName: kubernetes
-    controlPlaneEndpoint: 10.230.7.30:6443
+    controlPlaneEndpoint: 10.220.62.60:6443
     controllerManager: {}
     dns:
       type: CoreDNS
@@ -215,7 +215,7 @@ data:
   ClusterStatus: |
     apiEndpoints:
       k8s-master:
-        advertiseAddress: 10.230.7.30
+        advertiseAddress: 10.220.62.60
         bindPort: 6443
     apiVersion: kubeadm.k8s.io/v1beta2
     kind: ClusterStatus
@@ -232,7 +232,7 @@ metadata:
 
 ```bash
 $ kubeadm token create --print-join-command
-kubeadm join 10.230.7.30:6443 --token q96fs4.px2fojztfcr2bxyd --discovery-token-ca-cert-hash sha256:9e9d01d0ef844b387e1453788b5b58fcf74497cbd0ba8e8ffefd762125a380a8 
+kubeadm join 10.220.62.60:6443 --token q96fs4.px2fojztfcr2bxyd --discovery-token-ca-cert-hash sha256:9e9d01d0ef844b387e1453788b5b58fcf74497cbd0ba8e8ffefd762125a380a8 
 
 $ kubeadm init phase upload-certs --upload-certs
 I1001 12:21:20.438453   32513 version.go:254] remote version is much newer: v1.22.2; falling back to: stable-1.21
@@ -244,7 +244,7 @@ I1001 12:21:20.438453   32513 version.go:254] remote version is much newer: v1.2
 于是，加入master到集群的命令为
 
 ```bash
-$ kubeadm join 10.230.7.30:6443 \
+$ kubeadm join 10.220.62.60:6443 \
 --token q96fs4.px2fojztfcr2bxyd --discovery-token-ca-cert-hash sha256:9e9d01d0ef844b387e1453788b5b58fcf74497cbd0ba8e8ffefd762125a380a8 \
 --control-plane --certificate-key 6a76fe7da098717cd2871a0f65ea5bce2a135e0f9208fc4659847b33fb87805d
 ```
@@ -254,7 +254,7 @@ $ kubeadm join 10.230.7.30:6443 \
 然后登陆到ansible，让所有的node节点加入到k8s集群
 
 ```bash
-$ ansible node -m shell -a "kubeadm join 10.230.7.30:6443 --token q96fs4.px2fojztfcr2bxyd --discovery-token-ca-cert-hash sha256:9e9d01d0ef844b387e1453788b5b58fcf74497cbd0ba8e8ffefd762125a380a8"
+$ ansible node -m shell -a "kubeadm join 10.220.62.60:6443 --token q96fs4.px2fojztfcr2bxyd --discovery-token-ca-cert-hash sha256:9e9d01d0ef844b387e1453788b5b58fcf74497cbd0ba8e8ffefd762125a380a8"
 ```
 
 如何需要使用rancher，三个master还需要做如下操作
@@ -264,6 +264,17 @@ $ sed -i 's|- --port=0|#- --port=0|' /etc/kubernetes/manifests/kube-scheduler.ya
 $ sed -i 's|- --port=0|#- --port=0|' /etc/kubernetes/manifests/kube-controller-manager.yaml
 
 $ systemctl restart kubelet
+```
+
+### 安装cilium网络
+
+原先从`github.com`上下载的链接，更改为国内镜像地址`hub.fastgit.org`
+
+```bash
+$ curl -L --remote-name-all https://hub.fastgit.org/cilium/cilium-cli/releases/latest/download/cilium-linux-amd64.tar.gz{,.sha256sum}
+
+$ sudo tar xzvfC cilium-linux-amd64.tar.gz /usr/local/bin
+$ rm cilium-linux-amd64.tar.gz{,.sha256sum}
 ```
 
 ### 安装kube-ovn网络
