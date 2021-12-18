@@ -24,10 +24,7 @@ ip地址
 - 数据存储目录
 
 ```bash
-[root@minio ~]# mkdir -p /minio/data1
-[root@minio ~]# mkdir -p /minio/data2
-[root@minio ~]# mkdir -p /minio/data3
-[root@minio ~]# mkdir -p /minio/data4
+[root@minio ~]# mkdir -p /minio/{data1,data2,data3,data4}
 ```
 
 - 启动脚本目录

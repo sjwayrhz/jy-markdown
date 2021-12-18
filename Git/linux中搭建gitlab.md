@@ -37,7 +37,7 @@ $ curl -f -sSL https://packages.gitlab.com/install/repositories/gitlab/gitlab-ce
 现在可以使用dnf或者yum安装gitlab
 
 ```bash
-$ dnf install gitlab-ce
+$ dnf install gitlab-ce -y
 ```
 
 ### 配置 GitLab URL
