@@ -141,13 +141,12 @@ $ rpm -ivh /tmp/gitlab-runner-14.6.0-1.x86_64.rpm
 $ useradd staff
 
 $ gitlab-runner uninstall 
-Runtime platform                                    arch=amd64 os=linux pid=25137 revision=ac8e767a version=12.6.0
+Runtime platform                                    arch=amd64 os=linux pid=10356 revision=5316d4ac version=14.6.0
 
 $ gitlab-runner install --working-directory /home/staff --user staff
-Runtime platform                                    arch=amd64 os=linux pid=25169 revision=ac8e767a version=12.6.0
+Runtime platform                                    arch=amd64 os=linux pid=10426 revision=5316d4ac version=14.6.0
 
-[root@k8s-node02 staff]# vim /etc/systemd/system/gitlab-runner.service
-[root@k8s-node02 staff]# cat /etc/systemd/system/gitlab-runner.service
+$ tee /etc/systemd/system/gitlab-runner.service <<- 'EOF'
 [Unit]
 Description=GitLab Runner
 After=syslog.target network.target
@@ -163,6 +162,7 @@ RestartSec=120
 
 [Install]
 WantedBy=multi-user.target
+EOF
 ```
 
 ### 启动gitlab服务
