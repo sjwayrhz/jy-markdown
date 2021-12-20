@@ -1,27 +1,25 @@
 To use Docker-in-Docker with TLS enabled:
 
-1. Install [GitLab Runner](https://docs.gitlab.com/runner/install/).
+pull docker image
 
-   ```bash
-   $ docker run -d --name gitlab-runner-dind --restart always \
-       -v /srv/gitlab-runner-dind/config:/etc/gitlab-runner \
-       -v /var/run/docker.sock:/var/run/docker.sock \
-       gitlab/gitlab-runner:latest
-   ```
+```bash
+$ docker pull gitlab/gitlab-runner:v14.6.0
+```
 
-   Register GitLab Runner from the command line. Use `docker` and `privileged` mode:
+Register GitLab Runner from the command line. Use `docker` and `privileged` mode:
 
-   ```bash
-   $ sudo gitlab-runner register -n \
-     --url "https://gitlab.sjhz.tk" \
-     --registration-token xYvoAnF8ARWZTs-D9twb \
-     --executor docker \
-     --description "runner dind" \
-     --docker-image "docker:19.03.12" \
-     --docker-privileged \
-     --docker-volumes "/certs/client" \
-     --tag-list "dind" 
-   ```
+```bash
+$ docker run --rm -v /srv/gitlab-runner/config:/etc/gitlab-runner gitlab/gitlab-runner:v14.6.0 register \
+  --non-interactive \
+  --url "https://gitlab.sjhz.tk" \
+  --registration-token j1mBH4nSse6tizisSkzU \
+  --executor docker \
+  --description "runner dood" \
+  --docker-image "docker:19.03.12" \
+  --docker-privileged \
+  --docker-volumes "/certs/client" \
+  --tag-list "dood" 
+```
 
 - This command registers a new runner to use the `docker:19.03.12` image. To start the build and service containers, it uses the `privileged` mode. If you want to use [Docker-in-Docker](https://www.docker.com/blog/docker-can-now-run-within-docker/), you must always use `privileged = true` in your Docker containers.
 - This command mounts `/certs/client` for the service and build container, which is needed for the Docker client to use the certificates in that directory. For more information on how Docker with TLS works, see https://hub.docker.com/_/docker/#tls.
@@ -29,19 +27,42 @@ To use Docker-in-Docker with TLS enabled:
 The previous command creates a `config.toml` entry similar to this:
 
 ```toml
+$ vim /srv/gitlab-runner/config/config.toml
+
+concurrent = 1
+check_interval = 0
+
+[session_server]
+  session_timeout = 1800
+
 [[runners]]
+  name = "runner dood"
   url = "https://gitlab.sjhz.tk"
-  token = TOKEN
+  token = "FzJgyEzGvLwEQhMRLQLv"
   executor = "docker"
-  [runners.docker]
-    tls_verify = false
-    image = "docker:19.03.12"
-    privileged = true
-    disable_cache = false
-    volumes = ["/certs/client", "/cache"]
+  [runners.custom_build_dir]
   [runners.cache]
     [runners.cache.s3]
     [runners.cache.gcs]
+    [runners.cache.azure]
+  [runners.docker]
+    tls_verify = false
+    image = "docker:19.03.12"
+    privileged = false
+    disable_entrypoint_overwrite = false
+    oom_kill_disable = false
+    disable_cache = false
+    volumes = ["/cache", "/var/run/docker.sock:/var/run/docker.sock"]
+    shm_size = 0
+```
+
+Install [GitLab Runner](https://docs.gitlab.com/runner/install/).
+
+```bash
+$ docker run -d --name gitlab-runner --restart always \
+    -v /srv/gitlab-runner/config:/etc/gitlab-runner \
+    -v /var/run/docker.sock:/var/run/docker.sock \
+    gitlab/gitlab-runner:v14.6.0
 ```
 
 You can now use `docker` in the job script. Note the inclusion of the `docker:19.03.12-dind` service:
