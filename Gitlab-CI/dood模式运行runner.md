@@ -1,3 +1,5 @@
+# dood模式运行runner
+
 To use Docker-in-Docker with TLS enabled:
 
 pull docker image
@@ -8,17 +10,34 @@ $ docker pull gitlab/gitlab-runner:v14.6.0
 
 Register GitLab Runner from the command line. Use `docker` and `privileged` mode:
 
+dood-01
+
 ```bash
 $ docker run --rm -v /srv/gitlab-runner/config:/etc/gitlab-runner gitlab/gitlab-runner:v14.6.0 register \
   --non-interactive \
   --url "https://gitlab.sjhz.tk" \
   --registration-token j1mBH4nSse6tizisSkzU \
   --executor docker \
-  --description "runner dood" \
+  --description "dood" \
   --docker-image "docker:19.03.12" \
   --docker-privileged \
   --docker-volumes "/certs/client" \
-  --tag-list "dood" 
+  --tag-list "dood-01" 
+```
+
+dood-02
+
+```bash
+$ docker run --rm -v /srv/gitlab-runner/config:/etc/gitlab-runner gitlab/gitlab-runner:v14.6.0 register \
+  --non-interactive \
+  --url "https://gitlab.sjhz.tk" \
+  --registration-token j1mBH4nSse6tizisSkzU \
+  --executor docker \
+  --description "dood" \
+  --docker-image "docker:19.03.12" \
+  --docker-privileged \
+  --docker-volumes "/certs/client" \
+  --tag-list "dood-02" 
 ```
 
 - This command registers a new runner to use the `docker:19.03.12` image. To start the build and service containers, it uses the `privileged` mode. If you want to use [Docker-in-Docker](https://www.docker.com/blog/docker-can-now-run-within-docker/), you must always use `privileged = true` in your Docker containers.
@@ -83,20 +102,21 @@ variables:
   #
   # Specify to Docker where to create the certificates. Docker
   # creates them automatically on boot, and creates
-  # `/certs/client` to share between the service and job
+  # `/certs/client` to share between the service and jobs
   # container, thanks to volume mount from config.toml
+  # DOCKER_DRIVER: overlay2
   DOCKER_TLS_CERTDIR: "/certs"
-
-services:
-  - docker:19.03.12-dind
 
 before_script:
   - docker info
 
 build:
   stage: build
+  tags:
+    - linux
   script:
-    - docker build -t my-docker-image .
-    - docker run my-docker-image /script/to/run/tests
+    - docker build -t my-docker-image:test .
+    - docker run --rm my-docker-image:test
+    - docker rmi -f my-docker-image:test
 ```
 
