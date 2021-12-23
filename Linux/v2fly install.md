@@ -92,7 +92,10 @@ certbot certonly --standalone --agree-tos -n -d v2ray.sjhz.ml -m i@sjhz.cf
 crontab -e
 添加内容如下
 
-0 0 * * * "systemctl stop nginx ; /bin/certbot renew ; systemctl restart nginx"
+SHELL=/bin/bash
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+
+0 0 1 */2 * certbot renew --quiet --force-renewal
 ```
 
 ### 安装nginx
@@ -184,6 +187,20 @@ server {
     location / { index index.html; }
 }
 ```
+
+注意，关于ipv6 和ipv4
+
+```bash
+ipv4 can use
+    listen 80 reuseport fastopen=10; 
+    listen 443 ssl reuseport fastopen=10;
+
+ipv6 can use
+    listen [::]:80 reuseport fastopen=10; 
+    listen [::]:443 ssl reuseport fastopen=10;
+```
+
+
 
 ### 手动设置代理github
 
