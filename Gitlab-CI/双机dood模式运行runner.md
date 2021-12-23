@@ -19,7 +19,7 @@ $ docker run --rm -v /srv/gitlab-runner-dood-01/config:/etc/gitlab-runner gitlab
   --registration-token MCssk1xsjZo3yp4GyjAD \
   --executor docker \
   --description "dood-01" \
-  --docker-image "docker:19.03.12" \
+  --docker-image "docker:20.10.12" \
   --docker-volumes "/var/run/docker.sock:/var/run/docker.sock" \
   --tag-list "dood-01" 
 ```
@@ -33,12 +33,12 @@ $ docker run --rm -v /srv/gitlab-runner-dood-02/config:/etc/gitlab-runner gitlab
   --registration-token MCssk1xsjZo3yp4GyjAD \
   --executor docker \
   --description "dood-02" \
-  --docker-image "docker:19.03.12" \
+  --docker-image "docker:20.10.12" \
   --docker-volumes "/var/run/docker.sock:/var/run/docker.sock" \
   --tag-list "dood-02" 
 ```
 
-- This command registers a new runner to use the `docker:19.03.12` image. To start the build and service containers, it uses the `privileged` mode. If you want to use [Docker-in-Docker](https://www.docker.com/blog/docker-can-now-run-within-docker/), you must always use `privileged = true` in your Docker containers.
+- This command registers a new runner to use the `docker:20.10.12` image. To start the build and service containers, it uses the `privileged` mode. If you want to use [Docker-in-Docker](https://www.docker.com/blog/docker-can-now-run-within-docker/), you must always use `privileged = true` in your Docker containers.
 - This command mounts `/certs/client` for the service and build container, which is needed for the Docker client to use the certificates in that directory. For more information on how Docker with TLS works, see https://hub.docker.com/_/docker/#tls.
 
 The previous command creates a `config.toml` entry similar to this:
@@ -64,7 +64,7 @@ check_interval = 0
     [runners.cache.azure]
   [runners.docker]
     tls_verify = false
-    image = "docker:19.03.12"
+    image = "docker:20.10.12"
     privileged = false
     disable_entrypoint_overwrite = false
     oom_kill_disable = false
@@ -93,7 +93,7 @@ check_interval = 0
     [runners.cache.azure]
   [runners.docker]
     tls_verify = false
-    image = "docker:19.03.12"
+    image = "docker:20.10.12"
     privileged = false
     disable_entrypoint_overwrite = false
     oom_kill_disable = false
@@ -118,10 +118,10 @@ $ docker run -d --name gitlab-runner-dood-02 --restart always \
     gitlab/gitlab-runner:v14.6.0
 ```
 
-You can now use `docker` in the job script. Note the inclusion of the `docker:19.03.12-dind` service:
+You can now use `docker` in the job script. Note the inclusion of the `docker:20.10.12-dind` service:
 
 ```bash
-image: docker:19.03.12
+image: docker:20.10.12
 
 variables:
   # When you use the dind service, you must instruct Docker to talk with

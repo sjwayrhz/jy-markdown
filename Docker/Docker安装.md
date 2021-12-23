@@ -3,6 +3,12 @@
 [TOC]
 
 
+## 查看docker版本
+
+```
+dnf list docker-ce --showduplicates
+```
+
 ## docker 官方安装
 
 ### 添加仓库
@@ -156,3 +162,5 @@ Test the installation.
 ```
 ~]# docker-compose -version
 ```
+
+

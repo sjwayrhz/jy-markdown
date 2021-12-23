@@ -17,7 +17,7 @@ $ docker run --rm -v /srv/gitlab-runner/config:/etc/gitlab-runner gitlab/gitlab-
   --registration-token MCssk1xsjZo3yp4GyjAD \
   --executor docker \
   --description "dood" \
-  --docker-image "docker:19.03.12" \
+  --docker-image "docker:20.10.12" \
   --docker-volumes "/var/run/docker.sock:/var/run/docker.sock" \
   --tag-list "dood" 
 ```
@@ -48,7 +48,7 @@ check_interval = 0
     [runners.cache.azure]
   [runners.docker]
     tls_verify = false
-    image = "docker:19.03.12"
+    image = "docker:20.10.12"
     privileged = false
     disable_entrypoint_overwrite = false
     oom_kill_disable = false

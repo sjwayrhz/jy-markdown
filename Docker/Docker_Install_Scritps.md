@@ -1,6 +1,13 @@
-可以通过github的链接脚本安装
+查看docker版本
+
 ```bash
-~]# wget -O- https://gitee.com/sjwayrhz/one_key_install/raw/master/install_docker.sh | sh
+$ dnf list docker-ce --showduplicates
+```
+
+可以通过github的链接脚本安装
+
+```bash
+$ wget -O- https://gitee.com/sjwayrhz/one_key_install/raw/master/install_docker.sh | sh
 ```
 
 
