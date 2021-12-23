@@ -1,5 +1,9 @@
 # docker镜像仓库
 
+[TOC]
+
+## 搭建
+
 在/etc/pki/ssl中放入购买的ssl证书
 ```bash
 $ ll /etc/pki/ssl/
@@ -20,7 +24,74 @@ $ docker run -d \
   -e REGISTRY_HTTP_TLS_KEY=/certs/docker.sjhz.tk.key \
   --restart=always \
   --name registry \
-  registry:2
+  registry:2.7.1
 ```
 
 搭建完成后，镜像保存在/var/lib/registry目录下
+
+## 存放文件
+
+> 描述
+
+在docker-registry之外的其它linux系统中，推送镜像到docker-registry服务器
+
+> 准备证书
+
+注意： 证书是购买的与证书是自签名有区别
+
+建议使用购买的证书，而不是自签名证书，否则无法通过安全检查，需要对docker做进一步的设置。
+
+```bash
+$ mkdir -p /etc/docker/certs.d/docker.sjhz.tk:5000
+$ cp docker.sjhz.tk_bundle.crt /etc/docker/certs.d/docker.sjhz.tk:5000
+
+$ ls /etc/docker/certs.d/docker.sjhz.tk:5000
+docker.sjhz.tk_bundle.crt
+```
+
+> 重打标签
+
+将自建的maven包重新打包成私有镜像包
+
+```bash
+$ docker tag sjwayrhz/maven:3.8.4-jdk-8 docker.sjhz.tk:5000/maven:3.8.4-jdk-8
+```
+
+> 推送镜像
+
+```bash
+$ docker push sjwayrhz/maven:3.8.4-jdk-8 docker.sjhz.tk:5000/maven:3.8.4-jdk-8
+```
+
+
+
+## 查看仓库镜像
+
+推送了maven镜像之后，在docker-registry服务器上可以看到
+
+```bash
+$ ls /var/lib/registry/docker/registry/v2/repositories/
+maven  redis
+```
+
+推送了maven镜像之后，在docker客户端服务器上可以看到
+
+```bash
+$ curl -XGET https://docker.sjhz.tk:5000/v2/_catalog
+{"repositories":["maven","redis"]}
+
+$ curl -XGET https://docker.sjhz.tk:5000/v2/maven/tags/list
+{"name":"maven","tags":["3.8.4-jdk-8"]}
+$ curl -XGET https://docker.sjhz.tk:5000/v2/redis/tags/list
+{"name":"redis","tags":["4.0.1"]}
+```
+
+追加推送 docker:20.10.12 和 docker:20.10.12-dind , 在和客户端服务器可以看到
+
+```bash
+$ curl -XGET https://docker.sjhz.tk:5000/v2/_catalog
+{"repositories":["docker","maven","redis"]}
+$ curl -XGET https://docker.sjhz.tk:5000/v2/docker/tags/list
+{"name":"docker","tags":["20.10.12","20.10.12-dind"]}
+```
+
