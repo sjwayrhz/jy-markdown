@@ -53,7 +53,33 @@ $ touch CA/index.txt CA/serial && echo 00 > CA/serial
 （根据提示输入信息，除了 Country Name 选项需要记住的，后面的随便填）
 
 ```bash
-$ openssl req -new -x509 -days 3650 -keyout CA/ca.key -out CA/ca.crt -config tls/openssl.cnf
+$ openssl req -new -x509 -days 36500 -keyout CA/ca.key -out CA/ca.crt -config tls/openssl.cnf
+```
+
+例如输入以下字符，密码设置为 `123456` , 也就是 `Enter PEM pass phrase:123456`
+
+```
+Generating a RSA private key
+.............+++++
+........................................+++++
+writing new private key to 'CA/ca.key'
+Enter PEM pass phrase:
+Verifying - Enter PEM pass phrase:
+-----
+You are about to be asked to enter information that will be incorporated
+into your certificate request.
+What you are about to enter is what is called a Distinguished Name or a DN.
+There are quite a few fields but you can leave some blank
+For some fields there will be a default value,
+If you enter '.', the field will be left blank.
+-----
+Country Name (2 letter code) [XX]:CN
+State or Province Name (full name) []:shanghai
+Locality Name (eg, city) [Default City]:juneyao
+Organization Name (eg, company) [Default Company Ltd]:juneyaokc
+Organizational Unit Name (eg, section) []:juneyaokc
+Common Name (eg, your name or your server's hostname) []:juneyaokc.com
+Email Address []:i@sjhz.cf
 ```
 
 ### 生成密钥文件
@@ -62,30 +88,48 @@ $ openssl req -new -x509 -days 3650 -keyout CA/ca.key -out CA/ca.crt -config tls
 
 ```bash
 $ cd CA
-$ openssl genrsa -out server-with-password.key 2048
-```
-
-然后可以取消这个密钥的密码
-
-```bash
-$ openssl rsa -in server-with-password.key -out server.key
-
-$ rm -f server-with-password.key
+$ openssl genrsa -out juneyaokc.com.key 2048
 ```
 
 这个server.key也可以用于nginx,于是拷贝一份juneyaokc.com.key作为nginx密钥
 
-```bash
-$ cp server.key juneyaokc.com.key
-```
-
 ### 生成证书请求文件（CSR）
 
 根据提示输入信息，除了 Country Name 与前面根证书一致外，其他随便填写
+
+密码是之前设置的 `123456` , 也就是``Enter pass phrase for ca.key: 123456`
+
+`A challenge password`和`An optional company name`可以不填写
+
 Common Name 填写要保护的域名，比如：*.qhh.me
 
 ```bash
-$ openssl req -new -key server.key -out server.csr
+$ openssl req -new -key ca.key -out ca.csr
+```
+
+输入的内容为
+
+```
+Enter pass phrase for ca.key:
+You are about to be asked to enter information that will be incorporated
+into your certificate request.
+What you are about to enter is what is called a Distinguished Name or a DN.
+There are quite a few fields but you can leave some blank
+For some fields there will be a default value,
+If you enter '.', the field will be left blank.
+-----
+Country Name (2 letter code) [XX]:CN
+State or Province Name (full name) []:shanghai
+Locality Name (eg, city) [Default City]:shanghai
+Organization Name (eg, company) [Default Company Ltd]:juneyaokc
+Organizational Unit Name (eg, section) []:juneyao
+Common Name (eg, your name or your server's hostname) []:juneyaokc.com
+Email Address []:i@sjhz.cf
+
+Please enter the following 'extra' attributes
+to be sent with your certificate request
+A challenge password []:
+An optional company name []:
 ```
 
 ### 使用 openssl 签署 CSR 请求，生成证书
@@ -93,11 +137,11 @@ $ openssl req -new -key server.key -out server.csr
 ```bash
 $ openssl ca \
   -config ../tls/openssl.cnf \
-  -in server.csr \
-  -days 3650 \
+  -in ca.csr \
+  -days 36500 \
   -cert /etc/pki/CA/ca.crt \
   -keyfile /etc/pki/CA/ca.key \
-  -out juneyaokc.crt
+  -out juneyaokc.com.crt
 
 参数项说明：
 -in: CSR 请求文件
