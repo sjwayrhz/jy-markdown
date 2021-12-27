@@ -198,3 +198,28 @@ $ for i in $(seq 1 100); do curl -s -o /dev/null "http://10.225.63.20:31037/prod
 ```
 
 The Kiali dashboard shows an overview of your mesh with the relationships between the services in the `Bookinfo` sample application. It also provides filters to visualize the traffic flow.
+
+## 卸载
+
+To delete the `Bookinfo` sample application and its configuration, see [`Bookinfo` cleanup](https://istio.io/latest/docs/examples/bookinfo/#cleanup).
+
+The Istio uninstall deletes the RBAC permissions and all resources hierarchically under the `istio-system` namespace. It is safe to ignore errors for non-existent resources because they may have been deleted hierarchically.
+
+```bash
+$ kubectl delete -f /usr/local/istio-1.12.1/samples/addons
+$ istioctl manifest generate --set profile=demo | kubectl delete --ignore-not-found=true -f -
+$ istioctl tag remove default
+```
+
+The `istio-system` namespace is not removed by default. If no longer needed, use the following command to remove it:
+
+```bash
+$ kubectl delete namespace istio-system
+```
+
+The label to instruct Istio to automatically inject Envoy sidecar proxies is not removed by default. If no longer needed, use the following command to remove it:
+
+```bash
+$ kubectl label namespace default istio-injection-
+```
+
