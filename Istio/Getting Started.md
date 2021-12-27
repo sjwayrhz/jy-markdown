@@ -102,4 +102,99 @@ $ istioctl analyze
 
 ### 定义ingress的ip和端口
 
+在没有loadbalance的环境条件下，无法做出此配置
+
 ### 确认外部访问权限
+
+由于私有云服务器不支持loadbalance  所以只能使用nodeport方式访问应用
+
+查询访问地址如下：
+
+```bash
+$ kubectl get svc istio-ingressgateway -n istio-system
+NAME                   TYPE           CLUSTER-IP      EXTERNAL-IP   PORT(S)                                                                      AGE
+istio-ingressgateway   LoadBalancer   10.233.43.203   <pending>     15021:31639/TCP,80:31037/TCP,443:31905/TCP,31400:30263/TCP,15443:31319/TCP   2d22h
+```
+
+访问bookinfo的路径应该为
+
+```
+http://$GATEWAY_URL/productpage
+```
+
+本例的访问路径为
+
+```
+http://10.225.63.20:31037/productpage
+```
+
+## 查看dashboard
+
+### Install `Kiali and the other addons `and wait for them to be deployed.
+
+```bash
+$ kubectl apply -f /usr/local/istio-1.12.1/samples/addons
+$ kubectl rollout status deployment/kiali -n istio-system
+Waiting for deployment "kiali" rollout to finish: 0 of 1 updated replicas are available...
+deployment "kiali" successfully rolled out
+```
+
+### Access the Kiali dashboard.
+
+由于原生的kiali是clusterIp的方式，所以无法直接在集群外部浏览器访问
+
+```bash
+$ kubectl get svc -n istio-system | grep kiali
+kiali                  ClusterIP      10.233.0.190    <none>        20001/TCP,9090/TCP                                               9m
+```
+
+现在增加nodeport方式，yaml如下：
+
+```
+apiVersion: v1
+kind: Service
+metadata:
+  name: kiali-nodeport
+  namespace: istio-system
+  labels:
+    app: kiali
+spec:
+  type: NodePort
+  ports:
+  - name: http
+    port: 20001
+    targetPort: 20001
+    nodePort: 30021
+  - name: http-metrics
+    port: 9090
+    targetPort: 9090
+    nodePort: 30023
+  selector:
+    app: kiali
+```
+
+再次查看svc
+
+```bash
+$ kubectl get svc -n istio-system | grep kiali
+kiali                  ClusterIP      10.233.0.190    <none>        20001/TCP,9090/TCP                                                           18m
+kiali-nodeport         NodePort       10.233.29.23    <none>        20001:30021/TCP,9090:30023/TCP                                               9s
+```
+
+在局域网其它主机可以通过浏览器访问kiali，路径为：
+
+```
+http://10.225.63.20:30021
+```
+
+### In the left navigation menu, select *Graph* and in the *Namespace* drop down, select *default*.
+
+查看流量的官方教程 和本次案例如下：
+
+```bash
+$ for i in $(seq 1 100); do curl -s -o /dev/null "http://$GATEWAY_URL/productpage"; done
+
+$ for i in $(seq 1 100); do curl -s -o /dev/null "http://10.225.63.20:31037/productpage"; done
+```
+
+The Kiali dashboard shows an overview of your mesh with the relationships between the services in the `Bookinfo` sample application. It also provides filters to visualize the traffic flow.
