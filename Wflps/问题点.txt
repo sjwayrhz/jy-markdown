@@ -1,0 +1,2 @@
+Q: docker-compose不能转变为k8s
+A: 公网出口ip，钉钉要求每个实体的ip不一样。
