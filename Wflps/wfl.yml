@@ -1,0 +1,256 @@
+templates:
+
+  wfl-comm:
+    IdentityFile: ~/.ssh/wfl/id_rsa.liukun
+
+  wfl-frp:
+    Hostname: 127.0.0.1
+
+  wfl-acs:
+    Inherits: wfl-comm
+
+  wfl-acs-opsk:
+    Inherits: wfl-comm
+
+  wfl-aws-pk:
+    Inherits: wfl-comm
+    Gateways: monitor.iscl.aws
+
+  jycloud-vxlan:
+    Inherits: wfl-comm
+    Gateways: cat.jyc
+
+  jycloud-vlan:
+    Inherits: wfl-comm
+    Gateways: dog.jyc
+
+  wfl-debian:
+    User: admin
+
+  wfl-amnz-linux:
+    User: ec2-user
+
+  wfl-ubuntu:
+    User: ubuntu
+
+  wfl-centos:
+    User: centos
+
+  wfl-pem:
+    IdentityFile: ~/.ssh/wfl/AWS_wfl.pem
+
+hosts:
+
+  owl.iscl.aws:
+    Inherits:
+      - wfl-aws-pk
+      - wfl-debian
+
+  penguin.iscl.aws:
+    Inherits:
+      - wfl-aws-pk
+      - wfl-debian
+
+  eagle.iscl.aws:
+    Inherits:
+      - wfl-aws-pk
+      - wfl-ubuntu
+
+  bbb.iscl.aws:
+    Hostname: 172.31.16.30
+    Inherits:
+      - wfl-aws-pk
+      - wfl-ubuntu
+
+  sparrow.iscl.aws:
+    Inherits:
+      - wfl-aws-pk
+      - wfl-debian
+
+  proxy.iscl.aws:
+    Inherits:
+      - wfl-comm
+      - wfl-debian
+    Hostname: ec2-52-80-49-66.cn-north-1.compute.amazonaws.com.cn
+
+  monitor.iscl.aws:
+    Hostname: 52.80.136.79
+    Inherits:
+      - wfl-comm
+      - wfl-ubuntu
+
+  docker1.iscl.aws:
+    Inherits:
+      - wfl-aws-pk
+      - wfl-ubuntu
+
+  rabbit.iscl.aws:
+    Inherits:
+      - wfl-aws-pk
+      - wfl-debian
+
+  bear.iscl.aws:
+    Inherits:
+      - wfl-aws-pk
+      - wfl-debian
+
+  testing.iscl.aws:
+    Inherits:
+      - wfl-aws-pk
+      # - wfl-ubuntu
+
+  mule.iscl.aws:
+    Inherits:
+      - wfl-aws-pk
+      - wfl-ubuntu
+    # IdentityFile: ~/.ssh/wfl/AWS_wfl.pem
+
+  wolf.iscl.aws:
+    Inherits:
+      - wfl-aws-pk
+      - wfl-debian
+
+  vole.iscl.aws:
+    Inherits:
+      - wfl-aws-pk
+      - wfl-ubuntu
+    Hostname: 172.31.1.101
+
+  boa.iscl.aws:
+    Inherits:
+      - wfl-aws-pk
+      - wfl-ubuntu
+    Hostname: 172.31.6.160
+
+  camel.jf.aws:
+    User: centos
+    Hostname: 54.222.253.4
+    Inherits:
+      - wfl-comm
+
+  badger.jf.aws:
+    Inherits:
+      - wfl-comm
+    User: bitnami
+    Hostname: 52.80.59.143
+      #- wfl-ubuntu
+
+  pve01.swzx.wfl:
+    Hostname: eams-edu.wflms.cn
+    User: hezb
+    Port: 6952
+
+  eams.swzx.wfl:
+    Hostname: eams-edu.wflms.cn
+    User: liukun
+    Port: 2102
+
+  srv01.jycloud.iscl:
+    Inherits:
+      - wfl-comm
+    Hostname: 103.192.254.25
+    User: edwardtian
+
+  pve1.qpswxx.wfl:
+    Inherits:
+      - wfl-aws-pk
+      - wfl-frp
+    Port: 10023
+
+  lynx.qpswxx.wfl:
+    Inherits:
+      - wfl-comm
+    Hostname: 192.168.7.10
+    #User: liukun
+    Gateways: pve1.qpswxx.wfl
+
+  nas.qpswxx.wfl:
+    Inherits:
+      - wfl-aws-pk
+      - wfl-frp
+    Port: 10022
+
+  db.shiyue.jycloud:
+    Inherits:
+      - jycloud-vxlan
+    Hostname: 192.168.157.14
+
+  app.shiyue.jycloud:
+    Inherits:
+      - jycloud-vxlan
+    Hostname: 192.168.157.16
+
+  ec2-52-80-77-5.cn-north-1.compute.amazonaws.com.cn:
+    Hostname: ec2-52-80-77-5.cn-north-1.compute.amazonaws.com.cn
+    Identityfile: ~/.ssh/wfl/id_rsa.public-deploy
+    User: git
+    IdentitiesOnly: yes
+
+  code.wfl-ischool.cn:
+    Hostname: code.wfl-ischool.cn
+    Identityfile: ~/.ssh/wfl/id_rsa.liukun
+    User: git
+    IdentitiesOnly: yes
+
+  ops.nx.aws:
+    Hostname: 52.82.94.193
+    Inherits:
+      - wfl-comm
+      - wfl-ubuntu
+
+  opsk.sh.ac:
+    Hostname: 10.1.0.160
+    Port: 1022
+    Inherits:
+      - wfl-acs
+      - wfl-ubuntu
+
+  jump-host.sh.ac:
+    Hostname: 101.132.39.191
+    Inherits:
+      - wfl-comm
+
+  s1.ac.it:
+    Hostname: 47.100.183.153
+    Inherits:
+      - wfl-comm
+
+  jumpbox.nx.aws:
+    Inherits:
+      - wfl-comm
+    Hostname: 52.82.94.193
+    User: wfl_liukun
+    Port: 2222
+
+  cat.jyc:
+    Hostname: 10.1.0.160
+    Inherits:
+      - wfl-acs
+    Port: 22001
+
+  bbb-old.jyc:
+    Hostname: 10.225.125.5
+    Inherits:
+      - jycloud-vxlan
+
+  dog.jyc:
+    Hostname: 10.1.0.160
+  #   Hostname: 10.220.80.3
+    Inherits:
+      - wfl-acs
+    Port: 22002
+
+  bbb.jyc:
+    Hostname: 10.220.80.6
+    Inherits:
+      - jycloud-vlan
+
+  bbb.acs:
+    Hostname: 10.1.0.209
+    Inherits:
+      - wfl-acs
+
+  devops.sh.acs:
+    Hostname: 10.103.193.240
+    Inherits:
+      - wfl-acs-opsk

@@ -1,0 +1,17 @@
+bear.iscl.aws上的oa是我入职前部署的，是linux直接部署
+其他oa是用docker-compose部署的，因为他们有钉钉端，钉钉限制了后端出口ip必须唯一，k8s不符合条件
+
+
+管理机功能
+
+ssh登录的主机
+
+~/.ssh/assh.d/wfl.yml
+
+
+
+## dockerfile，helm chart和value
+
+/opt/project/project/oral3/api/rails/prod/oral3/rails
+/opt/project/k8s/oral3/prod/
+
