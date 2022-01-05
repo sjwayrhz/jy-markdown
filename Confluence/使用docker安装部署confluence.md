@@ -108,6 +108,14 @@ $ sh scripts/run.sh
 
 创建的数据库名字为confluence, 其它设置为 utf8mb4 和 utf8mb4_bin 。
 
+启动之后，可以更新mysql容器为自动启动
+
+```bash
+$ docker update --restart=always 容器ID(或者容器名)
+```
+
+
+
 ## 所需素材
 
 本文采用素材如下：
