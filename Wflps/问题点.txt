@@ -1,2 +1,5 @@
 Q: docker-compose不能转变为k8s
 A: 公网出口ip，钉钉要求每个实体的ip不一样。
+
+Q: 智学通架构
+A: 智学通的手机端调用后端api(oral3.wfl-ischool.cn)，手机端也通过bridge(ibmbridge.wfl-ischool.cn)传文件和打分，ibmbridge打分实际调用的是ibm api(ibm-oral-api.wfl-ischool.cn)
