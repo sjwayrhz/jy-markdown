@@ -73,4 +73,14 @@ docker.io		->  sjwayrhz / 1qaz2wsx#
 ```
 
 
+### 世外docker login --username=hi30316316@aliyun.com registry.cn-shanghai.aliyuncs.com
+```
+{
+	"auths": {
+		"registry.cn-shanghai.aliyuncs.com": {
+			"auth": "aGkzMDMxNjMxNkBhbGl5dW4uY29tOlZ3djU2dHk3"
+		}
+	}
+}
+```
 
