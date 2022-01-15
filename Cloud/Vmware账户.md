@@ -12,25 +12,15 @@ IP: 10.230.6.11
 account: administrator@vsphere.local / 2wsx#EDC
 ```
 
-mysql
-
-```
-10.230.7.27
-
-用户
-root / 2wsx#EDC   不可远程登陆
-sjhz / 2wsx#EDC 可远程登陆
-
-数据库
-juneyao
-```
-
-检测链接
-
-```
-http://10.230.7.28:8080/jery/page/banners
-http://10.230.7.28:8082/web/login.jsp
-```
 
 
+科稷账号
+
+keji / 3Erp7Ehez5
+
+科稷 esxi ip 地址
+10.220.62.244
+10.220.62.247
+10.220.62.250
+10.220.62.252
 
