@@ -72,9 +72,9 @@ $ dnf install keepalived haproxy -y
        option tcp-check
        balance roundrobin
        default-server inter 10s downinter 5s rise 2 fall 2 slowstart 60s maxconn 250 maxqueue 256 weight 100
-       server kube-apiserver-1 10.220.62.21:6443 check # Replace the IP address with your own.
-       server kube-apiserver-2 10.220.62.22:6443 check # Replace the IP address with your own.
-       server kube-apiserver-3 10.220.62.23:6443 check # Replace the IP address with your own.
+       server devops-master-01 10.220.62.21:6443 check # Replace the IP address with your own.
+       server devops-master-02 10.220.62.22:6443 check # Replace the IP address with your own.
+       server devops-master-03 10.220.62.23:6443 check # Replace the IP address with your own.
    ```
 
 3. 保存文件并运行以下命令以开启 HAproxy。
