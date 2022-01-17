@@ -138,7 +138,7 @@ MariaDB [(none)]> create database jumpserverdb;
 
 授予全部权限
 
-MariaDB [(none)]> grant all privileges on jumpserverdb.* to jumpserveruser@localhost identified by '1qaz@WSX';
+MariaDB [(none)]> grant all privileges on jumpserverdb.* to jumpserveruser@'%' identified by '1qaz@WSX';
 
 刷新系统权限表
 
