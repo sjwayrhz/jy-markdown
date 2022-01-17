@@ -160,7 +160,17 @@ $ kubectl delete -f crds.yaml
 etcdctl del /registry/namespaces/rook-ceph
 ```
 
+或者使用如下命令删除
 
+```bash
+$ dnf install jq -y 
+$ NAMESPACE=rook-ceph
+$ kubectl proxy &
+$ kubectl get namespace $NAMESPACE -o json |jq '.spec = {"finalizers":[]}' >temp.json
+$ curl -k -H "Content-Type: application/json" -X PUT --data-binary @temp.json 127.0.0.1:8001/api/v1/namespaces/$NAMESPACE/finalize
+```
+
+然后删除8001端口的进程
 
 ### 清理所有osd节点的磁盘
 
