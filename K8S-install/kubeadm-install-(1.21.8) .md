@@ -389,6 +389,8 @@ $ kubectl apply -f https://docs.projectcalico.org/v3.20/manifests/calico.yaml
 
 克隆项目
 
+k8s-1.21.8 对应与 rook-ceph-1.8.2，可以兼容
+
 登陆infrastructure，下载安装git，克隆gitee上的devops项目
 
 ```bash
