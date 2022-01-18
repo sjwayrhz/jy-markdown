@@ -150,8 +150,10 @@ $ ansible all -m shell -a "wget -O- https://gitee.com/sjwayrhz/one_key_install/r
 
 使用kubeadm之前，可以提前导入能生成10年有效期证书的kubeadm文件,蓝奏云分享链接和wget url如下：
 
-```
+```bash
 https://wwi.lanzouo.com/i5oWKxerf3c
+
+$ wget -P /usr/bin/ -N http://121.46.238.135:9000/k8s-tools/kubeadm-1.21/kubeadm
 ```
 
 用这个kubeadm替换master系统目录下的 /usr/bin/kubeadm
@@ -243,13 +245,13 @@ You can now join any number of control-plane nodes by copying certificate author
 and service account keys on each node and then running the following as root:
 
   kubeadm join 10.220.62.31:6443 --token abcdef.0123456789abcdef \
-	--discovery-token-ca-cert-hash sha256:634ccf84765085a2b3a4a412abc031079513d1697107d7b930312add12e32466 \
+	--discovery-token-ca-cert-hash sha256:d7b0780a21d34591268906a7855a685d093d14fda2699832ad4f65c4e9091296 \
 	--control-plane
 
 Then you can join any number of worker nodes by running the following on each as root:
 
 kubeadm join 10.220.62.31:6443 --token abcdef.0123456789abcdef \
-	--discovery-token-ca-cert-hash sha256:634ccf84765085a2b3a4a412abc031079513d1697107d7b930312add12e32466
+	--discovery-token-ca-cert-hash sha256:d7b0780a21d34591268906a7855a685d093d14fda2699832ad4f65c4e9091296
 ```
 
 
@@ -279,27 +281,33 @@ $ source ~/.bashrc
 $ wget -O- https://gitee.com/sjwayrhz/one_key_install/raw/master/install_containerd.sh | bash -s 1.21.8
 ```
 
-安装containerd之后，替换10年证书的kubeadm.
+安装containerd之后，替换10年证书的kubeadm
+
+```bash
+https://wwi.lanzouo.com/i5oWKxerf3c
+
+$ wget -P /usr/bin/ -N http://121.46.238.135:9000/k8s-tools/kubeadm-1.21/kubeadm
+```
 
 登录devops-master-01, 获得加入master的命令
 
 ```bash
 $ kubeadm token create --print-join-command
-kubeadm join 10.220.62.31:6443 --token abcdef.0123456789abcdef --discovery-token-ca-cert-hash sha256:634ccf84765085a2b3a4a412abc031079513d1697107d7b930312add12e32466
+kubeadm join 10.220.62.31:6443 --token abcdef.0123456789abcdef --discovery-token-ca-cert-hash sha256:d7b0780a21d34591268906a7855a685d093d14fda2699832ad4f65c4e9091296
 
 $ kubeadm init phase upload-certs --upload-certs
 W0117 17:38:56.059723    4405 version.go:114] could not obtain client version; using remote version: v1.23.1
 [upload-certs] Storing the certificates in Secret "kubeadm-certs" in the "kube-system" Namespace
 [upload-certs] Using certificate key:
-7e9cbcc3a0b1cca1024fd656de58315d34d1dce753417849cff62a6add86e09d
+c309edc3ccf996d37cc5abeb84df33a80899f0e9a698ad270b52cbc5c8876b5f
 ```
 
 于是， devops-master-02加入devops-master-01到集群的命令为
 
 ```bash
 $ kubeadm join 10.220.62.31:6443 \
---token abcdef.0123456789abcdef --discovery-token-ca-cert-hash sha256:634ccf84765085a2b3a4a412abc031079513d1697107d7b930312add12e32466 \
---control-plane --certificate-key 02097a089e3741bcf8549907c4c1c823b0bafa60d77d6b6f7aaed56eb0cbe37c
+--token abcdef.0123456789abcdef --discovery-token-ca-cert-hash sha256:d7b0780a21d34591268906a7855a685d093d14fda2699832ad4f65c4e9091296 \
+--control-plane --certificate-key c309edc3ccf996d37cc5abeb84df33a80899f0e9a698ad270b52cbc5c8876b5f
 ```
 
 可以登陆devops-master-02和devops-master-03执行上述指令，然后拷贝证书
@@ -313,7 +321,7 @@ $ kubeadm join 10.220.62.31:6443 \
 在devops-master-01上安装登录devops-master-02和devops-master-03的私钥拷贝脚本如下：
 
 ```shell
-# cat /tmp/cpkey.sh
+# tee /tmp/cpkey.sh <<- "EOF"
 USER=root
 CONTROL_PLANE_IPS="10.220.62.22 10.220.62.23"  # IP of k8s-master-02 and k8s-master-03
 dir=/etc/kubernetes/pki/
@@ -327,12 +335,13 @@ for host in ${CONTROL_PLANE_IPS}; do
     scp /etc/kubernetes/pki/etcd/ca.crt "${USER}"@$host:${dir}etcd
     scp /etc/kubernetes/pki/etcd/ca.key "${USER}"@$host:${dir}etcd
 done
+EOF
 ```
 
 然后登陆到ansible，让所有的worker节点加入到k8s集群
 
 ```bash
-$ kubeadm join 10.220.62.31:6443 --token abcdef.0123456789abcdef --discovery-token-ca-cert-hash sha256:634ccf84765085a2b3a4a412abc031079513d1697107d7b930312add12e32466
+$ kubeadm join 10.220.62.31:6443 --token abcdef.0123456789abcdef --discovery-token-ca-cert-hash sha256:d7b0780a21d34591268906a7855a685d093d14fda2699832ad4f65c4e9091296
 ```
 
 如何需要使用rancher，三个master还需要做如下操作

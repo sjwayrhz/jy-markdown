@@ -119,7 +119,7 @@ $ ansible all -m shell -a "wget -O- https://gitee.com/sjwayrhz/one_key_install/r
 ```
 https://wwa.lanzoui.com/iHa2jwii1ih
 
-$ wget http://121.46.238.136:30090/k8s-tools/kubeadm-1.21/kubeadm
+$ wget http://121.46.238.135:9000/k8s-tools/kubeadm-1.21/kubeadm
 ```
 
 进入k8s-master初始化k8s-master
