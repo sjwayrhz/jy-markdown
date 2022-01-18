@@ -146,7 +146,7 @@ $ ansible all -m shell -a "wget -O- https://gitee.com/sjwayrhz/one_key_install/r
 
 ## 安装kubernetes
 
-### 安装k8s-master
+### 安装devops-master-01
 
 使用kubeadm之前，可以提前导入能生成10年有效期证书的kubeadm文件,蓝奏云分享链接和wget url如下：
 
@@ -243,13 +243,13 @@ You can now join any number of control-plane nodes by copying certificate author
 and service account keys on each node and then running the following as root:
 
   kubeadm join 10.220.62.31:6443 --token abcdef.0123456789abcdef \
-	--discovery-token-ca-cert-hash sha256:732a5bb54e5dbbbc4c61e96dc6e88974dfd6f09f95eafbe260ae1195f2f804d2 \
+	--discovery-token-ca-cert-hash sha256:634ccf84765085a2b3a4a412abc031079513d1697107d7b930312add12e32466 \
 	--control-plane
 
 Then you can join any number of worker nodes by running the following on each as root:
 
 kubeadm join 10.220.62.31:6443 --token abcdef.0123456789abcdef \
-	--discovery-token-ca-cert-hash sha256:732a5bb54e5dbbbc4c61e96dc6e88974dfd6f09f95eafbe260ae1195f2f804d2
+	--discovery-token-ca-cert-hash sha256:634ccf84765085a2b3a4a412abc031079513d1697107d7b930312add12e32466
 ```
 
 
@@ -271,41 +271,68 @@ $ source ~/.bashrc
 
 ### 添加master节点
 
-假设原先有k8s-master作为主节点，现在需要添加两个master分别为 k8s-master-left 和k8s-master-right
+假设原先有devops-master-01作为主节点，现在需要添加两个master分别为 devops-master-02 和devops-master-03
 
-登录k8s-master, 获得加入master的命令
+登录 devops-master-02, 安装containerd
+
+```bash
+$ wget -O- https://gitee.com/sjwayrhz/one_key_install/raw/master/install_containerd.sh | bash -s 1.21.8
+```
+
+安装containerd之后，替换10年证书的kubeadm.
+
+登录devops-master-01, 获得加入master的命令
 
 ```bash
 $ kubeadm token create --print-join-command
-kubeadm join 10.220.62.31:6443 --token 8dnb5o.ce7g7yzmw1f7lsm3 --discovery-token-ca-cert-hash sha256:732a5bb54e5dbbbc4c61e96dc6e88974dfd6f09f95eafbe260ae1195f2f804d2
+kubeadm join 10.220.62.31:6443 --token abcdef.0123456789abcdef --discovery-token-ca-cert-hash sha256:634ccf84765085a2b3a4a412abc031079513d1697107d7b930312add12e32466
 
 $ kubeadm init phase upload-certs --upload-certs
-W0115 08:59:53.150220   15905 version.go:114] could not obtain client version; using remote version: v1.23.1
+W0117 17:38:56.059723    4405 version.go:114] could not obtain client version; using remote version: v1.23.1
 [upload-certs] Storing the certificates in Secret "kubeadm-certs" in the "kube-system" Namespace
 [upload-certs] Using certificate key:
-64c46206ede6bb29c1024fdcf80bbdc28341ae45a1d4da955826459efb3cf6f8
+7e9cbcc3a0b1cca1024fd656de58315d34d1dce753417849cff62a6add86e09d
 ```
 
-于是，加入master到集群的命令为
+于是， devops-master-02加入devops-master-01到集群的命令为
 
 ```bash
 $ kubeadm join 10.220.62.31:6443 \
---token 8dnb5o.ce7g7yzmw1f7lsm3 --discovery-token-ca-cert-hash sha256:732a5bb54e5dbbbc4c61e96dc6e88974dfd6f09f95eafbe260ae1195f2f804d2 \
---control-plane --certificate-key 64c46206ede6bb29c1024fdcf80bbdc28341ae45a1d4da955826459efb3cf6f8
+--token abcdef.0123456789abcdef --discovery-token-ca-cert-hash sha256:634ccf84765085a2b3a4a412abc031079513d1697107d7b930312add12e32466 \
+--control-plane --certificate-key 02097a089e3741bcf8549907c4c1c823b0bafa60d77d6b6f7aaed56eb0cbe37c
 ```
 
-可以登陆k8s-master-left和k8s-master-right执行上述指令
+可以登陆devops-master-02和devops-master-03执行上述指令，然后拷贝证书
 
-需要将k8s-master上的证书打包拷贝到其他的master，证书位置
+需要将devops-master-01上的证书打包拷贝到其他的master，证书位置
 
 ```
 /etc/kubernetes/pki/
 ```
 
-然后登陆到ansible，让所有的node节点加入到k8s集群
+在devops-master-01上安装登录devops-master-02和devops-master-03的私钥拷贝脚本如下：
+
+```shell
+# cat /tmp/cpkey.sh
+USER=root
+CONTROL_PLANE_IPS="10.220.62.22 10.220.62.23"  # IP of k8s-master-02 and k8s-master-03
+dir=/etc/kubernetes/pki/
+for host in ${CONTROL_PLANE_IPS}; do
+    scp /etc/kubernetes/pki/ca.crt "${USER}"@$host:${dir}
+    scp /etc/kubernetes/pki/ca.key "${USER}"@$host:${dir}
+    scp /etc/kubernetes/pki/sa.key "${USER}"@$host:${dir}
+    scp /etc/kubernetes/pki/sa.pub "${USER}"@$host:${dir}
+    scp /etc/kubernetes/pki/front-proxy-ca.crt "${USER}"@$host:${dir}
+    scp /etc/kubernetes/pki/front-proxy-ca.key "${USER}"@$host:${dir}
+    scp /etc/kubernetes/pki/etcd/ca.crt "${USER}"@$host:${dir}etcd
+    scp /etc/kubernetes/pki/etcd/ca.key "${USER}"@$host:${dir}etcd
+done
+```
+
+然后登陆到ansible，让所有的worker节点加入到k8s集群
 
 ```bash
-$ ansible node -m shell -a "kubeadm join 10.220.62.31:6443 --token 8dnb5o.ce7g7yzmw1f7lsm3 --discovery-token-ca-cert-hash sha256:732a5bb54e5dbbbc4c61e96dc6e88974dfd6f09f95eafbe260ae1195f2f804d2"
+$ kubeadm join 10.220.62.31:6443 --token abcdef.0123456789abcdef --discovery-token-ca-cert-hash sha256:634ccf84765085a2b3a4a412abc031079513d1697107d7b930312add12e32466
 ```
 
 如何需要使用rancher，三个master还需要做如下操作
