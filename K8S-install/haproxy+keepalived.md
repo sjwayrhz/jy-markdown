@@ -75,6 +75,14 @@ $ dnf install keepalived haproxy -y
        server devops-master-01 10.220.62.21:6443 check # Replace the IP address with your own.
        server devops-master-02 10.220.62.22:6443 check # Replace the IP address with your own.
        server devops-master-03 10.220.62.23:6443 check # Replace the IP address with your own.
+    
+   frontend in-ingress-nginx-30080
+       bind *:30080
+       default_backend ingress-nginx-30080
+   backend ingress-nginx-30080
+       server devops-master-01 10.220.62.21:30080 check # Replace the IP address with your own.
+       server devops-master-02 10.220.62.22:30080 check # Replace the IP address with your own.
+       server devops-master-03 10.220.62.23:30080 check # Replace the IP address with your own.
    ```
 
 3. 保存文件并运行以下命令以开启 HAproxy。
