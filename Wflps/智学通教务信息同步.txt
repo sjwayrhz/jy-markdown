@@ -4,3 +4,18 @@ xuzy
 EkY4W3Kz
 
 智学通教务信息同步
+
+
+在以下界面找到同步的jobs
+```
+https://ops-jobs.wfl-ischool.cn/project/oral-group-admisson-sync/jobs
+```
+
+发现本次的id是
+school_id:140207|03
+
+执行的命令是 
+```bash
+$ kubectl exec -it oral3-68c9987974-5wmxh -- /bin/bash
+$ bundle exec rake scripts:sync_data_jw[140207\|03]
+```
