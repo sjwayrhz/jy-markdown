@@ -4,13 +4,6 @@
 
 ## 安装
 
-### 启动Mariadb
-
-```bash
-$ sudo dnf install MariaDB-server -y
-$ sudo systemctl enable --now mariadb
-```
-
 ### 挂载第二块硬盘到/var/lib/mysql
 
 ```bash
