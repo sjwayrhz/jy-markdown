@@ -116,3 +116,16 @@ sed -e 's|^baseurl=https://repo.almalinux.org|baseurl=https://mirrors.sjtug.sjtu
     /etc/yum.repos.d/almalinux*.repo
 ```
 
+###  Epel源
+
+更改原先的epel源为清华源
+
+```bash
+sed -e 's!^metalink=!#metalink=!g' \
+    -e 's!^#baseurl=!baseurl=!g' \
+    -e 's!//download\.fedoraproject\.org/pub!//mirrors.tuna.tsinghua.edu.cn!g' \
+    -e 's!//download\.example/pub!//mirrors.tuna.tsinghua.edu.cn!g' \
+    -e 's!http://mirrors!https://mirrors!g' \
+    -i /etc/yum.repos.d/epel*.repo
+```
+
