@@ -24,7 +24,7 @@ $ docker run -d -p 3306:3306 --restart=always --name mysql \
 ```mysql
 $ docker exec -it mysql容器ID /bin/bash
 
-root@ID:/# mysql -u root -p123456
+root@ID:/# mysql -uroot -p123456
 mysql> GRANT ALL PRIVILEGES on *.* to root@'%' WITH GRANT OPTION;
 mysql> ALTER USER 'root'@'%' IDENTIFIED BY '123456' PASSWORD EXPIRE NEVER;
 Query OK, 0 rows affected (0.02 sec)
@@ -39,7 +39,7 @@ mysql> exit
 使用如下命令运行
 
 ```bash
-$ docker run -d -p 8080:80 --restart=always \
+$ docker run -d -p 80:80 --restart=always \
  -v /usr/local/nextcloud/html:/var/www/html \
  -v /usr/local/nextcloud/apps:/var/www/html/custom_apps \
  -v /usr/local/nextlcoud/config:/var/www/html/config \
@@ -48,9 +48,11 @@ $ docker run -d -p 8080:80 --restart=always \
  nextcloud:18
 ```
 
+如果安装  nextcloud:22.2.3  ，数据库需要安装 mysql:8.0  ,并且需要在  config.php 文件中 添加 'allow_local_remot_servers' => true;
+
 打开`&host:&IP`配置
 
-本次地址为：192.168.177.12:8080
+本次地址为：192.168.177.12:80
 
 ```
 账号：admin
@@ -87,8 +89,9 @@ $ docker run -i -t -d -p 6060:80 --restart=always \
    nextcloud 18版本之前不需要，19与19版本之后需要
 
 ```php
-添加如下语句，路径/root/nextlcoud/config
-'allow_local_remot_servers' => true;
+ $ vim /usr/local/nextlcoud/config/config.php
+ 添加如下语句   
+ 'allow_local_remote_servers' => true,
 ```
 
 配置nextcloud onlyoffice 服务器地址

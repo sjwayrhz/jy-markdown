@@ -1,10 +1,18 @@
-# Mysql_8.0的安装与配置
+# Mysql_5.7的安装与配置
 
 [TOC]
 
 ## 前置条件
 
-安装在 rocky-linux 8.5中 ，该版本系统对于mysql 8.0完美支持，如果需要安装mysql 5.7,则需要移除系统自带的mysql模块
+安装在 rocky-linux 8.5中 ，安装mysql 5.7,需要移除系统自带的mysql模块
+
+Disable MySQL default AppStream repository:
+
+```bash
+$ sudo dnf remove @mysql
+$ sudo dnf module reset mysql
+$ sudo dnf module disable mysql
+```
 
 ## 安装
 
@@ -32,9 +40,9 @@ $ df -h | grep mysql
 
 ```bash
 $ tee /etc/yum.repos.d/mysql-community.repo<<EOF
-[mysql80-community]
-name=MySQL 8.0 Community Server
-baseurl=https://mirrors.tuna.tsinghua.edu.cn/mysql/yum/mysql80-community-el8/
+[mysql57-community]
+name=MySQL 5.7 Community Server
+baseurl=https://mirrors.tuna.tsinghua.edu.cn/mysql/yum/mysql57-community-el7/
 enabled=1
 gpgcheck=0
 gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-mysql
@@ -61,16 +69,22 @@ $ systemctl enable --now mysqld
 $ systemctl status mysqld
 ```
 
+### 查看初使默认的mysql密码
+
+```bash
+$ cat /var/log/mysqld.log  | grep password
+2022-02-14T01:41:15.321262Z 1 [Note] A temporary password is generated for root@localhost: isFiTl/vo8yb
+```
+
 ### 初始化mysql
 
 ```bash
 $ mysql_secure_installation
 
-Press y|Y for Yes, any other key for No: y
-Please enter 0 = LOW, 1 = MEDIUM and 2 = STRONG: 0
+Enter password for user root: isFiTl/vo8yb
 New password: 2wsx#EDC
 Re-enter new password: 2wsx#EDC
-Do you wish to continue with the password provided?(Press y|Y for Yes, any other key for No) : y
+Change the password for root ? ((Press y|Y for Yes, any other key for No) : n
 Remove anonymous users? (Press y|Y for Yes, any other key for No) : y
 Disallow root login remotely? (Press y|Y for Yes, any other key for No) : n
 Remove test database and access to it? (Press y|Y for Yes, any other key for No) : y
@@ -94,7 +108,7 @@ mysql > use mysql;
 
 mysql > update user set host='%' where user='root';
 
-mysql > grant all privileges on *.* to root@'%';
+mysql > grant all privileges on *.* to root@'%' identified by '2wsx#EDC';
 
 mysql>  flush privileges;
 ```
