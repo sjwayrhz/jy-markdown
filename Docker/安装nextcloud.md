@@ -97,3 +97,4 @@ $ docker run -i -t -d -p 6060:80 --restart=always \
 配置nextcloud onlyoffice 服务器地址
 
 点击右上角用户图标--》设置--》onlyoffice--》配置相关信息
+
