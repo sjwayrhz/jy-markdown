@@ -142,6 +142,8 @@ mysql>  flush privileges;
 ```mysql
 创建用户和数据库
 
+mysql>  set global validate_password_policy=LOW;
+
 mysql>  create user 'oral3_dba'@'%' identified by'MxE79joA';
 
 mysql>  create database oral3;
