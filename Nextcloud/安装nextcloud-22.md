@@ -16,7 +16,7 @@ $ docker run -d -p 3306:3306 --restart=always --name mysql \
   -v /usr/local/mysql/logs:/logs \
   -v /usr/local/mysql/data:/var/lib/mysql \
   -e MYSQL_ROOT_PASSWORD=123456  \
-  mysql:5.7
+  mysql:8.0
 ```
 
 配置mysql
@@ -42,10 +42,10 @@ mysql> exit
 $ docker run -d -p 80:80 --restart=always \
  -v /usr/local/nextcloud/html:/var/www/html \
  -v /usr/local/nextcloud/apps:/var/www/html/custom_apps \
- -v /usr/local/nextlcoud/config:/var/www/html/config \
- -v /usr/local/nextcloud/nextcloud/data:/var/www/html/data \
+ -v /usr/local/nextcloud/config:/var/www/html/config \
+ -v /usr/local/nextcloud/data:/var/www/html/data \
  -v /usr/local/nextcloud/themes:/var/www/html/themes \
- nextcloud:18
+ nextcloud:22.2.5
 ```
 
 如果安装  nextcloud:22.2.3  ，数据库需要安装 mysql:8.0  ,并且需要在  config.php 文件中 添加 'allow_local_remot_servers' => true;
@@ -75,7 +75,7 @@ $ docker run -i -t -d -p 6060:80 --restart=always \
   -v /app/onlyoffice/DocumentServer/data:/var/www/onlyoffice/Data \
   -v /app/onlyoffice/DocumentServer/lib:/var/lib/onlyoffice \
   -v /app/onlyoffice/DocumentServer/db:/var/lib/postgresql \
-  onlyoffice/documentserver:6.4
+  onlyoffice/documentserver:6.4.2
 ```
 
 #### 配置onlyoffice
