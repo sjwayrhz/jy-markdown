@@ -71,3 +71,42 @@ Database host: 192.168.177.12:3306
 
 点击右上角，在设置app中搜索talk并下载。
 
+### ip自签名
+
+使用如下脚本自签名
+
+```bash
+wget https://gitee.com/sjwayrhz/one_key_install/raw/master/create_self-signed-cert.sh
+```
+
+使用如下https的nginx 配置
+
+```nginx
+server {
+	listen        80;
+	server_name   10.220.62.203;
+	if ($scheme != "https") {
+            return 301 https://$host$request_uri;
+        }
+}
+
+server {
+	client_max_body_size 100m;
+
+	listen        443	ssl;
+
+	ssl_certificate         /etc/nginx/ssl/tls.crt;
+	ssl_certificate_key     /etc/nginx/ssl/tls.key;
+
+	server_name   10.220.62.203;
+	access_log    /var/log/nginx/ipaddress.log  main;
+
+	location / {
+		proxy_pass http://127.0.0.1:8080/;
+		proxy_set_header   Host    $host;
+		proxy_set_header   X-Real-IP   $remote_addr;
+		proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+	}
+}
+```
+

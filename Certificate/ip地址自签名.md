@@ -1,17 +1,8 @@
+使用如下自签名证书
+
 ```
-openssl req \
--newkey rsa:2048 \
--x509 \
--nodes \
--keyout file.key \
--new \
--out file.crt \
--subj /CN=Hostname \
--reqexts SAN \
--extensions SAN \
--config <(cat /etc/ssl/openssl.cnf \
-    <(printf '[SAN]\nsubjectAltName=DNS:hostname,IP:10.220.62.203')) \
--sha256 \
--days 3650
+wget https://gitee.com/sjwayrhz/one_key_install/raw/master/create_self-signed-cert.sh
 ```
+
+生成的tls.key和tls.crt就是自签名
 
