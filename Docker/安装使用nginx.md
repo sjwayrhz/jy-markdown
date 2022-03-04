@@ -32,7 +32,7 @@ server {
 $ docker run -d \
 --name nginx \
 --restart=always \
--p 80:80 \
+--net=host \
 -v /opt/docker-nginx/log:/var/log/nginx \
 -v /opt/docker-nginx/ssl:/etc/nginx/ssl \
 -v /opt/docker-nginx/conf.d:/etc/nginx/conf.d \
