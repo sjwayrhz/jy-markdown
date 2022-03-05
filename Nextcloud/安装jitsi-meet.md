@@ -25,6 +25,7 @@ $ ./gen-passwords.sh
 ### 启动docker-compose
 
 ```bash
+$ sed -i 's/latest/stable-6173/g' docker-compose.yml
 $ docker-compose up -d 
 ```
 
