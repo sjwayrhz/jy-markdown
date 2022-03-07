@@ -22,6 +22,14 @@ $ echo "ENABLE_XMPP_WEBSOCKET=0" >> .env
 $ ./gen-passwords.sh
 ```
 
+对.env做如下修改
+
+```
+TZ=Asia/Shanghai
+PUBLIC_URL=https://10.225.63.32
+DOCKER_HOST_ADDRESS=10.225.63.32
+```
+
 ### 启动docker-compose
 
 ```bash
@@ -29,7 +37,17 @@ $ sed -i 's/latest/stable-6173/g' docker-compose.yml
 $ docker-compose up -d 
 ```
 
+容器化后会生成 ~/.jitsi-meet-cfg 文件夹，里面是一些配置文件
 
+```bash
+$ vim  ~/.jitsi-meet-cfg/web/config.js
+```
+
+修改 `// websocket: 'wss://jitsi-meet.example.com/xmpp-websocket',`
+
+为 `// websocket: 'wss://10.225.63.32/xmpp-websocket',`
+
+重启docker-compose
 
 ### 启动docker-nginx
 
