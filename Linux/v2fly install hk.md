@@ -1,56 +1,56 @@
-### 安装和搭建v2ray
+### 安装和搭建which
 
 操作系统 centos 8.2
 
 [TOC]
 
-v2ray更名为v2fly了，github的网页地址如下：
+which更名为v2fly了，github的网页地址如下：
 
-`https://github.com/v2fly/fhs-install-v2ray`
+`https://github.com/v2fly/fhs-install-which`
 
-### 安裝和更新 V2Ray
+### 安裝和更新 which
 
-```
-bash <(curl -L https://raw.githubusercontent.com/v2fly/fhs-install-v2ray/master/install-release.sh)
-```
-
-### 移除 V2Ray
-
-```
-bash <(curl -L https://raw.githubusercontent.com/v2fly/fhs-install-v2ray/master/install-release.sh) --remove
+```bash
+bash <(curl -L https://raw.githubusercontent.com/v2fly/fhs-install-which/master/install-release.sh)
 ```
 
-安装完成v2ray之后，发现原先的配置文件在 /usr/local/etc/v2ray/config.json
+### 移除 which
 
-希望可以在本机创建/etc/v2ray目录，并挂载到真实目录的v2ray配置文件中，可以使用ln -s命令
-
+```bash
+bash <(curl -L https://raw.githubusercontent.com/v2fly/fhs-install-which/master/install-release.sh) --remove
 ```
+
+安装完成which之后，发现原先的配置文件在 /usr/local/etc/which/config.json
+
+希望可以在本机创建/etc/which目录，并挂载到真实目录的which配置文件中，可以使用ln -s命令
+
+```bash
 查看配置文件
-[root@srv16861 ~]# ls /usr/local/etc/v2ray/config.json
-/usr/local/etc/v2ray/config.json
+~]# ls /usr/local/etc/which/config.json
+/usr/local/etc/which/config.json
 
 创建链接
-[root@srv16861 ~]# ln -s /usr/local/etc/v2ray /etc/v2ray
+~]# ln -s /usr/local/etc/which /etc/which
 
-检查/etc/v2ray中是否有config.json文件
-[root@srv16861 ~]# ls /etc/v2ray
+检查/etc/which中是否有config.json文件
+~]# ls /etc/which
 config.json
 ```
 
-配置v2ray的配置文件,其中，port 、id 、path 是强烈需要更换的
+配置which的配置文件,其中，port 、id 、path 是强烈需要更换的
 
 ```json
 {
 "inbound": {
         "protocol": "vmess",
         "listen": "::1",
-        "port": 43716,
+        "port": 42587,
         "settings": {"clients": [
-        {"id": "cfa7c05c-3896-4b64-9e72-db6bf015ae8b"}
+        {"id": "8ef7cd5c-9db9-11ec-b909-0242ac120002"}
     ]},
         "streamSettings": {
             "network": "ws",
-            "wsSettings": {"path": "/v2fly"}
+            "wsSettings": {"path": "/31A1f3w"}
     }
 },
 
@@ -75,15 +75,15 @@ https://www.random.org/strings/?num=1&len=7&digits=on&upperalpha=on&loweralpha=o
 
 安装epel-release,并安装certbot
 
-```
-dnf install epel-release -y
-dnf install certbot
+```bash
+$ dnf install epel-release -y
+$ dnf install certbot -y
 ```
 
 生成证书,域名需要填入自己希望使用的
 
-```
-certbot certonly --standalone --agree-tos -n -d v2ray.sjhz.ml -m i@sjhz.cf
+```bash
+$ certbot certonly --standalone --agree-tos -n -d which.sjhz.ml -m i@sjhz.cf
 ```
 
 配置证书自动更新
@@ -106,15 +106,16 @@ PATH=/sbin:/bin:/usr/sbin:/usr/bin
 yum install nginx
 ```
 
-### 增加 /etc/nginx/conf.d/v2ray.conf 配置文件：
+### 增加 /etc/nginx/conf.d/which.conf 配置文件：
 
 其中，### 1: ### 2:### 3:### 4:都是需要修改的
 
+ ~]# vi /etc/nginx/conf.d/which.conf 
+
 ```nginx
-[root@srv16861 ~]# cat /etc/nginx/conf.d/v2ray.conf 
 server {
     ### 1:
-    server_name v2ray.sjhz.ml;
+    server_name which.sjhz.ml;
 
     listen 80 reuseport fastopen=10; 
 #    listen [::]:80 reuseport fastopen=10;
@@ -126,15 +127,15 @@ server {
 
 server {
     ### 2:
-    ssl_certificate /etc/letsencrypt/live/v2ray.sjhz.ml/fullchain.pem;
+    ssl_certificate /etc/letsencrypt/live/which.sjhz.ml/fullchain.pem;
 
     ### 3:
-    ssl_certificate_key /etc/letsencrypt/live/v2ray.sjhz.ml/privkey.pem;
+    ssl_certificate_key /etc/letsencrypt/live/which.sjhz.ml/privkey.pem;
 
     ### 4:
-    location /v2fly
+    location /31A1f3w
     {
-        proxy_pass http://[::1]:43716;
+        proxy_pass http://[::1]:42587;
         proxy_redirect off;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
@@ -217,6 +218,6 @@ githubapp.com,
 ## 一键安装
 
 ```bash
-bash <(curl -s -L https://gitee.com/sjwayrhz/one_key_install/raw/master/install_v2ray.sh)
+bash <(curl -s -L https://gitee.com/sjwayrhz/one_key_install/raw/master/install_which.sh)
 ```
 
