@@ -1,0 +1,15 @@
+表扬机日志获取
+
+第一步
+
+切换到阿里云测试k8s
+
+第二步
+
+kubectl logs praise-api-test-747bbbbb58-cc4df praise-api-test | gzip > praise-api-test.log.gz
+
+kubectl logs praise-api-test-sidekiq-669b5ff5cf-dr4pj praise-api-test-sidekiq | gzip > praise-api-test-sidekiq.log.gz
+
+第三步
+
+发送2个日志文件
