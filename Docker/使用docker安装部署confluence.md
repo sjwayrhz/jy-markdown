@@ -389,8 +389,18 @@ org.swift.confluence.markdown
 
 使用atlasssian-agnet.jar破解
 
+```bash
+$ java -jar atlassian-agent.jar -d -m i@sjhz.cf -n caobo -p org.swift.confluence.markdown  -o https://confluence.sjhz.tk -s B0TF-8GK8-MILR-8QG9
 ```
-java -jar atlassian-agent.jar -d -m i@sjhz.cf -n BAT -p org.swift.confluence.markdown  -o https://confluence.sjhz.tk -s B0TF-8GK8-MILR-8QG9
+
+参数说明：
+
+```
+-m：指定邮箱
+-n：授权给的用户
+-p：需要获取key的程序(应用密钥), jira为Jira Software;jc为jira Core的缩写
+-o：confluence的url地址
+-s：服务器ID,在confluence-->一般设置-->授权细节中可以查到
 ```
 
 
