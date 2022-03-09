@@ -344,7 +344,7 @@ ip地址 - 10.220.62.51
 样例，本次查询到的服务器ID: `BX2E-GBMA-Q2L4-ZT0J`,破解操作如下：
 
 ```bash
-$ java -jar atlassian-agent.jar -d -m i@sjhz.tk -n BAT -p conf -o https://confluence.sjhz.tk -s BX2E-GBMA-Q2L4-ZT0J
+$ java -jar atlassian-agent.jar -d -m i@sjhz.cf -n BAT -p conf -o https://confluence.sjhz.tk -s BX2E-GBMA-Q2L4-ZT0J
 ```
 
 获得的结果如下：
@@ -370,6 +370,30 @@ coX3n0JnQ==X02k0
 ```
 
 输入授权码即可
+
+如果安装了一个markdown插件需要破解，首先，找到服务器id
+
+设置->系统信息->服务器ID
+
+```
+服务器ID
+B0TF-8GK8-MILR-8QG9 
+```
+
+需要应用密钥
+
+```
+应用密钥:
+org.swift.confluence.markdown 
+```
+
+使用atlasssian-agnet.jar破解
+
+```
+java -jar atlassian-agent.jar -d -m i@sjhz.cf -n BAT -p org.swift.confluence.markdown  -o https://confluence.sjhz.tk -s B0TF-8GK8-MILR-8QG9
+```
+
+
 
 ## 乱码问题
 在我们正常安装之后，中文可能会有乱码，我们修改一下连接字符串，在 confluence 的家目录下面，有一个配置文件confluence.cfg.xml，找到hibernate.connection.url，在数据库字符串后面加上如下字符，整体结果如下：
