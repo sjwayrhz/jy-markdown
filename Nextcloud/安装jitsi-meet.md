@@ -15,10 +15,9 @@ $ sudo chmod +x /usr/local/bin/docker-compose
 
 ```bash
 $ dnf install -y git
-$ git clone https://github.com/jitsi/docker-jitsi-meet
+$ git clone https://gitee.com/sjwayrhz/docker-jitsi-meet.git
 $ cd docker-jitsi-meet
 $ cp env.example .env
-$ echo "ENABLE_XMPP_WEBSOCKET=0" >> .env
 $ ./gen-passwords.sh
 ```
 
@@ -26,8 +25,8 @@ $ ./gen-passwords.sh
 
 ```
 TZ=Asia/Shanghai
-PUBLIC_URL=https://10.225.63.32
-DOCKER_HOST_ADDRESS=10.225.63.32
+PUBLIC_URL=https://jitsi-meet.juneyaokc.com
+DOCKER_HOST_ADDRESS=10.220.62.59
 ```
 
 ### 启动docker-compose
@@ -43,9 +42,29 @@ $ docker-compose up -d
 $ vim  ~/.jitsi-meet-cfg/web/config.js
 ```
 
-修改 `// websocket: 'wss://jitsi-meet.example.com/xmpp-websocket',`
+修改部分
 
-为 `// websocket: 'wss://10.225.63.32/xmpp-websocket',`
+```javascript
+//config.resolution = 720;
+//config.constraints.video.height = { ideal: 720, max: 720, min: 180 };
+//config.constraints.video.width = { ideal: 1280, max: 1280, min: 320};
+//config.disableSimulcast = false;
+//config.startVideoMuted = 10;
+//config.startWithVideoMuted = false;
+
+config.resolution = 1080;
+config.constraints.video.height = { ideal: 1080, max: 1080, min: 720 };
+config.constraints.video.width = { ideal: 1920, max: 1920, min: 1280};
+config.disableSimulcast = true;
+config.startVideoMuted = 10;
+config.startWithVideoMuted = false;
+```
+
+另外一个部分
+
+```
+capScreenshareBitrate: 0
+```
 
 重启docker-compose
 
@@ -76,7 +95,7 @@ total 8
 ```nginx
 server {
 	listen        80;
-	server_name   test.juneyaokc.com;
+	server_name   jitsi-meet.juneyaokc.com;
 	if ($scheme != "https") {
             return 301 https://$host$request_uri;
         }
@@ -90,8 +109,8 @@ server {
 	ssl_certificate         /etc/nginx/ssl/star_juneyaokc_com.pem;
 	ssl_certificate_key     /etc/nginx/ssl/star_juneyaokc_com.key;
 
-	server_name   test.juneyaokc.com;
-	access_log    /var/log/nginx/test.juneyaokc.com.log  main;
+	server_name   jitsi-meet.juneyaokc.com;
+	access_log    /var/log/nginx/jitsi-meet.juneyaokc.com.log  main;
 
 	location / {
 		proxy_pass http://10.220.62.57:8000/;
