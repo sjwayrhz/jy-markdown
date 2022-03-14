@@ -423,3 +423,72 @@ COPY "atlassian-agent.jar" /opt/atlassian/confluence/
 COPY server.xml /opt/atlassian/confluence/conf/server.xml
 RUN echo 'export CATALINA_OPTS="-javaagent:/opt/atlassian/confluence/atlassian-agent.jar ${CATALINA_OPTS}"' >> /opt/atlassian/confluence/bin/setenv.sh
 ```
+
+### 修改域名
+
+希望可以将confluence.sjhz.tk的image修改为conf.sjhz.tk
+
+在一个临时的linux服务器中安装docker，然后作为镜像中转之用。
+
+修改文件 server.xml
+
+```bash
+<?xml version="1.0"?>
+<Server port="8000" shutdown="SHUTDOWN">
+  <Service name="Tomcat-Standalone">
+        <Connector port="8090" connectionTimeout="20000" redirectPort="8443"
+                   maxThreads="48" minSpareThreads="10"
+                   enableLookups="false" acceptCount="10" debug="0" URIEncoding="UTF-8"
+                   protocol="org.apache.coyote.http11.Http11NioProtocol"
+                   scheme="https" secure="true" proxyName="conf.sjhz.tk" proxyPort="443"/>
+    <Engine name="Standalone" defaultHost="localhost">
+      <Host name="localhost" appBase="webapps" unpackWARs="true" autoDeploy="false" startStopThreads="4">
+        <Context path="" docBase="../confluence" reloadable="false" useHttpOnly="true">
+          <!-- Logging configuration for Confluence is specified in confluence/WEB-INF/classes/log4j.properties -->
+          <Manager pathname=""/>
+          <Valve className="org.apache.catalina.valves.StuckThreadDetectionValve" threshold="60"/>
+        </Context>
+        <Context path="${confluence.context.path}/synchrony-proxy" docBase="../synchrony-proxy" reloadable="false" useHttpOnly="true">
+          <Valve className="org.apache.catalina.valves.StuckThreadDetectionValve" threshold="60"/>
+        </Context>
+      </Host>
+    </Engine>
+  </Service>
+</Server>
+```
+
+制作dockerfile
+
+```dockerfile
+FROM sjwayrhz/confluence:confluence.sjhz.tk
+
+USER root
+
+# 将代理破解包加入容器
+COPY "atlassian-agent.jar" /opt/atlassian/confluence/
+
+# 添加自定义server.xml到容器，可添加支持ssl
+COPY server.xml /opt/atlassian/confluence/conf/server.xml
+
+# 设置启动加载代理包
+RUN echo 'export CATALINA_OPTS="-javaagent:/opt/atlassian/confluence/atlassian-agent.jar ${CATALINA_OPTS}"' >> /opt/atlassian/confluence/bin/setenv.sh
+```
+
+编辑docker images
+
+```bash
+$ docker build -t sjwayrhz/confluence:conf.sjhz.tk .
+```
+
+启动
+
+```bash
+$ docker run -d --name conf \
+  --restart always \
+  -p 8090:8090 \
+  -p 8091:8091 \
+  -e TZ="Asia/Shanghai" \
+  -v /var/atlassian/confluence:/var/atlassian/confluence \
+  sjwayrhz/confluence:conf.sjhz.tk
+```
+
