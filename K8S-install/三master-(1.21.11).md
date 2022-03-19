@@ -77,7 +77,17 @@ $ dnf install keepalived haproxy -y
            timeout connect 5000
            timeout client 50000
            timeout server 50000
-      
+           
+   listen status 
+       mode http
+       bind *:1080
+       log global
+       stats refresh 10s
+       stats hide-version
+       stats uri /haproxy
+       stats realm HAProxy\Statistics
+       stats auth admin:password
+   
    frontend kube-apiserver
      bind *:6443
      mode tcp
@@ -115,6 +125,8 @@ $ dnf install keepalived haproxy -y
    ```
 
 6. 确保您在三台机器上做了同样的 HAproxy 配置。
+
+   打开浏览器，输入网址`10.220.62.60:1080/haproxy` 输入账号密码“admin/password”即可查看流量
 
 ### Keepalived
 
