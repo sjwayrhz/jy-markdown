@@ -10,7 +10,7 @@
 
 |  IP address  |     Hostname      |   Disk   |    Application     |
 | :----------: | :---------------: | :------: | :----------------: |
-| 10.220.62.31 |        vip        |          |                    |
+| 10.220.62.41 |   internal-vip    |   40G    |    内网端口转发    |
 | 10.220.62.32 | loadbalance-left  |   40G    | haproxy+keepalived |
 | 10.220.62.33 | loadbalance-right |   40G    | haproxy+keepalived |
 | 10.220.62.21 | devops-master-01  |   40G    |                    |
@@ -19,6 +19,7 @@
 | 10.220.62.24 | devops-worker-01  | 40G+400G |                    |
 | 10.220.62.25 | devops-worker-02  | 40G+400G |                    |
 | 10.220.62.26 | devops-worker-03  | 40G+400G |                    |
+| 10.220.62.31 |    global-vip     |          |   ingress-nginx    |
 
 ### 安装haproxy+keepalived 
 

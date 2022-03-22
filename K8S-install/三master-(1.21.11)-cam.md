@@ -6,7 +6,7 @@
 
 | IP 地址      | 服务名        | 角色                 |
 | ------------ | ------------- | -------------------- |
-| 10.220.62.17 | internal-VIP  | 内网虚拟 IP 地址     |
+| 10.220.62.17 | internal-VIP  | 内网端口转发         |
 | 10.220.62.27 | k8s-lb-01     | Keepalived & HAproxy |
 | 10.220.62.28 | k8s-lb-02     | Keepalived & HAproxy |
 | 10.220.62.29 | k8s-lb-03     | Keepalived & HAproxy |
