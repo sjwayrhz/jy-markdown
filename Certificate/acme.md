@@ -133,8 +133,30 @@ server {
 为Nginx安装
 
 ```bash
-$ acme.sh --install-cert -d gitlab.sjhz.tk \
-  --key-file       /etc/nginx/ssl/gitlab.sjhz.tk.key  \
+$ acme.sh --install-cert -d test.sjhz.tk \
+  --key-file       /etc/nginx/ssl/test.sjhz.tk.key  \
+  --fullchain-file /etc/nginx/ssl/fullchain.cer \
+  --reloadcmd     "service nginx force-reload"
+```
+
+
+
+为Nginx安装泛域名
+
+test1
+
+```bash
+$ acme.sh --install-cert -d *.sjhz.tk \
+  --key-file       /etc/nginx/ssl/test1.sjhz.tk.key  \
+  --fullchain-file /etc/nginx/ssl/fullchain.cer \
+  --reloadcmd     "service nginx force-reload"
+```
+
+test2
+
+```bash
+$ acme.sh --install-cert -d *.sjhz.tk \
+  --key-file       /etc/nginx/ssl/test2.sjhz.tk.key  \
   --fullchain-file /etc/nginx/ssl/fullchain.cer \
   --reloadcmd     "service nginx force-reload"
 ```
