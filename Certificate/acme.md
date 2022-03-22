@@ -36,12 +36,12 @@ excute
 
 ```bash
 $ sh acme.sh --install  \
-  --home /usr/local/acme \
+  --home /usr/local/bin \
   --config-home /usr/local/acme/data \
-  --cert-home  /usr/local/certs \
+  --cert-home  /usr/local/acme/certs \
   --accountemail  "i@sjhz.cf" \
-  --accountkey  /usr/local/account.key \
-  --accountconf /usr/local/account.conf \
+  --accountkey  /usr/local/acme/account.key \
+  --accountconf /usr/local/acme/account.conf \
   --useragent  "this is my client."
 ```
 
