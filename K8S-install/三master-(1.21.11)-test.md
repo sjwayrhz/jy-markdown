@@ -6,6 +6,7 @@
 
 | IP 地址      | 服务名         | 角色                 |
 | ------------ | -------------- | -------------------- |
+| 10.220.62.42 | internal-test  |                      |
 | 10.220.62.61 | test-lb-01     | Keepalived & HAproxy |
 | 10.220.62.62 | test-lb-02     | Keepalived & HAproxy |
 | 10.220.62.63 | test-lb-03     | Keepalived & HAproxy |

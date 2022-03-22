@@ -10,7 +10,7 @@
 
 |  IP address  |     Hostname      |   Disk   |    Application     |
 | :----------: | :---------------: | :------: | :----------------: |
-| 10.220.62.41 |   internal-vip    |   40G    |    内网端口转发    |
+| 10.220.62.41 |  internal-devops  |   40G    |    内网端口转发    |
 | 10.220.62.32 | loadbalance-left  |   40G    | haproxy+keepalived |
 | 10.220.62.33 | loadbalance-right |   40G    | haproxy+keepalived |
 | 10.220.62.21 | devops-master-01  |   40G    |                    |
