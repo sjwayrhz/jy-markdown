@@ -82,6 +82,12 @@ $ acme.sh --issue --dns dns_dp -d test.sjhz.tk
 $ acme.sh --issue --dns dns_dp -d test1.sjhz.tk -d test2.sjhz.tk
 ```
 
+泛域名签证
+
+```bash
+$ acme.sh --issue --dns dns_dp -d *.sjhz.tk
+```
+
 查看证书
 
 ```bash
