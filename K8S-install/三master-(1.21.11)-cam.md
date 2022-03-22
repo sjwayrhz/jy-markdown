@@ -10,13 +10,13 @@
 | 10.220.62.27 | k8s-lb-01     | Keepalived & HAproxy |
 | 10.220.62.28 | k8s-lb-02     | Keepalived & HAproxy |
 | 10.220.62.29 | k8s-lb-03     | Keepalived & HAproxy |
-| 10.220.62.21 | k8s-master-01 |                      |
-| 10.220.62.22 | k8s-master-02 |                      |
-| 10.220.62.23 | k8s-master-03 |                      |
-| 10.220.62.24 | k8s-worker-01 |                      |
-| 10.220.62.25 | k8s-worker-02 |                      |
-| 10.220.62.26 | k8s-worker-03 |                      |
-| 10.220.62.30 | global-VIP    | 公网虚拟 IP 地址     |
+| 10.220.65.21 | k8s-master-01 |                      |
+| 10.220.65.22 | k8s-master-02 |                      |
+| 10.220.65.23 | k8s-master-03 |                      |
+| 10.220.65.24 | k8s-worker-01 |                      |
+| 10.220.65.25 | k8s-worker-02 |                      |
+| 10.220.65.26 | k8s-worker-03 |                      |
+| 10.220.65.30 | global-VIP    | 公网虚拟 IP 地址     |
 
 
 
@@ -43,9 +43,9 @@ $ dnf install keepalived haproxy -y
    10.220.62.27 k8s-lb-01
    10.220.62.28 k8s-lb-02
    10.220.62.29 k8s-lb-03
-   10.220.62.21 k8s-master-01
-   10.220.62.22 k8s-master-02
-   10.220.62.23 k8s-master-03
+   10.220.65.21 k8s-master-01
+   10.220.65.22 k8s-master-02
+   10.220.65.23 k8s-master-03
    EOF
    ```
 
