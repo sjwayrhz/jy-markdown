@@ -124,6 +124,17 @@ server {
 }
 ```
 
+为Nginx安装
+
+```bash
+$ acme.sh --install-cert -d gitlab.sjhz.tk \
+  --key-file       /etc/nginx/ssl/gitlab.sjhz.tk.key  \
+  --fullchain-file /etc/nginx/ssl/fullchain.cer \
+  --reloadcmd     "service nginx force-reload"
+```
+
+
+
 
 
 
