@@ -28,7 +28,7 @@ Explanations :
 
 
 ```bash
-$ git clone https://gitlab.sjhz.tk/caobo/acme.sh.git 
+$ git clone git@gitee.com:sjwayrhz/acme.sh.git
 $ cd acme.sh
 ```
 
