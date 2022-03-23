@@ -7,21 +7,25 @@
 ### 安装mail
 
 ```bash
-~]# dnf -y install mailx
+~]# dnf -y install mailx zip
 ```
 
 ### 配置文件 `~/.mailrc`
 
 这里配置的发邮件方是 a@sjhz.cf
 
-    set smtp=smtps://smtp.sjhz.cf:465   
-    set smtp-auth=login                  
-    set smtp-auth-user=a@sjhz.cf        
-    set smtp-auth-password=Vwv56ty7     
-    set ssl-verify=ignore              
-    set nss-config-dir=/etc/pki/nssdb    
-    set from=a@sjhz.cf                   
-    #set smtp-use-starttls=yes           
+```bash
+tee ~/.mailrc <<- 'EOF'
+set smtp=smtps://smtp.sjhz.cf:465   
+set smtp-auth=login                  
+set smtp-auth-user=a@sjhz.cf        
+set smtp-auth-password=Vwv56ty7     
+set ssl-verify=ignore              
+set nss-config-dir=/etc/pki/nssdb    
+set from=a@sjhz.cf                   
+#set smtp-use-starttls=yes       
+EOF
+```
 
 ### 发送邮件
 
@@ -63,53 +67,47 @@ If you have recieved this message ,that means the backup_sever is broken down.
 
 ### 脚本
 
-```
-vi /opt/sendmail.sh
+```bash
+$ vi /opt/sendmail.sh
 ```
 
 内容为
 
 ```shell
 #!/bin/bash
-
 cd /usr/local/src/devops && /usr/bin/git pull
-
 sleep 3
-
 cd /usr/local/src/markdown && /usr/bin/git pull
-
 sleep 3
-
 cd /usr/local/src && zip -r /usr/local/games/devops_$(date +%Y%m%d).zip *
-
 sleep 8
-
 cd /usr/local/src && zip -r /usr/local/games/markdown_$(date +%Y%m%d).zip *
-
 sleep 8
-
 if [ -f "/usr/local/games/devops_$(date +%Y%m%d).zip" ];then
     mail -s devops_and_markdown_backup_$(date +%Y%m%d) -a /usr/local/games/devops_$(date +%Y%m%d).zip -a /usr/local/games/markdown_$(date +%Y%m%d).zip taoistmonk@163.com < /opt/nxsuccess.txt
 else
     mail -s back_up_failed taoistmonk@163.com < /opt/nxfailed.txt
 fi
-
 find /usr/local/games -ctime +40 -type f | xargs rm -rf
 ```
 
+增加可执行权限
 
+```bash
+$ chmod +x /opt/sendmail.sh
+```
 
 ### 定时任务
 
-```
-# crontab -l 
+```bash
+$ crontab -l 
 
 0 17 * * * /opt/sendmail.sh
 ```
 
 opt文件夹下的文件
 
-```
-# ls /opt
+```bash
+$ ls /opt
 nxfailed.txt  nxsuccess.txt  sendmail.sh
 ```
