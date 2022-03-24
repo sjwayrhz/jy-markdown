@@ -47,9 +47,48 @@ $ cat /var/jenkins_home/secrets/initialAdminPassword
 
 输入密码后，选择安装推荐的插件即可。
 
+nginx反向代理配置文件
+
+```nginx
+server {
+	listen        80;
+	server_name   jenkins.sjhz.tk;
+	if ($scheme != "https") {
+            return 301 https://$host$request_uri;
+        }
+}
+
+server {
+	client_max_body_size 100m;
+
+	listen        443	ssl;
+
+	ssl_certificate         /etc/nginx/ssl/sjhz.tk.cer;
+	ssl_certificate_key     /etc/nginx/ssl/sjhz.tk.key;
+
+	server_name   jenkins.sjhz.tk;
+	access_log    /var/log/nginx/jenkins.sjhz.tk.log  main;
+
+	location / {
+		proxy_pass http://10.220.62.44:8080/;
+		proxy_set_header   Host    $host;
+		proxy_set_header   X-Real-IP   $remote_addr;
+		proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+	}
+}
+```
+
+
+
 ## 优化安装
 
-安装两个插件，一个是**publish over ssh**，一个是**Maven Integration**
+安装插件
+
+- Locale
+
+- publish over ssh
+
+- Maven Integration
 
 安装插件完成后我们需要配置Maven环境和JDK环境。
 

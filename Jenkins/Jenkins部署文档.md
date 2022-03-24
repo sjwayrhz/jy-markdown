@@ -143,21 +143,21 @@ candidates="
 设置nginx配置文件,将`/etc/nginx/nginx.conf` 的server 模块修改为如下内容
 
 ```bash
-    server {
-        listen       80;
-        server_name  localhost;
-        #access_log /var/log/jenkins_access_log main;
-        #error_log  /var/log/jenkins_error_log  debug_http;
-        client_max_body_size 60M;
-        client_body_buffer_size 512k;
-        location / {
-            proxy_pass      http://localhost:8080/;
-            proxy_redirect  off;
-            proxy_set_header Host $host;
-            proxy_set_header X-Real-IP $remote_addr;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-         }
-     }
+server {
+    listen       80;
+    server_name  localhost;
+    #access_log /var/log/jenkins_access_log main;
+    #error_log  /var/log/jenkins_error_log  debug_http;
+    client_max_body_size 60M;
+    client_body_buffer_size 512k;
+    location / {
+        proxy_pass      http://localhost:8080/;
+        proxy_redirect  off;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+}
 ```
 
 ### 启动jenkins和nginx
