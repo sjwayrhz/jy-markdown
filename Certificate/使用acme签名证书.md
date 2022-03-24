@@ -1,34 +1,11 @@
+# acme使用手册
+
+[TOC]
+
 ## Install
 
-```
-git clone https://github.com/acmesh-official/acme.sh.git
-cd acme.sh
-./acme.sh --install  \
---home ~/myacme \
---config-home ~/myacme/data \
---cert-home  ~/mycerts \
---accountemail  "my@example.com" \
---accountkey  ~/myaccount.key \
---accountconf ~/myaccount.conf \
---useragent  "this is my client."
-```
-
-You don't need to set them all, just set those ones you care about.
-
-Explanations :
-
-- `--home` is a customized dir to install `acme.sh` in. By default, it installs into `~/.acme.sh`
-- `--config-home` is a writable folder, acme.sh will write all the files(including cert/keys, configs) there. By default, it's in `--home`
-- `--cert-home` is a customized dir to save the certs you issue. By default, it's saved in `--config-home`.
-- `--accountemail `is the email used to register an account to Let's Encrypt, you will receive a renewal notice email here.
-- `--accountkey` is the file saving your account private key. By default, it's saved in `--config-home`.
-- `--user-agent` is the user-agent header value used to send to Let's Encrypt.
-- `--nocron` install acme.sh without cronjob
-
-
-
 ```bash
-$ git clone git@gitee.com:sjwayrhz/acme.sh.git
+$ git clone https://gitee.com/sjwayrhz/acme.sh.git
 $ cd acme.sh
 ```
 
@@ -53,6 +30,61 @@ $ sh acme.sh --install  \
 $ acme.sh --register-account -m i@sjhz.cf
 ```
 
+## cloudflare API
+
+Cloudflare Domain API offers two methods to automatically issue certs.
+
+### Using the global API key
+
+```bash
+export CF_Key="95989177cdf5347b93bc13a550d049760653f"
+export CF_Email="i@sjhz.cf"
+```
+
+### Using the new cloudflare api token
+
+Create a token that can read all resources
+
+#### juneyao.cf
+
+export vars
+
+```bash
+export CF_Token="oH7tmqW1m8TAKxwebYCo0btP5AUO2b4t8vXhLgCO"
+export CF_Account_ID="e1946178dc74948cd7d25ba573a577c0"
+export CF_Zone_ID="b19966bec833112dfccbc602c923cfcf"
+```
+
+bind dns
+
+```
+*.juneyao.cf.	1	IN	A	10.220.62.52
+```
+
+then issue a cert
+
+```bash
+$ acme.sh --issue --dns dns_cf -d *.juneyao.cf
+```
+
+#### caobo.cf
+
+export vars
+
+```bash
+export CF_Token="BXR35WxyKcLVhgbUkkEv9d3T8t1j-AcrFEBACmEt"
+export CF_Account_ID="93ff417fdc3e39e117ed1ff99f0c0a56"
+export CF_Zone_ID="b19966bec833112dfccbc602c923cfcf"
+```
+
+bind dns
+
+then , issue a cert
+
+```bash
+$ acme.sh --issue --dns dns_cf -d *.caobo.cf
+```
+
 
 
 ## DNSpod API
@@ -70,23 +102,17 @@ $ export DP_Id="300838"
 $ export DP_Key="d250f22a8fa48a48edc2ad02900af8d2"
 ```
 
-单点签证
+在dnspod中绑定泛域名到一个acme.sh云主机的内网ip上
 
-```bash
-$ acme.sh --issue --dns dns_dp -d test.sjhz.tk
-```
+例如 *.sjhz.tk绑定到 10.220.62.52
 
-多点签证
-
-```bash
-$ acme.sh --issue --dns dns_dp -d test1.sjhz.tk -d test2.sjhz.tk
-```
-
-泛域名签证
+然后，可以使用泛域名签证
 
 ```bash
 $ acme.sh --issue --dns dns_dp -d *.sjhz.tk
 ```
+
+## 使用证书
 
 查看证书
 
@@ -130,7 +156,7 @@ server {
 }
 ```
 
-为Nginx安装
+为Nginx安装单域名
 
 ```bash
 $ acme.sh --install-cert -d test.sjhz.tk \
@@ -138,8 +164,6 @@ $ acme.sh --install-cert -d test.sjhz.tk \
   --fullchain-file /etc/nginx/ssl/fullchain.cer \
   --reloadcmd     "service nginx force-reload"
 ```
-
-
 
 为Nginx安装泛域名
 
