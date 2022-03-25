@@ -72,6 +72,43 @@ nohup /opt/image-syncer --proc=6 --retries=3 --auth=/opt/auth.yaml --images=/opt
 
 
 
+## 同步请求举例
+
+### Prometheus
+
+```yaml
+quay.io/prometheus-operator/prometheus-operator: docker.io/sjwayrhz/prometheus-operator
+quay.io/prometheus/alertmanager: docker.io/sjwayrhz/alertmanager
+quay.io/prometheus/node-exporter: docker.io/sjwayrhz/node-exporter
+quay.io/prometheus/prometheus: docker.io/sjwayrhz/prometheus
+quay.io/prometheus/blackbox-exporter: docker.io/sjwayrhz/blackbox-exporter
+quay.io/brancz/kube-rbac-proxy: docker.io/sjwayrhz/kube-rbac-proxy
+jimmidyson/configmap-reload: docker.io/sjwayrhz/configmap-reload
+grafana/grafana: docker.io/sjwayrhz/grafana
+k8s.gcr.io/kube-state-metrics/kube-state-metrics: docker.io/sjwayrhz/kube-state-metrics
+k8s.gcr.io/prometheus-adapter/prometheus-adapter: docker.io/sjwayrhz/prometheus-adapter
+quay.io/prometheus-operator/prometheus-config-reloader: docker.io/sjwayrhz/prometheus-config-reloader
+```
+
+### ingress-nginx
+
+```yaml
+k8s.gcr.io/ingress-nginx/controller: docker.io/sjwayrhz/controller
+k8s.gcr.io/ingress-nginx/kube-webhook-certgen: docker.io/sjwayrhz/kube-webhook-certgen
+```
+
+### kubernetes
+
+```yaml
+k8s.gcr.io/kube-apiserver: docker.io/sjwayrhz/kube-apiserver
+k8s.gcr.io/kube-controller-manager: docker.io/sjwayrhz/kube-controller-manager
+k8s.gcr.io/kube-scheduler: docker.io/sjwayrhz/kube-scheduler
+k8s.gcr.io/kube-proxy: docker.io/sjwayrhz/kube-proxy
+k8s.gcr.io/pause: docker.io/sjwayrhz/pause
+k8s.gcr.io/etcd: docker.io/sjwayrhz/etcd
+k8s.gcr.io/coredns/coredns: docker.io/sjwayrhz/coredns
+```
+
 
 
 
