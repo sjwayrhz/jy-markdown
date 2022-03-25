@@ -1,3 +1,15 @@
+### github registry
+
+```json
+{
+	"auths": {
+		"ghcr.io": {
+			"auth": "c2p3YXlyaHo6Z2hwX083WW41ZE52VDE0bkJPVFRnb1RGTkttR1ppejFJaDE2U245Sw=="
+		}
+	}
+}
+```
+
 ### 阿里云镜像仓库
 
 采用自己的邮箱号taoistmonk@163.com注册的阿里云账号，绑定了i@sjhz.cf邮箱，申请了阿里云镜像仓库，地址为
