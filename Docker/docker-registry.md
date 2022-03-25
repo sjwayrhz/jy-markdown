@@ -35,11 +35,52 @@ $ docker run -d \
 
 ```bash
 $ docker run -d \
-	--name registry \
-	--restart=always \
-  -p 5000:5000 \
-  -v /var/lib/registry:/var/lib/registry \  
-  registry:2.8.2
+    --name registry \
+    --restart=always \
+    -p 5000:5000 \
+    -v /var/lib/registry:/var/lib/registry \
+    registry:2.8.1
+```
+
+配置文件如下
+
+```nginx
+upstream docker_registry  {
+    server 10.220.62.15:5000;
+}
+
+## START docker.sjhz.tk ##
+server {
+    server_name docker.sjhz.tk;
+
+    listen 80;
+    listen 443 ssl;
+
+    ssl_certificate /etc/nginx/ssl/docker.sjhz.tk_bundle.crt;
+    ssl_certificate_key /etc/nginx/ssl/docker.sjhz.tk.key;
+
+
+    root        /usr/local/nginx/html;
+    index       index.html;
+
+    # allow 114.114.114.114;
+    # deny all;
+
+
+    client_max_body_size 0;
+    chunked_transfer_encoding on;
+
+   location / {
+        proxy_pass  http://docker_registry;
+        proxy_next_upstream error timeout invalid_header http_500 http_502 http_503 http_504;
+        proxy_redirect off;
+        proxy_buffering off;
+        proxy_set_header        Host            $host;
+        proxy_set_header        X-Real-IP       $remote_addr;
+        proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+}
+## END docker.sjhz.tk  ##
 ```
 
 
