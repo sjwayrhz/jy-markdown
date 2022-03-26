@@ -21,6 +21,8 @@ https://github.com/AliyunContainerService/image-syncer/blob/master/README-zh_CN.
 ```
 quay.io 		-> 	sjwayrhz / Vwv56ty7
 docker.io		->  sjwayrhz / 1qaz2wsx#
+gchr.io			->	sjwayrhz / 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
+registry.cn-shanghai.aliyuncs.com -> taoistmonk@163.com	/ Vwv56ty7
 ```
 
 ### image-syncer
@@ -38,11 +40,16 @@ tee /opt/auth.yaml <<- 'EOF'
 docker.io:
   username: sjwayrhz
   password: 1qaz2wsx#
-  insecure: true
 quay.io:
   username: sjwayrhz
   password: Vwv56ty7
   insecure: true
+gchr.io:
+  username: sjwayrhz
+  password: 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
+registry.cn-shanghai.aliyuncs.com:
+  username: taoistmonk@163.com
+  password: Vwv56ty7
 EOF
 ```
 

@@ -1,3 +1,27 @@
+### 合集
+
+```json
+$ cat .docker/config.json
+{
+	"auths": {
+		"ghcr.io": {
+			"auth": "c2p3YXlyaHo6Z2hwX083WW41ZE52VDE0bkJPVFRnb1RGTkttR1ppejFJaDE2U245Sw=="
+		},
+		"https://index.docker.io/v1/": {
+			"auth": "c2p3YXlyaHo6MXFhejJ3c3gj"
+		},
+		"quay.io": {
+			"auth": "c2p3YXlyaHo6Vnd2NTZ0eTc="
+		},
+		"registry.cn-shanghai.aliyuncs.com": {
+			"auth": "aGkzMDMxNjMxNkBhbGl5dW4uY29tOlZ3djU2dHk3"
+		}
+	}
+}
+```
+
+
+
 ### github registry
 
 ```json
