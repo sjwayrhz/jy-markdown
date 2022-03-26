@@ -392,7 +392,7 @@ $ ansible k8s -m shell -a "wget -O- https://gitee.com/sjwayrhz/one_key_install/r
 如果已经是模版rocky linux了，仅需在ansible虚拟机中执行如下命令安装1.21.10版本运行时
 
 ```bash
-$ ansible k8s -m shell -a "wget -O- https://gitee.com/sjwayrhz/one_key_install/raw/master/install_containerd.sh | bash -s 1.21.10"
+$ ansible k8s -m shell -a "wget -O- https://gitee.com/sjwayrhz/one_key_install/raw/master/install_containerd_1.5.sh | bash -s 1.21.10"
 ```
 
 ## 安装kubernetes
@@ -529,7 +529,7 @@ $ source ~/.bashrc
 登录 k8s-master-02, 安装containerd
 
 ```bash
-$ wget -O- https://gitee.com/sjwayrhz/one_key_install/raw/master/install_containerd.sh | bash -s 1.21.10
+$ wget -O- https://gitee.com/sjwayrhz/one_key_install/raw/master/install_containerd_1.5.sh | bash -s 1.21.10
 ```
 
 安装containerd之后，替换10年证书的kubeadm

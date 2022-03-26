@@ -382,7 +382,7 @@ $ dnf install keepalived haproxy -y
    使用如下命令安装
 
    ```bash
-   $ wget -O- https://gitee.com/sjwayrhz/one_key_install/raw/master/install_containerd.sh | bash -s 1.21.11
+   $ wget -O- https://gitee.com/sjwayrhz/one_key_install/raw/master/install_containerd_1.5.sh | bash -s 1.21.11
    ```
 
    用这个kubeadm替换master系统目录下的 /usr/bin/kubeadm
@@ -499,7 +499,7 @@ $ dnf install keepalived haproxy -y
 登录 k8s-master-02, 安装containerd
 
 ```bash
-$ wget -O- https://gitee.com/sjwayrhz/one_key_install/raw/master/install_containerd.sh | bash -s 1.21.11
+$ wget -O- https://gitee.com/sjwayrhz/one_key_install/raw/master/install_containerd_1.5.sh | bash -s 1.21.11
 ```
 
 安装containerd之后，替换10年证书的kubeadm

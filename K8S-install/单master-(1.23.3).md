@@ -107,7 +107,7 @@ $ ansible all -m shell -a "wget -O- https://gitee.com/sjwayrhz/one_key_install/r
 $ ansible cb23 -m shell -a "modprobe br_netfilter"
 $ ansible cb23 -m shell -a "echo 1 > /proc/sys/net/bridge/bridge-nf-call-iptables"
 
-$ ansible cb23 -m shell -a "wget -O- https://gitee.com/sjwayrhz/one_key_install/raw/master/install_containerd.sh | bash -s 1.23.3"
+$ ansible cb23 -m shell -a "wget -O- https://gitee.com/sjwayrhz/one_key_install/raw/master/install_containerd_1.5.sh | bash -s 1.23.3"
 ```
 
 ## 安装kubernetes

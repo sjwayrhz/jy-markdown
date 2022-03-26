@@ -142,7 +142,7 @@ $ ansible all -m shell -a "wget -O- https://gitee.com/sjwayrhz/one_key_install/r
 $ ansible all -m shell -a "modprobe br_netfilter"
 $ ansible all -m shell -a "echo 1 > /proc/sys/net/bridge/bridge-nf-call-iptables"
 
-$ ansible all -m shell -a "wget -O- https://gitee.com/sjwayrhz/one_key_install/raw/master/install_containerd.sh | bash -s 1.21.8"
+$ ansible all -m shell -a "wget -O- https://gitee.com/sjwayrhz/one_key_install/raw/master/install_containerd_1.5.sh | bash -s 1.21.8"
 ```
 
 ## 安装kubernetes
@@ -279,7 +279,7 @@ $ source ~/.bashrc
 登录 devops-master-02, 安装containerd
 
 ```bash
-$ wget -O- https://gitee.com/sjwayrhz/one_key_install/raw/master/install_containerd.sh | bash -s 1.21.8
+$ wget -O- https://gitee.com/sjwayrhz/one_key_install/raw/master/install_containerd_1.5.sh | bash -s 1.21.8
 ```
 
 安装containerd之后，替换10年证书的kubeadm
