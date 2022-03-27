@@ -376,7 +376,7 @@ $ dnf install keepalived haproxy -y
  Linux初始化
 
    ```bash
-   $ wget -O- https://gitee.com/sjwayrhz/one_key_install/raw/master/rocky_linux_8.5_init.sh | sh
+   $ sh -c "$(curl -fsSL https://gitee.com/sjwayrhz/one_key_install/raw/master/rocky_linux_8.5_init.sh)"
    ```
 
    使用如下命令安装
