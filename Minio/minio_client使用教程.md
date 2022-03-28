@@ -12,14 +12,14 @@ http://docs.minio.org.cn/docs/master/minio-client-complete-guide
 
 下载之后要赋予mc可执行权限
 ```
-$ wget -P /usr/local/bin http://dl.minio.org.cn/client/mc/release/linux-amd64/mc
+$ wget -P /usr/local/bin https://dl.min.io/client/mc/release/linux-amd64/mc
 $ chmod +x /usr/local/bin/mc
 $ mc -h
 ```
 
 ### (Microsoft Windows)
 ```
-http://dl.minio.org.cn/client/mc/release/windows-amd64/mc.exe
+https://dl.min.io/client/mc/release/windows-amd64/mc.exe
 ```
 需要将mc.exe加入到环境变量，或者放到`C:\WINDOWS\System32\`目录下
 
